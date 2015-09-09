@@ -74,6 +74,15 @@ public class UI extends JFrame implements ActionListener {
 	            _mapGrids[x][y].setBackground(Color.ORANGE);
 	            _mapGrids[x][y].addActionListener(this);
 	            map.add(_mapGrids[x][y]); 
+	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+	            	_mapGrids[x][y].setEnabled(false);
+	            	_mapGrids[x][y].setBackground(Color.GREEN);
+	            	if (x == 1 & y == 13) {
+	            		_mapGrids[x][y].setText("G");
+	            	} else if (x == 18 && y == 1) {
+	            		_mapGrids[x][y].setText("S");
+	            	}
+	            }
 			}
 		}
 		_mapPane.add(map);
