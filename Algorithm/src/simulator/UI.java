@@ -266,6 +266,7 @@ public class UI extends JFrame implements ActionListener {
 	public void setStatus(String message) {
 		_status.setText(message);
 	}
+	
 
 	/*
 	 * Add document listener to dynamically show robot position.
@@ -279,17 +280,9 @@ public class UI extends JFrame implements ActionListener {
             		int index = position.indexOf(",");
         			int x = Integer.parseInt(position.substring(0, index));
         			int y = Integer.parseInt(position.substring(index + 1));
-        			if (x < 2 || x > 14 || y < 2 || y > 9) {
-        				_status.setText("warning: robot position out of range");
-        			} else {
-	        			for (int i = x-1; i <= x+1; i++) {
-	        				for (int j = y-1; j <= y+1; j++) {
-	                			_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
-	        				}
-	        			}
-	        			_status.setText("robot position set");
-        			}
+        			InitRobotInMaze (_mazeGrids, x, y);
             	} else {
+            		initMaze(_mazeGrids);
             		_status.setText("robot position not set");
             	}
         	} catch (BadLocationException ex) {
@@ -305,25 +298,9 @@ public class UI extends JFrame implements ActionListener {
             		int index = position.indexOf(",");
         			int x = Integer.parseInt(position.substring(0, index));
         			int y = Integer.parseInt(position.substring(index + 1));
-        			if (x < 2 || x > 14 || y < 2 || y > 9) {
-        				_status.setText("warning: robot position out of range");
-        			} else {
-	        			for (int i = x-1; i <= x+1; i++) {
-	        				for (int j = y-1; j <= y+1; j++) {
-	                			_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
-	        				}
-	        			}
-	        			_status.setText("robot position set");
-        			}
+        			InitRobotInMaze (_mazeGrids, x, y);
             	} else {
-            		for (int x = 0; x < MAP_WIDTH; x++) {
-            			for (int y = 0; y < MAP_LENGTH; y++) {
-            	            _mazeGrids[x][y].setBackground(Color.BLACK);
-            	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
-            	            	_mazeGrids[x][y].setBackground(Color.ORANGE);
-            	            }
-            			}
-            		}
+            		initMaze(_mazeGrids);
             		_status.setText("robot position not set");
             	}
         	} catch (BadLocationException ex) {
@@ -333,5 +310,36 @@ public class UI extends JFrame implements ActionListener {
         public void changedUpdate(DocumentEvent e) {
         	
         }
+        
+    	private void initMaze(JButton[][] mazeGrids) {
+    		for (int x = 0; x < MAP_WIDTH; x++) {
+    			for (int y = 0; y < MAP_LENGTH; y++) {
+    	            mazeGrids[x][y].setBackground(Color.BLACK);
+    	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+    	            	mazeGrids[x][y].setBackground(Color.ORANGE);
+    	            }
+    			}
+    		}
+    	}
+    	
+    	private void InitRobotInMaze (JButton[][] mazeGrids, int x, int y) {
+    		if (x < 2 || x > 14 || y < 2 || y > 9) {
+				_status.setText("warning: robot position out of range");
+				initMaze(_mazeGrids);
+			} else {
+    			for (int i = x-1; i <= x+1; i++) {
+    				for (int j = y-1; j <= y+1; j++) {
+    					if (i == x && j == y+1) {
+    						_mazeGrids[20-j][i-1].setBackground(Color.PINK);
+    					} else {
+    						_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
+    					}
+    				}
+    			}
+    			_status.setText("robot position set");
+			}
+    	}
+    	
+    	
     }
 }
