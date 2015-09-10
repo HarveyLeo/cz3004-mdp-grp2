@@ -58,7 +58,7 @@ public class UI extends JFrame implements ActionListener {
 	private void initContentPane(JPanel contentPane) {
 		
 		/*
-		 * Add left panel: the real map and three control buttons (load/export/clear).
+		 * Add left panel: the reference map and two control buttons (load/clear).
 		 */
 		_mapPane = new JPanel(new FlowLayout());
 		_mapPane.setPreferredSize(new Dimension(450, 650));
@@ -69,7 +69,7 @@ public class UI extends JFrame implements ActionListener {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 			for (int y = 0; y < MAP_LENGTH; y++) {
 				_mapGrids[x][y] = new JButton();
-				_mapGrids[x][y].setActionCommand("SetObstacleAt " + x + "," + y);
+				_mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
 	            _mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
 	            _mapGrids[x][y].setBackground(Color.ORANGE);
 	            _mapGrids[x][y].addActionListener(this);
@@ -89,20 +89,18 @@ public class UI extends JFrame implements ActionListener {
 		JButton loadMap = new JButton("Load");
 		loadMap.setActionCommand("LoadMap");
 		loadMap.addActionListener(this);
-		JButton exportMap = new JButton("Export");
-		exportMap.setActionCommand("ExportMap");
-		exportMap.addActionListener(this);
 		JButton clearMap = new JButton("Clear");
 		clearMap.setActionCommand("ClearMap");
 		clearMap.addActionListener(this);
 		_mapPane.add(loadMap);
-		_mapPane.add(exportMap);
 		_mapPane.add(clearMap);
 		contentPane.add(_mapPane,BorderLayout.WEST);
 		
-		//Add control panel to the interface.
+		/*
+		 * Add middle panel: the explore/fastest path control panel.
+		 */
 		
-		//Add control switch
+		//Add control switch (combo box).
 		_ctrlPane = new JPanel(new BorderLayout());
 		_ctrlPane.setBorder(new EmptyBorder(50, 20, 20, 20));
 		String comboBoxItems[] = { EXPLORE_PANEL, FFP_PANEL };
@@ -113,12 +111,10 @@ public class UI extends JFrame implements ActionListener {
 		cbCtrlSwitch.setActionCommand("SwitchCtrl");
 		_ctrlPane.add(cbCtrlSwitch, BorderLayout.NORTH);
 		
-		//Create control panel for exploring.
+		//Add control panel for exploring.
 		JLabel[] exploreCtrlLabels = new JLabel[4];
 	    JTextField[] exploreCtrlTextFields = new JTextField[4];
 	    JButton exploreBtn = new JButton("Explore");
-	    exploreBtn.setFont(new Font("Tahoma", Font.PLAIN, 15));
-	    exploreBtn.setBackground(SystemColor.inactiveCaption);
 	    exploreCtrlLabels[0] = new JLabel("Robot initial position: ");
 	    exploreCtrlLabels[1] = new JLabel("Speed (steps/sec): ");
 	    exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
@@ -126,7 +122,7 @@ public class UI extends JFrame implements ActionListener {
 	    for (int i = 0; i < 4; i++) {
 	    	exploreCtrlTextFields[i] = new JTextField(10);
         }
-
+	    
 	    JPanel exploreCtrlPane = new JPanel(new GridBagLayout());
 		GridBagConstraints exploreGridConstraints = new GridBagConstraints();
 		exploreGridConstraints.weighty = 0.25;
@@ -241,26 +237,19 @@ public class UI extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
 		Controller controller = Controller.getInstance();
-		if (cmd.matches("SetObstacleAt [0-9]+,[0-9]+")) {
+		if (cmd.matches("ToggleObstacleAt [0-9]+,[0-9]+")) {
 			int index = cmd.indexOf(",");
-			int x = Integer.parseInt(cmd.substring(14, index));
+			int x = Integer.parseInt(cmd.substring(17, index));
 			int y = Integer.parseInt(cmd.substring(index + 1));
-			if (_mapGrids[x][y].getBackground() == Color.ORANGE) {
-				_mapGrids[x][y].setBackground(Color.BLACK);
-			} else {
-				_mapGrids[x][y].setBackground(Color.ORANGE);
-			}
+			controller.toggleObstacle (_mapGrids, x, y);
 		} else if (cmd.equals("SwitchCtrl")) {
 			JComboBox cb = (JComboBox) e.getSource();
 			JPanel cardPanel = (JPanel) _ctrlPane.getComponent(1);
-			CardLayout cardLayout = (CardLayout) (cardPanel.getLayout());
-			cardLayout.show(cardPanel, (String) cb.getSelectedItem());
+			controller.switchComboBox(cb, cardPanel);
 		} else if (cmd.equals("LoadMap")) {
 			controller.loadMap();
-		} else if (cmd.equals("ExportMap")) {
-			controller.exportMap();
 		} else if (cmd.equals("ClearMap")) {
-			controller.clearMap();
+			controller.clearMap(_mapGrids);
 		}
 	}
 	
