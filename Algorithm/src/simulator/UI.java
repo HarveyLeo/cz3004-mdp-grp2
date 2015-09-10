@@ -35,6 +35,7 @@ public class UI extends JFrame implements ActionListener {
 	private JPanel _mapPane;
 	private JPanel _ctrlPane;
 	private JPanel _mazePane;
+	private JLabel _status;
 	private JButton[][] _mapGrids;
 	private JButton[][] _mazeGrids;
 
@@ -191,8 +192,8 @@ public class UI extends JFrame implements ActionListener {
 	    JPanel statusConsole = new JPanel();
 	    statusConsole.setBackground(Color.LIGHT_GRAY);
 	    statusConsole.setPreferredSize(new Dimension(280, 100));
-	    JLabel status = new JLabel("waiting for commands...");
-	    statusConsole.add(status);
+	    _status = new JLabel("waiting for commands...");
+	    statusConsole.add(_status);
 	    statusPane.add(statusConsole, BorderLayout.CENTER);
 	    _ctrlPane.add(statusPane, BorderLayout.SOUTH);
 	    
@@ -234,11 +235,14 @@ public class UI extends JFrame implements ActionListener {
 			JPanel cardPanel = (JPanel) _ctrlPane.getComponent(1);
 			controller.switchComboBox(cb, cardPanel);
 		} else if (cmd.equals("LoadMap")) {
-			controller.loadMap();
+			controller.loadMap(_mapGrids);
 		} else if (cmd.equals("ClearMap")) {
 			controller.clearMap(_mapGrids);
 		}
 	}
 	
+	public void setStatus(String message) {
+		_status.setText(message);
+	}
 
 }

@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 
 public class Controller {
 	private static Controller _instance;
-	protected UI _ui;
+	private UI _ui;
+	private Boolean[][] _layout;
 	
 	private Controller() {
 		_ui = new UI();
@@ -39,9 +40,18 @@ public class Controller {
 		cardLayout.show(cardPanel, (String) cb.getSelectedItem());
 	}
 	
-	public void loadMap() {
-		//TODO implement method
-		System.out.println("loading map...");
+	public void loadMap(JButton[][] mapGrids) {
+		_layout = new Boolean[UI.MAP_WIDTH][UI.MAP_LENGTH];
+		for (int x = 0; x < UI.MAP_WIDTH; x++) {
+			for (int y = 0; y < UI.MAP_LENGTH; y++) {
+				if (mapGrids[x][y].getBackground() == Color.RED) {
+					_layout[x][y] = true;
+				} else {
+					_layout[x][y] = false;
+				}
+			}
+		}
+		_ui.setStatus("finished map loading");
 	}
 	
 	public void clearMap(JButton[][] mapGrids) {
@@ -52,5 +62,6 @@ public class Controller {
 				}
 			}
 		}
+		_ui.setStatus("finished map clearing");
 	}
 }
