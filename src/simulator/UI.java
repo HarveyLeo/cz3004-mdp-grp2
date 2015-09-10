@@ -102,7 +102,7 @@ public class UI extends JFrame implements ActionListener {
 		
 		//Add control switch (combo box).
 		_ctrlPane = new JPanel(new BorderLayout());
-		_ctrlPane.setBorder(new EmptyBorder(50, 20, 20, 20));
+		_ctrlPane.setBorder(new EmptyBorder(50, 20, 50, 20));
 		String comboBoxItems[] = { EXPLORE_PANEL, FFP_PANEL };
 		JComboBox cbCtrlSwitch = new JComboBox(comboBoxItems);
 		cbCtrlSwitch.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -123,103 +123,89 @@ public class UI extends JFrame implements ActionListener {
 	    	exploreCtrlTextFields[i] = new JTextField(10);
         }
 	    
-	    JPanel exploreCtrlPane = new JPanel(new GridBagLayout());
-		GridBagConstraints exploreGridConstraints = new GridBagConstraints();
-		exploreGridConstraints.weighty = 0.25;
-		exploreGridConstraints.anchor = GridBagConstraints.LINE_END;
-		exploreGridConstraints.gridx = 0;
-		exploreGridConstraints.gridy = 0;
-	    exploreCtrlPane.add(exploreCtrlLabels[0], exploreGridConstraints);
+	    JPanel exploreInputPane = new JPanel(new GridLayout(4, 2));
+	    exploreInputPane.add(exploreCtrlLabels[0]);
 	    exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    exploreGridConstraints.gridx = 0;
-	    exploreGridConstraints.gridy = 1;
-		exploreCtrlPane.add(exploreCtrlLabels[1], exploreGridConstraints);
-		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreGridConstraints.gridx = 0;
-		exploreGridConstraints.gridy = 2;
-		exploreCtrlPane.add(exploreCtrlLabels[2], exploreGridConstraints);
-		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreGridConstraints.gridx = 0;
-		exploreGridConstraints.gridy = 3;
-		exploreCtrlPane.add(exploreCtrlLabels[3], exploreGridConstraints);
-		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
-		exploreGridConstraints.anchor = GridBagConstraints.LINE_START;
-		exploreGridConstraints.gridx = 1;
-		exploreGridConstraints.gridy = 0;
-	    exploreCtrlPane.add(exploreCtrlTextFields[0], exploreGridConstraints);
+	    exploreInputPane.add(exploreCtrlTextFields[0]);
 	    exploreCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    exploreGridConstraints.gridx = 1;
-	    exploreGridConstraints.gridy = 1;
-		exploreCtrlPane.add(exploreCtrlTextFields[1], exploreGridConstraints);
+		exploreInputPane.add(exploreCtrlLabels[1]);
+		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		exploreInputPane.add(exploreCtrlTextFields[1]);
 		exploreCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreGridConstraints.gridx = 1;
-		exploreGridConstraints.gridy = 2;
-		exploreCtrlPane.add(exploreCtrlTextFields[2], exploreGridConstraints);
+		exploreInputPane.add(exploreCtrlLabels[2]);
+		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		exploreInputPane.add(exploreCtrlTextFields[2]);
 		exploreCtrlTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreGridConstraints.gridx = 1;
-		exploreGridConstraints.gridy = 3;
-		exploreCtrlPane.add(exploreCtrlTextFields[3], exploreGridConstraints);
+		exploreInputPane.add(exploreCtrlLabels[3]);
+		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		exploreInputPane.add(exploreCtrlTextFields[3]);
 		exploreCtrlTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
-		exploreGridConstraints.weighty = 3;
-		exploreGridConstraints.gridwidth = 2;
-		exploreGridConstraints.gridx = 0;
-		exploreGridConstraints.gridy = 4;
-		exploreGridConstraints.anchor = GridBagConstraints.CENTER;
-		exploreCtrlPane.add(exploreBtn, exploreGridConstraints);
+
+		JPanel exploreBtnPane = new JPanel();
+		exploreBtnPane.add(exploreBtn);
+
+		JPanel exploreCtrlPane = new JPanel();
+		exploreCtrlPane.add(exploreInputPane);
+		exploreCtrlPane.add(exploreBtnPane);
 		exploreCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
-	    
-	    //Create control panel for finding fastest path.
-	    JLabel[] ffpCtrlLabels = new JLabel[2];
+
+		//Add control panel for finding fastest path.
+		JLabel[] ffpCtrlLabels = new JLabel[2];
 	    JTextField[] ffpCtrlTextFields = new JTextField[2];
-	    JButton ffpBtn = new JButton("Find");
-	    ffpBtn.setFont(new Font("Tahoma", Font.PLAIN, 15));
-	    ffpBtn.setBackground(SystemColor.inactiveCaption);
+	    JButton ffpBtn = new JButton("Navigate");
 	    ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 	    ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 	    for (int i = 0; i < 2; i++) {
 	    	ffpCtrlTextFields[i] = new JTextField(10);
         }
-	    JPanel ffpCtrlPane = new JPanel(new GridBagLayout());
-	    GridBagConstraints ffpGridConstraints = new GridBagConstraints();
-	    ffpGridConstraints.weighty = 0.1;
-		ffpGridConstraints.anchor = GridBagConstraints.LINE_END;
-		ffpGridConstraints.gridx = 0;
-		ffpGridConstraints.gridy = 0;
-	    ffpCtrlPane.add(ffpCtrlLabels[0], ffpGridConstraints);
-	    ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    ffpGridConstraints.gridx = 0;
-	    ffpGridConstraints.gridy = 1;
-		ffpCtrlPane.add(ffpCtrlLabels[1], ffpGridConstraints);
-		ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		ffpGridConstraints.anchor = GridBagConstraints.LINE_START;
-		ffpGridConstraints.gridx = 1;
-		ffpGridConstraints.gridy = 0;
-	    ffpCtrlPane.add(ffpCtrlTextFields[0], ffpGridConstraints);
-	    ffpCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-	    ffpGridConstraints.gridx = 1;
-	    ffpGridConstraints.gridy = 1;
-		ffpCtrlPane.add(ffpCtrlTextFields[1], ffpGridConstraints);
-		ffpCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		ffpGridConstraints.weighty = 1.4;
-		ffpGridConstraints.gridwidth = 2;
-		ffpGridConstraints.gridx = 0;
-		ffpGridConstraints.gridy = 4;
-		ffpGridConstraints.anchor = GridBagConstraints.CENTER;
-		ffpCtrlPane.add(ffpBtn, ffpGridConstraints);
-		ffpCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
 	    
+	    JPanel ffpInputPane = new JPanel(new GridLayout(2, 2));
+	    ffpInputPane.add(ffpCtrlLabels[0]);
+	    ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    ffpInputPane.add(ffpCtrlTextFields[0]);
+	    ffpCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    ffpInputPane.add(ffpCtrlLabels[1]);
+	    ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    ffpInputPane.add(ffpCtrlTextFields[1]);
+	    ffpCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JPanel ffpBtnPane = new JPanel();
+		ffpBtnPane.add(ffpBtn);
+
+		JPanel ffpCtrlPane = new JPanel();
+		ffpCtrlPane.add(ffpInputPane);
+		ffpCtrlPane.add(ffpBtnPane);
+		ffpCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+		//Add card panel to switch between explore and shortest path panels.
 		JPanel cardPane = new JPanel(new CardLayout());
 	    cardPane.add(exploreCtrlPane, EXPLORE_PANEL);
 	    cardPane.add(ffpCtrlPane, FFP_PANEL);
+	    cardPane.setPreferredSize(new Dimension(280, 300));
 	    _ctrlPane.add(cardPane, BorderLayout.CENTER);
+	    
+	    //Add status panel.
+	    JPanel statusPane = new JPanel(new BorderLayout());
+	    JLabel statusLabel = new JLabel("Status Console:");
+	    statusPane.add(statusLabel, BorderLayout.NORTH);
+	    JPanel statusConsole = new JPanel();
+	    statusConsole.setBackground(Color.LIGHT_GRAY);
+	    statusConsole.setPreferredSize(new Dimension(280, 100));
+	    JLabel status = new JLabel("waiting for commands...");
+	    statusConsole.add(status);
+	    statusPane.add(statusConsole, BorderLayout.CENTER);
+	    _ctrlPane.add(statusPane, BorderLayout.SOUTH);
+	    
 		contentPane.add(_ctrlPane, BorderLayout.CENTER); 
 		
-		//Add maze panel to the interface.
-		_mazePane = new JPanel();
-		_mazePane.setLayout(new GridLayout(MAP_WIDTH, MAP_LENGTH));
-		_mazePane.setPreferredSize(new Dimension(450, 600));
+		/*
+		 * Add right panel: the maze panel.
+		 */
+		_mazePane = new JPanel(new FlowLayout());
+		_mazePane.setPreferredSize(new Dimension(450, 650));
+		JPanel maze = new JPanel();
+		maze.setLayout(new GridLayout(MAP_WIDTH, MAP_LENGTH));
+		maze.setPreferredSize(new Dimension(450, 600));
 		_mazeGrids = new JButton[MAP_WIDTH][MAP_LENGTH];
 		for (int x = 0; x < MAP_WIDTH; x++) {
 			for (int y = 0; y < MAP_LENGTH; y++) {
@@ -227,9 +213,10 @@ public class UI extends JFrame implements ActionListener {
 				_mazeGrids[x][y].setEnabled(false);
 	            _mazeGrids[x][y].setBorder(BorderFactory.createEtchedBorder());
 	            _mazeGrids[x][y].setBackground(Color.BLACK);
-	            _mazePane.add(_mazeGrids[x][y]); 
+	            maze.add(_mazeGrids[x][y]); 
 			}
 		}
+		_mazePane.add(maze);
 		contentPane.add(_mazePane,BorderLayout.EAST);
 	}
 	
