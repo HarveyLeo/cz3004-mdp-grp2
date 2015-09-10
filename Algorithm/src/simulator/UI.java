@@ -13,7 +13,14 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
+
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -129,6 +136,7 @@ public class UI extends JFrame implements ActionListener {
 	    exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 	    exploreInputPane.add(exploreCtrlTextFields[0]);
 	    exploreCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    exploreCtrlTextFields[0].getDocument().addDocumentListener(new InitPositionListener());
 		exploreInputPane.add(exploreCtrlLabels[1]);
 		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(exploreCtrlTextFields[1]);
@@ -213,8 +221,22 @@ public class UI extends JFrame implements ActionListener {
 				_mazeGrids[x][y] = new JButton();
 				_mazeGrids[x][y].setEnabled(false);
 	            _mazeGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
+	            if (x == 10) {
+	            	_mazeGrids[x][y].setBorder(new CompoundBorder(
+	            		    BorderFactory.createMatteBorder(3, 0, 0, 0, Color.BLUE), 
+	            		    BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY)));
+	            }
 	            _mazeGrids[x][y].setBackground(Color.BLACK);
 	            maze.add(_mazeGrids[x][y]); 
+	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+	            	_mazeGrids[x][y].setEnabled(false);
+	            	_mazeGrids[x][y].setBackground(Color.ORANGE);
+	            	if (x == 1 & y == 13) {
+	            		_mazeGrids[x][y].setText("G");
+	            	} else if (x == 18 && y == 1) {
+	            		_mazeGrids[x][y].setText("S");
+	            	}
+	            }
 			}
 		}
 		_mazePane.add(maze);
@@ -238,11 +260,78 @@ public class UI extends JFrame implements ActionListener {
 			controller.loadMap(_mapGrids);
 		} else if (cmd.equals("ClearMap")) {
 			controller.clearMap(_mapGrids);
-		}
+		} 
 	}
 	
 	public void setStatus(String message) {
 		_status.setText(message);
 	}
 
+	/*
+	 * Add document listener to dynamically show robot position.
+	 */
+    class InitPositionListener implements DocumentListener {
+        public void insertUpdate(DocumentEvent e) {
+        	Document doc = (Document)e.getDocument();
+        	try {
+        		String position = doc.getText(0, doc.getLength());
+            	if (position.matches("[0-9]+,[0-9]+")) {
+            		int index = position.indexOf(",");
+        			int x = Integer.parseInt(position.substring(0, index));
+        			int y = Integer.parseInt(position.substring(index + 1));
+        			if (x < 2 || x > 14 || y < 2 || y > 9) {
+        				_status.setText("warning: robot position out of range");
+        			} else {
+	        			for (int i = x-1; i <= x+1; i++) {
+	        				for (int j = y-1; j <= y+1; j++) {
+	                			_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
+	        				}
+	        			}
+	        			_status.setText("robot position set");
+        			}
+            	} else {
+            		_status.setText("robot position not set");
+            	}
+        	} catch (BadLocationException ex) {
+        		ex.printStackTrace();
+        	}
+
+        }
+        public void removeUpdate(DocumentEvent e) {
+        	Document doc = (Document)e.getDocument();
+        	try {
+        		String position = doc.getText(0, doc.getLength());
+            	if (position.matches("[0-9]+,[0-9]+")) {
+            		int index = position.indexOf(",");
+        			int x = Integer.parseInt(position.substring(0, index));
+        			int y = Integer.parseInt(position.substring(index + 1));
+        			if (x < 2 || x > 14 || y < 2 || y > 9) {
+        				_status.setText("warning: robot position out of range");
+        			} else {
+	        			for (int i = x-1; i <= x+1; i++) {
+	        				for (int j = y-1; j <= y+1; j++) {
+	                			_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
+	        				}
+	        			}
+	        			_status.setText("robot position set");
+        			}
+            	} else {
+            		for (int x = 0; x < MAP_WIDTH; x++) {
+            			for (int y = 0; y < MAP_LENGTH; y++) {
+            	            _mazeGrids[x][y].setBackground(Color.BLACK);
+            	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+            	            	_mazeGrids[x][y].setBackground(Color.ORANGE);
+            	            }
+            			}
+            		}
+            		_status.setText("robot position not set");
+            	}
+        	} catch (BadLocationException ex) {
+        		ex.printStackTrace();
+        	}
+        }
+        public void changedUpdate(DocumentEvent e) {
+        	
+        }
+    }
 }
