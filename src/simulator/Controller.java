@@ -27,10 +27,10 @@ public class Controller {
 	}
 	
 	public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
-		if (mapGrids[x][y].getBackground() == Color.ORANGE) {
-			mapGrids[x][y].setBackground(Color.BLACK);
+		if (mapGrids[x][y].getBackground() == Color.GREEN) {
+			mapGrids[x][y].setBackground(Color.RED);
 		} else {
-			mapGrids[x][y].setBackground(Color.ORANGE);
+			mapGrids[x][y].setBackground(Color.GREEN);
 		}
 	}
 	
@@ -47,8 +47,8 @@ public class Controller {
 	public void clearMap(JButton[][] mapGrids) {
 		for (int x = 0; x < UI.MAP_WIDTH; x++) {
 			for (int y = 0; y < UI.MAP_LENGTH; y++) {
-				if (mapGrids[x][y].getBackground() == Color.BLACK) {
-					mapGrids[x][y].setBackground(Color.ORANGE);
+				if (mapGrids[x][y].getBackground() == Color.RED) {
+					mapGrids[x][y].setBackground(Color.GREEN);
 				}
 			}
 		}

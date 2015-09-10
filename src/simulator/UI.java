@@ -58,7 +58,7 @@ public class UI extends JFrame implements ActionListener {
 	private void initContentPane(JPanel contentPane) {
 		
 		/*
-		 * Add left panel: the reference map and two control buttons (load/clear).
+		 * Add right panel: the reference map and two control buttons (load/clear).
 		 */
 		_mapPane = new JPanel(new FlowLayout());
 		_mapPane.setPreferredSize(new Dimension(450, 650));
@@ -71,12 +71,12 @@ public class UI extends JFrame implements ActionListener {
 				_mapGrids[x][y] = new JButton();
 				_mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
 	            _mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
-	            _mapGrids[x][y].setBackground(Color.ORANGE);
+	            _mapGrids[x][y].setBackground(Color.GREEN);
 	            _mapGrids[x][y].addActionListener(this);
 	            map.add(_mapGrids[x][y]); 
 	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
 	            	_mapGrids[x][y].setEnabled(false);
-	            	_mapGrids[x][y].setBackground(Color.GREEN);
+	            	_mapGrids[x][y].setBackground(Color.ORANGE);
 	            	if (x == 1 & y == 13) {
 	            		_mapGrids[x][y].setText("G");
 	            	} else if (x == 18 && y == 1) {
@@ -94,7 +94,7 @@ public class UI extends JFrame implements ActionListener {
 		clearMap.addActionListener(this);
 		_mapPane.add(loadMap);
 		_mapPane.add(clearMap);
-		contentPane.add(_mapPane,BorderLayout.WEST);
+		contentPane.add(_mapPane,BorderLayout.EAST);
 		
 		/*
 		 * Add middle panel: the explore/fastest path control panel.
@@ -199,7 +199,7 @@ public class UI extends JFrame implements ActionListener {
 		contentPane.add(_ctrlPane, BorderLayout.CENTER); 
 		
 		/*
-		 * Add right panel: the maze panel.
+		 * Add left panel: the maze panel.
 		 */
 		_mazePane = new JPanel(new FlowLayout());
 		_mazePane.setPreferredSize(new Dimension(450, 650));
@@ -211,13 +211,13 @@ public class UI extends JFrame implements ActionListener {
 			for (int y = 0; y < MAP_LENGTH; y++) {
 				_mazeGrids[x][y] = new JButton();
 				_mazeGrids[x][y].setEnabled(false);
-	            _mazeGrids[x][y].setBorder(BorderFactory.createEtchedBorder());
+	            _mazeGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
 	            _mazeGrids[x][y].setBackground(Color.BLACK);
 	            maze.add(_mazeGrids[x][y]); 
 			}
 		}
 		_mazePane.add(maze);
-		contentPane.add(_mazePane,BorderLayout.EAST);
+		contentPane.add(_mazePane,BorderLayout.WEST);
 	}
 	
 	@Override
