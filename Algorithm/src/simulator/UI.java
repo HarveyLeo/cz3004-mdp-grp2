@@ -22,13 +22,9 @@ import javax.swing.text.Document;
 
 
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 
 import javax.swing.JTextField;
 import java.awt.FlowLayout;
-import java.awt.SystemColor;
-
 
 
 public class UI extends JFrame implements ActionListener {
@@ -45,7 +41,8 @@ public class UI extends JFrame implements ActionListener {
 	private JLabel _status;
 	private JButton[][] _mapGrids;
 	private JButton[][] _mazeGrids;
-
+	private int[] _robotPosition = new int[2];
+	private int _speed;
 
 
 	/**
@@ -123,6 +120,8 @@ public class UI extends JFrame implements ActionListener {
 		JLabel[] exploreCtrlLabels = new JLabel[4];
 	    JTextField[] exploreCtrlTextFields = new JTextField[4];
 	    JButton exploreBtn = new JButton("Explore");
+		exploreBtn.setActionCommand("ExploreMaze");
+		exploreBtn.addActionListener(this);
 	    exploreCtrlLabels[0] = new JLabel("Robot initial position: ");
 	    exploreCtrlLabels[1] = new JLabel("Speed (steps/sec): ");
 	    exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
@@ -137,19 +136,26 @@ public class UI extends JFrame implements ActionListener {
 	    exploreInputPane.add(exploreCtrlTextFields[0]);
 	    exploreCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 	    exploreCtrlTextFields[0].getDocument().addDocumentListener(new InitPositionListener());
+	    exploreCtrlTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
 		exploreInputPane.add(exploreCtrlLabels[1]);
 		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(exploreCtrlTextFields[1]);
 		exploreCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		exploreCtrlTextFields[1].getDocument().addDocumentListener(new InitPositionListener());
+		exploreCtrlTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
 		exploreInputPane.add(exploreCtrlLabels[2]);
 		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(exploreCtrlTextFields[2]);
 		exploreCtrlTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		exploreCtrlTextFields[2].getDocument().addDocumentListener(new InitPositionListener());
+		exploreCtrlTextFields[2].getDocument().putProperty("name", "Target Coverage");
 		exploreInputPane.add(exploreCtrlLabels[3]);
 		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(exploreCtrlTextFields[3]);
 		exploreCtrlTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-
+		exploreCtrlTextFields[3].getDocument().addDocumentListener(new InitPositionListener());
+		exploreCtrlTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
+		
 		JPanel exploreBtnPane = new JPanel();
 		exploreBtnPane.add(exploreBtn);
 
@@ -260,35 +266,51 @@ public class UI extends JFrame implements ActionListener {
 			controller.loadMap(_mapGrids);
 		} else if (cmd.equals("ClearMap")) {
 			controller.clearMap(_mapGrids);
-		} 
+		} else if (cmd.equals("ExploreMaze")) {
+			//TODO call exploreMaze()
+		}
 	}
 	
 	public void setStatus(String message) {
 		_status.setText(message);
 	}
-	
 
 	/*
-	 * Add document listener to dynamically show robot position.
+	 * Add a document listener class to dynamically show robot position.
 	 */
+	//TODO change removeUpdate and insertUpdate
     class InitPositionListener implements DocumentListener {
         public void insertUpdate(DocumentEvent e) {
         	Document doc = (Document)e.getDocument();
-        	try {
-        		String position = doc.getText(0, doc.getLength());
-            	if (position.matches("[0-9]+,[0-9]+")) {
-            		int index = position.indexOf(",");
-        			int x = Integer.parseInt(position.substring(0, index));
-        			int y = Integer.parseInt(position.substring(index + 1));
-        			InitRobotInMaze (_mazeGrids, x, y);
-            	} else {
-            		initMaze(_mazeGrids);
-            		_status.setText("robot position not set");
-            	}
-        	} catch (BadLocationException ex) {
-        		ex.printStackTrace();
+        	String name = (String)doc.getProperty("name");
+        	if (name.equals("Robot Initial Position")) {
+	        	try {	
+	        		String position = doc.getText(0, doc.getLength());
+	                if (position.matches("[0-9]+,[0-9]+")) {
+	                	int index = position.indexOf(",");
+	            		int x = Integer.parseInt(position.substring(0, index));
+	            		int y = Integer.parseInt(position.substring(index + 1));
+	            		InitRobotInMaze (_mazeGrids, x, y);
+	                } else {
+	                	initMaze(_mazeGrids);
+	                	_status.setText("robot position not set");
+	                }	
+	        	} catch (BadLocationException ex) {
+	        		ex.printStackTrace();
+	        	}
+        	} else if (name.equals("Robot Explore Speed")) {
+        		try {	
+	        		String speed = doc.getText(0, doc.getLength());
+	                if (speed.matches("[0-9]+")) {
+	            		_speed = Integer.parseInt(speed);
+	            		_status.setText("robot speed set");
+	                } else {
+	                	_status.setText("robot speed not set");
+	                }	
+	        	} catch (BadLocationException ex) {
+	        		ex.printStackTrace();
+	        	}
         	}
-
         }
         public void removeUpdate(DocumentEvent e) {
         	Document doc = (Document)e.getDocument();
@@ -332,10 +354,12 @@ public class UI extends JFrame implements ActionListener {
     					if (i == x && j == y+1) {
     						_mazeGrids[20-j][i-1].setBackground(Color.PINK);
     					} else {
-    						_mazeGrids[20-j][i-1].setBackground(Color.GREEN);
+    						_mazeGrids[20-j][i-1].setBackground(Color.CYAN);
     					}
     				}
     			}
+    			_robotPosition[0] = x;
+    			_robotPosition[1] = y;
     			_status.setText("robot position set");
 			}
     	}

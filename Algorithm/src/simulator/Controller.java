@@ -13,7 +13,6 @@ public class Controller {
 	
 	private Controller() {
 		_ui = new UI();
-		
 	}
 
 	public static Controller getInstance() {
