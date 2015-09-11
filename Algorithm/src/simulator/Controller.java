@@ -6,7 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
-import algorithms.ExploreMaze;
+import algorithms.MazeExplorer;
 import simulator.arena.Arena;
 
 
@@ -75,8 +75,8 @@ public class Controller {
 					}
 				}
 			}
-			_robotPosition[0] = x;
-			_robotPosition[1] = y;
+			_robotPosition[0] = x - 1;
+			_robotPosition[1] = y - 1;
 			_ui.setStatus("robot initial position set");
 		}
 	}
@@ -113,10 +113,11 @@ public class Controller {
 
 	public void exploreMaze() {
 		Arena arena = Arena.getInstance();
+		MazeExplorer explorer = MazeExplorer.getInstance();
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
-			ExploreMaze.explore(_robotPosition, _speed, _coverage, _timeLimit);
+			explorer.explore(_robotPosition, _speed, _coverage, _timeLimit);
 		}
 	}
 }

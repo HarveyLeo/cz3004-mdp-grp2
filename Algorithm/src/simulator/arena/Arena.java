@@ -4,8 +4,8 @@ import java.awt.Color;
 
 import javax.swing.JButton;
 
-import simulator.Controller;
-import simulator.UI;
+import datatypes.Orientation;
+
 
 
 public class Arena {
@@ -17,6 +17,7 @@ public class Arena {
 	private Boolean[][] _layout;
 	
 	private Arena() {
+		
 	}
 	
 	public static Arena getInstance() {
@@ -41,6 +42,49 @@ public class Arena {
 				}
 			}
 		}
-		
+	}
+	
+	public int getNumOfClearGrids (int[] sensorPosition, Orientation sensorOrientation) {
+		int numOfClearGrids = 0;
+		switch (sensorOrientation) {
+			case NORTH:
+				for (int y = sensorPosition[1] + 1; y < Arena.MAP_WIDTH; y++) {
+					if (_layout[sensorPosition[0]][y] == false) {
+						numOfClearGrids++;
+					} else {
+						break;
+					}
+				}
+				break;
+			case SOUTH:
+				for (int y = sensorPosition[1] - 1; y >= 0; y--) {
+					if (_layout[sensorPosition[0]][y] == false) {
+						numOfClearGrids++;
+					} else {
+						break;
+					}
+				}
+				break;
+			case EAST:
+				for (int x = sensorPosition[0] + 1; x < Arena.MAP_LENGTH; x++) {
+					if (_layout[x][sensorPosition[1]] == false) {
+						numOfClearGrids++;
+					} else {
+						break;
+					}
+				}
+				break;
+			case WEST:
+				for (int x = sensorPosition[0] - 1; x >= 0; x--) {
+					if (_layout[x][sensorPosition[1]] == false) {
+						numOfClearGrids++;
+					} else {
+						break;
+					}
+				}
+		}
+		//testing
+		System.out.println("Sensor " + sensorPosition[0] + " " + sensorPosition[1] + ": " + numOfClearGrids);
+		return numOfClearGrids;
 	}
 }
