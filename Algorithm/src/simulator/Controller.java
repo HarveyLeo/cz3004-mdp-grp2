@@ -82,7 +82,7 @@ public class Controller {
 			}
 			_robotPosition[0] = x;
 			_robotPosition[1] = y;
-			_ui.setStatus("robot position set");
+			_ui.setStatus("robot initial position set");
 		}
 	}
 	
@@ -109,6 +109,6 @@ public class Controller {
 	
 	public void setExploreTimeLimit(int limit) {
 		_timeLimit = limit;
-		_ui.setStatus("time limit for exploring set");
+		_ui.setStatus("exploring time limit set");
 	}
 }

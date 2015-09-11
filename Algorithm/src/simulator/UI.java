@@ -305,7 +305,7 @@ public class UI extends JFrame implements ActionListener {
 	            		_controller.InitRobotInMaze (_mazeGrids, x, y);
 	                } else {
 	                	_controller.initMaze(_mazeGrids);
-	                	_status.setText("robot position not set");
+	                	_status.setText("robot initial position not set");
 	                }	
 	        	} catch (BadLocationException ex) {
 	        		ex.printStackTrace();
@@ -338,7 +338,7 @@ public class UI extends JFrame implements ActionListener {
 	                if (timeLimit.matches("[0-9]+")) {
 	            		_controller.setExploreTimeLimit(Integer.parseInt(timeLimit));
 	                } else {
-	                	_status.setText("time limit not set");
+	                	_status.setText("exploring time limit not set");
 	                }	
 	        	} catch (BadLocationException ex) {
 	        		ex.printStackTrace();
