@@ -6,6 +6,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import algorithms.ExploreMaze;
+
 public class Controller {
 	private static Controller _instance;
 	private UI _ui;
@@ -41,14 +43,15 @@ public class Controller {
 		cardLayout.show(cardPanel, (String) cb.getSelectedItem());
 	}
 
+	//TODO refine loadMap
 	public void loadMap(JButton[][] mapGrids) {
-		_layout = new Boolean[UI.MAP_WIDTH][UI.MAP_LENGTH];
+		_layout = new Boolean[UI.MAP_LENGTH][UI.MAP_WIDTH];
 		for (int x = 0; x < UI.MAP_WIDTH; x++) {
 			for (int y = 0; y < UI.MAP_LENGTH; y++) {
 				if (mapGrids[x][y].getBackground() == Color.RED) {
-					_layout[x][y] = true;
+					_layout[y][19-x] = true;
 				} else {
-					_layout[x][y] = false;
+					_layout[y][19-x] = false;
 				}
 			}
 		}
@@ -117,7 +120,6 @@ public class Controller {
 	}
 
 	public void exploreMaze() {
-		// TODO implement
-
+		ExploreMaze.explore(_robotPosition, _speed, _coverage, _timeLimit);
 	}
 }
