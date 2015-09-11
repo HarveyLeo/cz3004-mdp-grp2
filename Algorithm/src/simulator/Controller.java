@@ -10,6 +10,8 @@ public class Controller {
 	private static Controller _instance;
 	private UI _ui;
 	private Boolean[][] _layout;
+	private int[] _robotPosition = new int[2];
+	private int _speed, _coverage, _timeLimit;
 	
 	private Controller() {
 		_ui = new UI();
@@ -62,5 +64,51 @@ public class Controller {
 			}
 		}
 		_ui.setStatus("finished map clearing");
+	}
+	
+	public void InitRobotInMaze (JButton[][] mazeGrids, int x, int y) {
+		if (x < 2 || x > 14 || y < 2 || y > 9) {
+			_ui.setStatus("warning: robot position out of range");
+			initMaze(mazeGrids);
+		} else {
+			for (int i = x-1; i <= x+1; i++) {
+				for (int j = y-1; j <= y+1; j++) {
+					if (i == x && j == y+1) {
+						mazeGrids[20-j][i-1].setBackground(Color.PINK);
+					} else {
+						mazeGrids[20-j][i-1].setBackground(Color.CYAN);
+					}
+				}
+			}
+			_robotPosition[0] = x;
+			_robotPosition[1] = y;
+			_ui.setStatus("robot position set");
+		}
+	}
+	
+	public void initMaze(JButton[][] mazeGrids) {
+		for (int x = 0; x < UI.MAP_WIDTH; x++) {
+			for (int y = 0; y < UI.MAP_LENGTH; y++) {
+	            mazeGrids[x][y].setBackground(Color.BLACK);
+	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+	            	mazeGrids[x][y].setBackground(Color.ORANGE);
+	            }
+			}
+		}
+	}
+	
+	public void setExploreSpeed(int speed) {
+		_speed = speed;
+		_ui.setStatus("robot speed set");
+	}
+	
+	public void setCoverage(int coverage) {
+		_coverage = coverage;
+		_ui.setStatus("target coverage set");
+	}
+	
+	public void setExploreTimeLimit(int limit) {
+		_timeLimit = limit;
+		_ui.setStatus("time limit for exploring set");
 	}
 }

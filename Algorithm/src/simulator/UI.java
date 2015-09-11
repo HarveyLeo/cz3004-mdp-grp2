@@ -41,8 +41,7 @@ public class UI extends JFrame implements ActionListener {
 	private JLabel _status;
 	private JButton[][] _mapGrids;
 	private JButton[][] _mazeGrids;
-	private int[] _robotPosition = new int[2];
-	private int _speed;
+	private Controller _controller;
 
 
 	/**
@@ -252,20 +251,20 @@ public class UI extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-		Controller controller = Controller.getInstance();
+		_controller = Controller.getInstance();
 		if (cmd.matches("ToggleObstacleAt [0-9]+,[0-9]+")) {
 			int index = cmd.indexOf(",");
 			int x = Integer.parseInt(cmd.substring(17, index));
 			int y = Integer.parseInt(cmd.substring(index + 1));
-			controller.toggleObstacle (_mapGrids, x, y);
+			_controller.toggleObstacle (_mapGrids, x, y);
 		} else if (cmd.equals("SwitchCtrl")) {
 			JComboBox cb = (JComboBox) e.getSource();
 			JPanel cardPanel = (JPanel) _ctrlPane.getComponent(1);
-			controller.switchComboBox(cb, cardPanel);
+			_controller.switchComboBox(cb, cardPanel);
 		} else if (cmd.equals("LoadMap")) {
-			controller.loadMap(_mapGrids);
+			_controller.loadMap(_mapGrids);
 		} else if (cmd.equals("ClearMap")) {
-			controller.clearMap(_mapGrids);
+			_controller.clearMap(_mapGrids);
 		} else if (cmd.equals("ExploreMaze")) {
 			//TODO call exploreMaze()
 		}
@@ -281,6 +280,19 @@ public class UI extends JFrame implements ActionListener {
 	//TODO change removeUpdate and insertUpdate
     class InitPositionListener implements DocumentListener {
         public void insertUpdate(DocumentEvent e) {
+        	update(e);
+        }
+        
+       
+        public void removeUpdate(DocumentEvent e) {
+        	update(e);
+        }
+        public void changedUpdate(DocumentEvent e) {
+        	
+        }
+        
+        private void update(DocumentEvent e) {
+        	_controller = Controller.getInstance();
         	Document doc = (Document)e.getDocument();
         	String name = (String)doc.getProperty("name");
         	if (name.equals("Robot Initial Position")) {
@@ -290,9 +302,9 @@ public class UI extends JFrame implements ActionListener {
 	                	int index = position.indexOf(",");
 	            		int x = Integer.parseInt(position.substring(0, index));
 	            		int y = Integer.parseInt(position.substring(index + 1));
-	            		InitRobotInMaze (_mazeGrids, x, y);
+	            		_controller.InitRobotInMaze (_mazeGrids, x, y);
 	                } else {
-	                	initMaze(_mazeGrids);
+	                	_controller.initMaze(_mazeGrids);
 	                	_status.setText("robot position not set");
 	                }	
 	        	} catch (BadLocationException ex) {
@@ -302,68 +314,37 @@ public class UI extends JFrame implements ActionListener {
         		try {	
 	        		String speed = doc.getText(0, doc.getLength());
 	                if (speed.matches("[0-9]+")) {
-	            		_speed = Integer.parseInt(speed);
-	            		_status.setText("robot speed set");
+	            		_controller.setExploreSpeed(Integer.parseInt(speed));
 	                } else {
 	                	_status.setText("robot speed not set");
 	                }	
 	        	} catch (BadLocationException ex) {
 	        		ex.printStackTrace();
 	        	}
+        	} else if (name.equals("Target Coverage")) {
+        		try {	
+	        		String coverage = doc.getText(0, doc.getLength());
+	                if (coverage.matches("[0-9]+")) {
+	            		_controller.setCoverage(Integer.parseInt(coverage));
+	                } else {
+	                	_status.setText("target coverage not set");
+	                }	
+	        	} catch (BadLocationException ex) {
+	        		ex.printStackTrace();
+	        	}
+        	} else if (name.equals("Robot Explore Time Limit")) {
+        		try {	
+	        		String timeLimit = doc.getText(0, doc.getLength());
+	                if (timeLimit.matches("[0-9]+")) {
+	            		_controller.setExploreTimeLimit(Integer.parseInt(timeLimit));
+	                } else {
+	                	_status.setText("time limit not set");
+	                }	
+	        	} catch (BadLocationException ex) {
+	        		ex.printStackTrace();
+	        	}
         	}
         }
-        public void removeUpdate(DocumentEvent e) {
-        	Document doc = (Document)e.getDocument();
-        	try {
-        		String position = doc.getText(0, doc.getLength());
-            	if (position.matches("[0-9]+,[0-9]+")) {
-            		int index = position.indexOf(",");
-        			int x = Integer.parseInt(position.substring(0, index));
-        			int y = Integer.parseInt(position.substring(index + 1));
-        			InitRobotInMaze (_mazeGrids, x, y);
-            	} else {
-            		initMaze(_mazeGrids);
-            		_status.setText("robot position not set");
-            	}
-        	} catch (BadLocationException ex) {
-        		ex.printStackTrace();
-        	}
-        }
-        public void changedUpdate(DocumentEvent e) {
-        	
-        }
-        
-    	private void initMaze(JButton[][] mazeGrids) {
-    		for (int x = 0; x < MAP_WIDTH; x++) {
-    			for (int y = 0; y < MAP_LENGTH; y++) {
-    	            mazeGrids[x][y].setBackground(Color.BLACK);
-    	            if ( (x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
-    	            	mazeGrids[x][y].setBackground(Color.ORANGE);
-    	            }
-    			}
-    		}
-    	}
-    	
-    	private void InitRobotInMaze (JButton[][] mazeGrids, int x, int y) {
-    		if (x < 2 || x > 14 || y < 2 || y > 9) {
-				_status.setText("warning: robot position out of range");
-				initMaze(_mazeGrids);
-			} else {
-    			for (int i = x-1; i <= x+1; i++) {
-    				for (int j = y-1; j <= y+1; j++) {
-    					if (i == x && j == y+1) {
-    						_mazeGrids[20-j][i-1].setBackground(Color.PINK);
-    					} else {
-    						_mazeGrids[20-j][i-1].setBackground(Color.CYAN);
-    					}
-    				}
-    			}
-    			_robotPosition[0] = x;
-    			_robotPosition[1] = y;
-    			_status.setText("robot position set");
-			}
-    	}
-    	
-    	
+
     }
 }
