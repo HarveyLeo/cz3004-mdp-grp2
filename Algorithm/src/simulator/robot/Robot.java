@@ -13,5 +13,28 @@ public class Robot {
 		_rightShort.setRange(1, 5);
 	}
 	
+	public int senseFront() {
+		//TODO implement
+		return 0;
+	}
 	
+	public int senseFrontLeft() {
+		//TODO implement
+		return 0;
+	}
+	
+	public int senseFrontRight() {
+		//TODO implement
+		return 0;
+	}
+	
+	public int senseLeft() {
+		//TODO implement
+		return 0;
+	}
+	
+	public int senseRight() {
+		//TODO implement
+		return 0;
+	}
 }

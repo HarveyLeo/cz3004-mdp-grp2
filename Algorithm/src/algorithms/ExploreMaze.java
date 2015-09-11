@@ -1,31 +1,29 @@
 package algorithms;
 
 import simulator.UI;
+import simulator.arena.Arena;
 import simulator.robot.Robot;
 
 public class ExploreMaze {
 
-	private Robot _robot;
-	private static Boolean[][] _isExplored;
+	private static Robot _robot;
+	private static Boolean[][] _isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 	
 	public static void explore(int[] robotPosition, int speed, int coverage, int timeLimit) {
-		initIsExplored(robotPosition);
-		// TODO Auto-generated method stub
+		for (int i = robotPosition[0] - 1; i < robotPosition[0] + 1; i++) {
+			for (int j = robotPosition[1] - 1; j < robotPosition[1] + 1; j++) {
+				_isExplored[i][j] = true;
+			}
+		}
+		setIsExplored(robotPosition);
 		if (robotPosition[0] <= 8) {
-	
+			
 			
 		}
 	}
 
-	private static void initIsExplored(int[] robotPosition) {
-		_isExplored = new Boolean[UI.MAP_LENGTH][UI.MAP_WIDTH];
-		for (int i = 0; i < 2; i++) {
-			for (int j=0; j <2;j++) {
-				_isExplored[i][j] = true;
-			}
-		}
-
-		
+	private static void setIsExplored(int[] robotPosition) {
+//		_robot.senseFront()
 	}
 	
 }

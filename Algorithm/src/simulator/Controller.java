@@ -7,11 +7,12 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import algorithms.ExploreMaze;
+import simulator.arena.Arena;
+
 
 public class Controller {
 	private static Controller _instance;
 	private UI _ui;
-	private Boolean[][] _layout;
 	private int[] _robotPosition = new int[2];
 	private int _speed, _coverage, _timeLimit;
 
@@ -43,24 +44,15 @@ public class Controller {
 		cardLayout.show(cardPanel, (String) cb.getSelectedItem());
 	}
 
-	//TODO refine loadMap
 	public void loadMap(JButton[][] mapGrids) {
-		_layout = new Boolean[UI.MAP_LENGTH][UI.MAP_WIDTH];
-		for (int x = 0; x < UI.MAP_WIDTH; x++) {
-			for (int y = 0; y < UI.MAP_LENGTH; y++) {
-				if (mapGrids[x][y].getBackground() == Color.RED) {
-					_layout[y][19-x] = true;
-				} else {
-					_layout[y][19-x] = false;
-				}
-			}
-		}
+		Arena arena = Arena.getInstance();
+		arena.setLayout(mapGrids);
 		_ui.setStatus("finished map loading");
 	}
 
 	public void clearMap(JButton[][] mapGrids) {
-		for (int x = 0; x < UI.MAP_WIDTH; x++) {
-			for (int y = 0; y < UI.MAP_LENGTH; y++) {
+		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
+			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				if (mapGrids[x][y].getBackground() == Color.RED) {
 					mapGrids[x][y].setBackground(Color.GREEN);
 				}
@@ -90,8 +82,8 @@ public class Controller {
 	}
 
 	public void initMaze(JButton[][] mazeGrids) {
-		for (int x = 0; x < UI.MAP_WIDTH; x++) {
-			for (int y = 0; y < UI.MAP_LENGTH; y++) {
+		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
+			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				mazeGrids[x][y].setBackground(Color.BLACK);
 				if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
 					mazeGrids[x][y].setBackground(Color.ORANGE);
@@ -120,6 +112,11 @@ public class Controller {
 	}
 
 	public void exploreMaze() {
-		ExploreMaze.explore(_robotPosition, _speed, _coverage, _timeLimit);
+		Arena arena = Arena.getInstance();
+		if (arena.getLayout() == null) {
+			_ui.setStatus("warning: no layout loaded yet");
+		} else {
+			ExploreMaze.explore(_robotPosition, _speed, _coverage, _timeLimit);
+		}
 	}
 }

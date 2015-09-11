@@ -21,6 +21,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import simulator.arena.Arena;
+
 import java.awt.Font;
 
 import javax.swing.JTextField;
@@ -28,8 +30,6 @@ import java.awt.FlowLayout;
 
 public class UI extends JFrame implements ActionListener {
 
-	public static final int MAP_WIDTH = 20;
-	public static final int MAP_LENGTH = 15;
 	private static final String EXPLORE_PANEL = "Explore arena";
 	private static final String FFP_PANEL = "Find fastest path";
 	private static final long serialVersionUID = 1L;
@@ -66,11 +66,11 @@ public class UI extends JFrame implements ActionListener {
 		_mapPane = new JPanel(new FlowLayout());
 		_mapPane.setPreferredSize(new Dimension(450, 650));
 		JPanel map = new JPanel();
-		map.setLayout(new GridLayout(MAP_WIDTH, MAP_LENGTH));
+		map.setLayout(new GridLayout(Arena.MAP_WIDTH, Arena.MAP_LENGTH));
 		map.setPreferredSize(new Dimension(450, 600));
-		_mapGrids = new JButton[MAP_WIDTH][MAP_LENGTH];
-		for (int x = 0; x < MAP_WIDTH; x++) {
-			for (int y = 0; y < MAP_LENGTH; y++) {
+		_mapGrids = new JButton[Arena.MAP_WIDTH][Arena.MAP_LENGTH];
+		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
+			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				_mapGrids[x][y] = new JButton();
 				_mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
 				_mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -217,11 +217,11 @@ public class UI extends JFrame implements ActionListener {
 		_mazePane = new JPanel(new FlowLayout());
 		_mazePane.setPreferredSize(new Dimension(450, 650));
 		JPanel maze = new JPanel();
-		maze.setLayout(new GridLayout(MAP_WIDTH, MAP_LENGTH));
+		maze.setLayout(new GridLayout(Arena.MAP_WIDTH, Arena.MAP_LENGTH));
 		maze.setPreferredSize(new Dimension(450, 600));
-		_mazeGrids = new JButton[MAP_WIDTH][MAP_LENGTH];
-		for (int x = 0; x < MAP_WIDTH; x++) {
-			for (int y = 0; y < MAP_LENGTH; y++) {
+		_mazeGrids = new JButton[Arena.MAP_WIDTH][Arena.MAP_LENGTH];
+		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
+			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				_mazeGrids[x][y] = new JButton();
 				_mazeGrids[x][y].setEnabled(false);
 				_mazeGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
