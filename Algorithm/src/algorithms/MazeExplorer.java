@@ -1,7 +1,6 @@
 package algorithms;
 
 import datatypes.Orientation;
-import simulator.UI;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 import simulator.robot.Sensor;
@@ -36,15 +35,6 @@ public class MazeExplorer {
 			}
 		}
 		setIsExplored(robotPosition);
-		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
-			for (int j = 0; j <Arena.MAP_WIDTH; j++) {
-				if (_isExplored[i][j]) {
-					System.out.print("[" + i + "][" + j + "]" + " ");
-				}
-			}
-		}
-		
-
 	}
 
 	private void setIsExplored(int[] robotPosition) {
@@ -55,7 +45,7 @@ public class MazeExplorer {
 		int[] rightSensorPosition = new int[2];
 		int numOfClearGrids;
 		Orientation ori = _robot.getOrientation();
-		
+
 		switch (ori) {
 		case NORTH:
 			frontSensorPosition[0] = robotPosition[0];
@@ -68,8 +58,7 @@ public class MazeExplorer {
 			leftSensorPosition[1] = robotPosition[1] + 1;
 			rightSensorPosition[0] = robotPosition[0] + 1;
 			rightSensorPosition[1] = robotPosition[1] + 1;
-			//testing
-			System.out.println(frontSensorPosition[0] + " " + frontSensorPosition[1]);
+			
 			numOfClearGrids = _robot.senseFront(frontSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0]][robotPosition[1] + 1 + i] = true;
@@ -80,11 +69,6 @@ public class MazeExplorer {
 			numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] + 1 + i] = true;
-				//Testing
-				System.out.print(i + ": ");
-				System.out.print(robotPosition[0] - 1);
-				System.out.print(" ");
-				System.out.println(robotPosition[1] + 1 + i);
 			}
 			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_WIDTH) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] + numOfClearGrids + 2] = true;
@@ -122,6 +106,7 @@ public class MazeExplorer {
 			leftSensorPosition[1] = robotPosition[1] - 1;
 			rightSensorPosition[0] = robotPosition[0] - 1;
 			rightSensorPosition[1] = robotPosition[1] - 1;
+			
 			numOfClearGrids = _robot.senseFront(frontSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0]][robotPosition[1] - 1 - i] = true;
@@ -143,7 +128,6 @@ public class MazeExplorer {
 			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] - numOfClearGrids - 2] = true;
 			}
-			
 			numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1 + i][robotPosition[1] - 1] = true;
@@ -170,39 +154,40 @@ public class MazeExplorer {
 			leftSensorPosition[1] = robotPosition[1] + 1;
 			rightSensorPosition[0] = robotPosition[0] + 1;
 			rightSensorPosition[1] = robotPosition[1] - 1;
+			
 			numOfClearGrids = _robot.senseFront(frontSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1 + i][robotPosition[1]] = true;
 			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
-				_isExplored[robotPosition[1] + numOfClearGrids + 2][robotPosition[1]] = true;
+			if (numOfClearGrids < Sensor.LONG_RANGE && robotPosition[0] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
+				_isExplored[robotPosition[0] + numOfClearGrids + 2][robotPosition[1]] = true;
 			}
 			numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1 + i][robotPosition[1] + 1] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
 				_isExplored[robotPosition[0] + numOfClearGrids + 2][robotPosition[1] + 1] = true;
 			}
 			numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1 + i][robotPosition[1] - 1] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
 				_isExplored[robotPosition[0] + numOfClearGrids + 2][robotPosition[1] - 1] = true;
 			}
 			numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1][robotPosition[1] + 1 + i] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] + numOfClearGrids + 2 < Arena.MAP_WIDTH) {
-				_isExplored[robotPosition[0] + 1][robotPosition[0] + numOfClearGrids + 2] = true;
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_WIDTH) {
+				_isExplored[robotPosition[0] + 1][robotPosition[1] + numOfClearGrids + 2] = true;
 			}
 			numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] + 1][robotPosition[1] - 1 - i] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] - numOfClearGrids - 2 >= 0) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
 				_isExplored[robotPosition[0] + 1][robotPosition[1] - numOfClearGrids - 2] = true;
 			}
 			break;
@@ -217,39 +202,40 @@ public class MazeExplorer {
 			leftSensorPosition[1] = robotPosition[1] - 1;
 			rightSensorPosition[0] = robotPosition[0] - 1;
 			rightSensorPosition[1] = robotPosition[1] + 1;
+	
 			numOfClearGrids = _robot.senseFront(frontSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
-				_isExplored[robotPosition[0] - 1 - i][robotPosition[1]] = true;
+				_isExplored[robotPosition[0] - 1 - i][robotPosition[1]] = true;				
 			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
-				_isExplored[robotPosition[1] - numOfClearGrids - 2][robotPosition[1]] = true;
+			if (numOfClearGrids < Sensor.LONG_RANGE && robotPosition[0] - numOfClearGrids - 2 >= 0) {
+				_isExplored[robotPosition[0] - numOfClearGrids - 2][robotPosition[1]] = true;
 			}
 			numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] - 1 - i][robotPosition[1] - 1] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] - numOfClearGrids - 2 >= 0) {
 				_isExplored[robotPosition[0] - numOfClearGrids - 2][robotPosition[1] - 1] = true;
 			}
 			numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] - 1 - i][robotPosition[1] + 1] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] - numOfClearGrids - 2 >= 0) {
 				_isExplored[robotPosition[0] - numOfClearGrids - 2][robotPosition[1] + 1] = true;
 			}
 			numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] - 1 - i] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] - numOfClearGrids - 2 >= 0) {
-				_isExplored[robotPosition[0] - 1][robotPosition[0] - numOfClearGrids - 2] = true;
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] - numOfClearGrids - 2 >= 0) {
+				_isExplored[robotPosition[0] - 1][robotPosition[1] - numOfClearGrids - 2] = true;
 			}
 			numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			for (int i = 1; i <= numOfClearGrids; i++) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] + 1 + i] = true;
 			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[0] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
+			if (numOfClearGrids < Sensor.SHORT_RANGE && robotPosition[1] + numOfClearGrids + 2 < Arena.MAP_LENGTH) {
 				_isExplored[robotPosition[0] - 1][robotPosition[1] + numOfClearGrids + 2] = true;
 			}
 	}

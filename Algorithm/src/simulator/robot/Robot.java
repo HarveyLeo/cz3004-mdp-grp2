@@ -65,6 +65,7 @@ public class Robot {
 				break;
 			case WEST:
 				sensorOri = Orientation.SOUTH;
+				break;
 			default:
 				sensorOri = null;
 		}
@@ -91,6 +92,7 @@ public class Robot {
 				break;
 			case WEST:
 				sensorOri = Orientation.NORTH;
+				break;
 			default:
 				sensorOri = null;
 		}

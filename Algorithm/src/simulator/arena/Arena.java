@@ -83,8 +83,6 @@ public class Arena {
 					}
 				}
 		}
-		//testing
-		System.out.println("Sensor " + sensorPosition[0] + " " + sensorPosition[1] + ": " + numOfClearGrids);
 		return numOfClearGrids;
 	}
 }
