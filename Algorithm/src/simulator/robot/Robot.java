@@ -102,4 +102,14 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
+
+	public int[] turnRight() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void moveForward() {
+		// TODO Auto-generated method stub
+		
+	}
 }
