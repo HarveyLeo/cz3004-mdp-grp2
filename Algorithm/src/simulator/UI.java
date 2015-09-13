@@ -57,6 +57,15 @@ public class UI extends JFrame implements ActionListener {
 		pack();
 	}
 
+	public JButton[][] getMazeGrids() {
+		return _mazeGrids;
+	}
+	
+	public void setMazeGrids(JButton[][] mazeGrids) {
+		_mazeGrids = mazeGrids;
+	}
+	
+	
 	private void initContentPane(JPanel contentPane) {
 
 		/*

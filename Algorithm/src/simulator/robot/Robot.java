@@ -1,6 +1,7 @@
 package simulator.robot;
 
 import datatypes.Orientation;
+import simulator.Controller;
 import simulator.arena.Arena;
 
 public class Robot {
@@ -94,18 +95,19 @@ public class Robot {
 		return numOfClearGrids;
 	}
 
-	public int[] turnRight() {
-		// TODO Auto-generated method stub
-		return null;
+	public void turnRight() {
+		Controller controller = Controller.getInstance();
+		controller.turnRobotRight();
 	}
 
 	public void moveForward() {
-		// TODO Auto-generated method stub
+		Controller controller = Controller.getInstance();
+		controller.moveRobotForward();
 		
 	}
 
 	public void turnLeft() {
-		// TODO Auto-generated method stub
-		
+		Controller controller = Controller.getInstance();
+		controller.turnRobotLeft();
 	}
 }
