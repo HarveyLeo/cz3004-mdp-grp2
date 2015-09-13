@@ -14,7 +14,7 @@ public class MazeExplorer {
 	private static final int RIGHT_NO_ACCESS = -1;
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
-	private static final int[] GOAL = {18, 13};
+	private static final int[] GOAL = {13, 18};
 	private static final int[] START = {1, 1};
 	
 	private static MazeExplorer _instance;
@@ -62,6 +62,7 @@ public class MazeExplorer {
 		setIsExplored(robotPosition, _robotOrientation);
 		
 		exploreAlongWall (GOAL);
+		
 		exploreAlongWall (START);
 		
 //Testing module:
@@ -75,8 +76,15 @@ public class MazeExplorer {
 	}
 	
 	private void exploreAlongWall (int[] goalPos) {
-		
 		while (!isGoalPos(_robotPosition, goalPos)) {
+			//testing
+			if (isGoalPos(goalPos, START)) {
+				System.out.println("robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
+			}
+			if (_robotPosition[0]==11 && _robotPosition[1]==16) {
+				System.out.println("robot(11,16) right side status: " + checkRightSide(_robotPosition, _robotOrientation));
+			}
+			
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
@@ -92,6 +100,9 @@ public class MazeExplorer {
 						updateRobotOrientation(Movement.TURN_LEFT);
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
+					_robot.turnRight();
+					updateRobotOrientation(Movement.TURN_RIGHT);
+					setIsExplored(_robotPosition, _robotOrientation);
 					_robot.moveForward();
 					setIsExplored(_robotPosition, _robotOrientation);
 					updateRobotPositionAfterMF();

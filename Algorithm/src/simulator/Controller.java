@@ -153,10 +153,10 @@ public class Controller {
 
 	public void moveRobotForward() {
 		JButton[][] mazeGrids = _ui.getMazeGrids();
-		
+		//System.out.println("robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 		for (int i = 18 - _robotPosition[1]; i <= 20 - _robotPosition[1]; i++) {
 			for (int j = _robotPosition[0] - 1; j <= _robotPosition[0] + 1; j++) {
-				mazeGrids[i][j].setBackground(Color.CYAN);
+				mazeGrids[i][j].setBackground(Color.GREEN);
 			}
 		}
 		
@@ -171,7 +171,7 @@ public class Controller {
 						}
 					}
 				}
-				_robotPosition[1] = _robotPosition[1] - 1;
+				_robotPosition[1] = _robotPosition[1] + 1;
 				break;
 			case SOUTH:
 				for (int i = 19 - _robotPosition[1]; i <= 21 - _robotPosition[1]; i++) {
@@ -183,7 +183,7 @@ public class Controller {
 						}
 					}
 				}
-				_robotPosition[1] = _robotPosition[1] + 1;
+				_robotPosition[1] = _robotPosition[1] - 1;
 				break;
 			case EAST:
 				for (int i = 18 - _robotPosition[1]; i <= 20 - _robotPosition[1]; i++) {
