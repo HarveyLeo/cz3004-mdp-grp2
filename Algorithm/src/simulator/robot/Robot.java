@@ -7,7 +7,6 @@ public class Robot {
 	private Sensor _front;
 	private Sensor _frontleft, _frontright;
 	private Sensor _right, _left;
-	private Orientation _ori;
 	
 	public Robot() {
 		_front = new Sensor(Sensor.LONG_RANGE);
@@ -15,16 +14,8 @@ public class Robot {
 		_frontright = new Sensor(Sensor.SHORT_RANGE);
 		_left = new Sensor(Sensor.SHORT_RANGE);
 		_right = new Sensor(Sensor.SHORT_RANGE);
-		_ori = Orientation.NORTH;
 	}
 	
-	public Orientation getOrientation() {
-		return _ori;
-	}
-	
-	public void setOrientation(Orientation ori) {
-		_ori = ori;
-	}
 	
 	public int senseFront(int[] sensorPosition, Orientation robotOrientation) {
 		Arena arena = Arena.getInstance();
@@ -109,6 +100,11 @@ public class Robot {
 	}
 
 	public void moveForward() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void turnLeft() {
 		// TODO Auto-generated method stub
 		
 	}
