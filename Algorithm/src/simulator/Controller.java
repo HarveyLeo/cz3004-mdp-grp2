@@ -115,6 +115,7 @@ public class Controller {
 	}
 
 	public void exploreMaze() {
+		_ui.refreshInput();
 		Arena arena = Arena.getInstance();
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		if (arena.getLayout() == null) {

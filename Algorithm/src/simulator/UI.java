@@ -41,6 +41,7 @@ public class UI extends JFrame implements ActionListener {
 	private JButton[][] _mapGrids;
 	private JButton[][] _mazeGrids;
 	private Controller _controller;
+	private JTextField[] _exploreTextFields, _ffpTextFields;
 
 	/**
 	 * Create the simulator.
@@ -57,6 +58,10 @@ public class UI extends JFrame implements ActionListener {
 		pack();
 	}
 
+	public JPanel getContentPane() {
+		return _contentPane;
+	}
+	
 	public JButton[][] getMazeGrids() {
 		return _mazeGrids;
 	}
@@ -125,7 +130,7 @@ public class UI extends JFrame implements ActionListener {
 
 		// Add control panel for exploring.
 		JLabel[] exploreCtrlLabels = new JLabel[4];
-		JTextField[] exploreCtrlTextFields = new JTextField[4];
+		_exploreTextFields = new JTextField[4];
 		JButton exploreBtn = new JButton("Explore");
 		exploreBtn.setActionCommand("ExploreMaze");
 		exploreBtn.addActionListener(this);
@@ -134,34 +139,34 @@ public class UI extends JFrame implements ActionListener {
 		exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
 		exploreCtrlLabels[3] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 4; i++) {
-			exploreCtrlTextFields[i] = new JTextField(10);
+			_exploreTextFields[i] = new JTextField(10);
 		}
 
 		JPanel exploreInputPane = new JPanel(new GridLayout(4, 2));
 		exploreInputPane.add(exploreCtrlLabels[0]);
 		exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreInputPane.add(exploreCtrlTextFields[0]);
-		exploreCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreCtrlTextFields[0].getDocument().addDocumentListener(new InitPositionListener());
-		exploreCtrlTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
+		exploreInputPane.add(_exploreTextFields[0]);
+		_exploreTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_exploreTextFields[0].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
 		exploreInputPane.add(exploreCtrlLabels[1]);
 		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreInputPane.add(exploreCtrlTextFields[1]);
-		exploreCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreCtrlTextFields[1].getDocument().addDocumentListener(new InitPositionListener());
-		exploreCtrlTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
+		exploreInputPane.add(_exploreTextFields[1]);
+		_exploreTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_exploreTextFields[1].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
 		exploreInputPane.add(exploreCtrlLabels[2]);
 		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreInputPane.add(exploreCtrlTextFields[2]);
-		exploreCtrlTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreCtrlTextFields[2].getDocument().addDocumentListener(new InitPositionListener());
-		exploreCtrlTextFields[2].getDocument().putProperty("name", "Target Coverage");
+		exploreInputPane.add(_exploreTextFields[2]);
+		_exploreTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_exploreTextFields[2].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[2].getDocument().putProperty("name", "Target Coverage");
 		exploreInputPane.add(exploreCtrlLabels[3]);
 		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreInputPane.add(exploreCtrlTextFields[3]);
-		exploreCtrlTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		exploreCtrlTextFields[3].getDocument().addDocumentListener(new InitPositionListener());
-		exploreCtrlTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
+		exploreInputPane.add(_exploreTextFields[3]);
+		_exploreTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_exploreTextFields[3].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
 
 		JPanel exploreBtnPane = new JPanel();
 		exploreBtnPane.add(exploreBtn);
@@ -173,23 +178,23 @@ public class UI extends JFrame implements ActionListener {
 
 		// Add control panel for finding fastest path.
 		JLabel[] ffpCtrlLabels = new JLabel[2];
-		JTextField[] ffpCtrlTextFields = new JTextField[2];
+		JTextField[] _ffpTextFields = new JTextField[2];
 		JButton ffpBtn = new JButton("Navigate");
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 2; i++) {
-			ffpCtrlTextFields[i] = new JTextField(10);
+			_ffpTextFields[i] = new JTextField(10);
 		}
 
 		JPanel ffpInputPane = new JPanel(new GridLayout(2, 2));
 		ffpInputPane.add(ffpCtrlLabels[0]);
 		ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		ffpInputPane.add(ffpCtrlTextFields[0]);
-		ffpCtrlTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		ffpInputPane.add(_ffpTextFields[0]);
+		_ffpTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		ffpInputPane.add(ffpCtrlLabels[1]);
 		ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		ffpInputPane.add(ffpCtrlTextFields[1]);
-		ffpCtrlTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		ffpInputPane.add(_ffpTextFields[1]);
+		_ffpTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 
 		JPanel ffpBtnPane = new JPanel();
 		ffpBtnPane.add(ffpBtn);
@@ -353,5 +358,10 @@ public class UI extends JFrame implements ActionListener {
 			}
 		}
 
+	}
+
+	public void refreshInput() {
+		_exploreTextFields[0].setText(_exploreTextFields[0].getText());	
+//		_ffpTextFields[0].setText(_ffpTextFields[0].getText());	
 	}
 }

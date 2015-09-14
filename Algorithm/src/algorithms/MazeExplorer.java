@@ -25,6 +25,42 @@ public class MazeExplorer {
 	private Orientation _robotOrientation;
 	
 	private MazeExplorer() {
+		
+	}
+	
+	public int[][] getMazeRef() {
+		return _mazeRef;
+	}
+	
+    public static MazeExplorer getInstance() {
+        if (_instance == null) {
+            _instance = new MazeExplorer();
+        }
+        return _instance;
+    }
+    
+	public void explore(int[] robotPosition, int speed, int coverage, int timeLimit) {
+		
+		init();
+		
+		_robotPosition[0] = robotPosition[0];
+		_robotPosition[1] = robotPosition[1];
+		
+		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
+			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
+				_isExplored[i][j] = true;
+				_mazeRef[i][j] = IS_EMPTY;
+			}
+		}
+		
+		setIsExplored(robotPosition, _robotOrientation);
+
+		exploreAlongWall (GOAL);
+		exploreAlongWall (START);
+		
+	}
+
+	private void init() {
 		_robot = new Robot();
 		_robotPosition = new int[2];
 		_robotOrientation = Orientation.NORTH;
@@ -40,38 +76,6 @@ public class MazeExplorer {
 				_mazeRef[i][j] = UNEXPLORED;
 			}
 		}
-	}
-	
-	public int[][] getMazeRef() {
-		return _mazeRef;
-	}
-	
-	public static MazeExplorer getInstance() {
-		if (_instance == null) {
-			_instance = new MazeExplorer();
-		}
-		return _instance;
-	}
-	
-	public void explore(int[] robotPosition, int speed, int coverage, int timeLimit) {
-		
-		
-		_robotPosition[0] = robotPosition[0];
-		_robotPosition[1] = robotPosition[1];
-		
-		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
-			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
-				_isExplored[i][j] = true;
-				_mazeRef[i][j] = IS_EMPTY;
-			}
-		}
-		
-		setIsExplored(robotPosition, _robotOrientation);
-
-		exploreAlongWall (GOAL);
-		System.out.println("successsly goaled");
-		exploreAlongWall (START);
-		
 	}
 	
 	private void exploreAlongWall (int[] goalPos) {
