@@ -148,18 +148,12 @@ public class Controller {
 				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
 				_robotOrientation = Orientation.NORTH;
 		}
-		
+		updateMazeColor();
 	}
 
 	public void moveRobotForward() {
 		JButton[][] mazeGrids = _ui.getMazeGrids();
-		//System.out.println("robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
-		for (int i = 18 - _robotPosition[1]; i <= 20 - _robotPosition[1]; i++) {
-			for (int j = _robotPosition[0] - 1; j <= _robotPosition[0] + 1; j++) {
-				mazeGrids[i][j].setBackground(Color.GREEN);
-			}
-		}
-		
+
 		switch (_robotOrientation) {
 			case NORTH:
 				for (int i = 17 - _robotPosition[1]; i <= 19 - _robotPosition[1]; i++) {
@@ -209,6 +203,7 @@ public class Controller {
 				}
 				_robotPosition[0] = _robotPosition[0] - 1;
 		}
+		updateMazeColor();
 	}
 
 	public void turnRobotLeft() {
@@ -235,7 +230,33 @@ public class Controller {
 				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
 				_robotOrientation = Orientation.SOUTH;
 		}
-		
-		
+		updateMazeColor();
+	}
+	
+	private void updateMazeColor() {
+		JButton[][] mazeGrids = _ui.getMazeGrids();
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		int[][] mazeRef = explorer.getMazeRef();
+		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
+			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
+				if (mazeRef[i][j] == MazeExplorer.IS_EMPTY) {
+					if (i < _robotPosition[0] - 1 || i > _robotPosition[0] + 1 ||
+					j < _robotPosition[1] - 1 || j > _robotPosition[1] + 1) {
+						if ((i >= MazeExplorer.START[0] - 1 && i <= MazeExplorer.START[0] + 1
+								&& j >= MazeExplorer.START[1] - 1 && j <= MazeExplorer.START[1] + 1)
+								|| (i >= MazeExplorer.GOAL[0] - 1 && i <= MazeExplorer.GOAL[0] + 1
+										&& j >= MazeExplorer.GOAL[1] - 1 && j <= MazeExplorer.GOAL[1] + 1)) {
+							mazeGrids[19-j][i].setBackground(Color.ORANGE);
+						} else {
+							mazeGrids[19-j][i].setBackground(Color.GREEN);
+						}
+					}
+				} else if (mazeRef[i][j] == MazeExplorer.IS_OBSTACLE) {
+					mazeGrids[19-j][i].setBackground(Color.RED);
+				}
+			}
+		}
+		//testing
+		System.out.println("UI's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 	}
 }

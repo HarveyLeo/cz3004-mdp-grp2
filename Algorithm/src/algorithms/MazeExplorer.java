@@ -8,14 +8,14 @@ import simulator.robot.Sensor;
 
 public class MazeExplorer {
 	
-	private static final int UNEXPLORED = -1;
-	private static final int IS_OBSTACLE = 1;
-	private static final int IS_EMPTY = 0;
+	public static final int UNEXPLORED = -1;
+	public static final int IS_OBSTACLE = 1;
+	public static final int IS_EMPTY = 0;
 	private static final int RIGHT_NO_ACCESS = -1;
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
-	private static final int[] GOAL = {13, 18};
-	private static final int[] START = {1, 1};
+	public static final int[] GOAL = {13, 18};
+	public static final int[] START = {1, 1};
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
@@ -42,6 +42,10 @@ public class MazeExplorer {
 		}
 	}
 	
+	public int[][] getMazeRef() {
+		return _mazeRef;
+	}
+	
 	public static MazeExplorer getInstance() {
 		if (_instance == null) {
 			_instance = new MazeExplorer();
@@ -51,71 +55,61 @@ public class MazeExplorer {
 	
 	public void explore(int[] robotPosition, int speed, int coverage, int timeLimit) {
 		
+		
 		_robotPosition[0] = robotPosition[0];
 		_robotPosition[1] = robotPosition[1];
 		
 		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
 			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
 				_isExplored[i][j] = true;
+				_mazeRef[i][j] = IS_EMPTY;
 			}
 		}
+		
 		setIsExplored(robotPosition, _robotOrientation);
-		
+
 		exploreAlongWall (GOAL);
-		
+		System.out.println("successsly goaled");
 		exploreAlongWall (START);
 		
-//Testing module:
-//		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
-//			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
-//				if (_isExplored[i][j]) {
-//					System.out.print("[" + i + "][" + j + "] ");
-//				}
-//			}
-//		} 
 	}
 	
 	private void exploreAlongWall (int[] goalPos) {
+
 		while (!isGoalPos(_robotPosition, goalPos)) {
-			//testing
-			if (isGoalPos(goalPos, START)) {
-				System.out.println("robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
-			}
-			if (_robotPosition[0]==11 && _robotPosition[1]==16) {
-				System.out.println("robot(11,16) right side status: " + checkRightSide(_robotPosition, _robotOrientation));
-			}
-			
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
-					_robot.turnRight();
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
+					_robot.turnRight();
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
-						_robot.moveForward();
-						setIsExplored(_robotPosition, _robotOrientation);
 						updateRobotPositionAfterMF();
+						setIsExplored(_robotPosition, _robotOrientation);
+						_robot.moveForward();
 					} else {
-						_robot.turnLeft();
 						updateRobotOrientation(Movement.TURN_LEFT);
+						_robot.turnLeft();
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
-					_robot.turnRight();
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.moveForward();
-					setIsExplored(_robotPosition, _robotOrientation);
+					_robot.turnRight();
 					updateRobotPositionAfterMF();
+					setIsExplored(_robotPosition, _robotOrientation);
+					_robot.moveForward();
 				}
 			} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 
-				_robot.moveForward();
-				setIsExplored(_robotPosition, _robotOrientation);
 				updateRobotPositionAfterMF();
+				setIsExplored(_robotPosition, _robotOrientation);
+				_robot.moveForward();
 			} else {
-				_robot.turnLeft();
 				updateRobotOrientation(Movement.TURN_LEFT);
 				setIsExplored(_robotPosition, _robotOrientation);
+				_robot.turnLeft();
 			}
+			//testing
+			System.out.println("Brain's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 		}
 	}
 
