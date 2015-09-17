@@ -95,18 +95,33 @@ public class Robot {
 		return numOfClearGrids;
 	}
 
-	public void turnRight() {
+	public void turnRight(long stepTime) {
+		try {
+			Thread.sleep(stepTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Controller controller = Controller.getInstance();
 		controller.turnRobotRight();
 	}
 
-	public void moveForward() {
+	public void moveForward(long stepTime) {
+		try {
+			Thread.sleep(stepTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Controller controller = Controller.getInstance();
 		controller.moveRobotForward();
 		
 	}
 
-	public void turnLeft() {
+	public void turnLeft(long stepTime) {
+		try {
+			Thread.sleep(stepTime);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Controller controller = Controller.getInstance();
 		controller.turnRobotLeft();
 	}

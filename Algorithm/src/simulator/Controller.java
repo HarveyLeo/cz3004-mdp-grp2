@@ -5,6 +5,7 @@ import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import algorithms.MazeExplorer;
 import datatypes.Orientation;
@@ -121,7 +122,21 @@ public class Controller {
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
-			explorer.explore(_robotPosition, _speed, _coverage, _timeLimit);
+			_ui.setStatus("robot exploring");
+			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					explorer.explore(_robotPosition, _speed, _coverage, _timeLimit);
+					return null;
+				}
+
+				@Override
+				public void done() {
+					_ui.setStatus("robot exploration completed");
+				}
+			};
+			
+			exploreMaze.execute();
 		}
 	}
 

@@ -26,6 +26,8 @@ import simulator.arena.Arena;
 import java.awt.Font;
 
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
+
 import java.awt.FlowLayout;
 
 public class UI extends JFrame implements ActionListener {
@@ -279,7 +281,7 @@ public class UI extends JFrame implements ActionListener {
 		} else if (cmd.equals("ClearMap")) {
 			_controller.clearMap(_mapGrids);
 		} else if (cmd.equals("ExploreMaze")) {
-			_controller.exploreMaze();
+        	_controller.exploreMaze();
 		}
 	}
 

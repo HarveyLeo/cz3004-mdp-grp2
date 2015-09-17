@@ -55,8 +55,8 @@ public class MazeExplorer {
 		
 		setIsExplored(robotPosition, _robotOrientation);
 
-		exploreAlongWall (GOAL);
-		exploreAlongWall (START);
+		exploreAlongWall (GOAL, speed);
+		exploreAlongWall (START, speed);
 		
 	}
 
@@ -78,39 +78,40 @@ public class MazeExplorer {
 		}
 	}
 	
-	private void exploreAlongWall (int[] goalPos) {
+	private void exploreAlongWall (int[] goalPos, int speed) {
 
+		long stepTime = 1000 / speed;
 		while (!isGoalPos(_robotPosition, goalPos)) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+					_robot.turnRight(stepTime);
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
 						updateRobotPositionAfterMF();
 						setIsExplored(_robotPosition, _robotOrientation);
-						_robot.moveForward();
+						_robot.moveForward(stepTime);
 					} else {
 						updateRobotOrientation(Movement.TURN_LEFT);
-						_robot.turnLeft();
+						_robot.turnLeft(stepTime);
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+					_robot.turnRight(stepTime);
 					updateRobotPositionAfterMF();
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.moveForward();
+					_robot.moveForward(stepTime);
 				}
 			} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 
 				updateRobotPositionAfterMF();
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.moveForward();
+				_robot.moveForward(stepTime);
 			} else {
 				updateRobotOrientation(Movement.TURN_LEFT);
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.turnLeft();
+				_robot.turnLeft(stepTime);
 			}
 			//testing
 			System.out.println("Brain's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
