@@ -35,13 +35,9 @@ public class UI extends JFrame implements ActionListener {
 	private static final String EXPLORE_PANEL = "Explore arena";
 	private static final String FFP_PANEL = "Find fastest path";
 	private static final long serialVersionUID = 1L;
-	private JPanel _contentPane;
-	private JPanel _mapPane;
-	private JPanel _ctrlPane;
-	private JPanel _mazePane;
-	private JLabel _status;
-	private JButton[][] _mapGrids;
-	private JButton[][] _mazeGrids;
+	private JPanel _contentPane, _mapPane, _ctrlPane, _mazePane;
+	private JLabel _status, _timeCounter, _coverageUpdate;
+	private JButton[][] _mapGrids, _mazeGrids;
 	private Controller _controller;
 	private JTextField[] _exploreTextFields, _ffpTextFields;
 
@@ -180,7 +176,7 @@ public class UI extends JFrame implements ActionListener {
 
 		// Add control panel for finding fastest path.
 		JLabel[] ffpCtrlLabels = new JLabel[2];
-		JTextField[] _ffpTextFields = new JTextField[2];
+		_ffpTextFields = new JTextField[2];
 		JButton ffpBtn = new JButton("Navigate");
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
@@ -217,11 +213,18 @@ public class UI extends JFrame implements ActionListener {
 		JPanel statusPane = new JPanel(new BorderLayout());
 		JLabel statusLabel = new JLabel("Status Console:");
 		statusPane.add(statusLabel, BorderLayout.NORTH);
-		JPanel statusConsole = new JPanel();
+		JPanel statusConsole = new JPanel(new GridLayout(3, 1));
 		statusConsole.setBackground(Color.LIGHT_GRAY);
 		statusConsole.setPreferredSize(new Dimension(280, 100));
 		_status = new JLabel("waiting for commands...");
+		_status.setHorizontalAlignment(JLabel.CENTER);
+		_timeCounter = new JLabel();
+		_timeCounter.setHorizontalAlignment(JLabel.CENTER);
+		_coverageUpdate = new JLabel();
+		_coverageUpdate.setHorizontalAlignment(JLabel.CENTER);
 		statusConsole.add(_status);
+		statusConsole.add(_coverageUpdate);
+		statusConsole.add(_timeCounter);
 		statusPane.add(statusConsole, BorderLayout.CENTER);
 		_ctrlPane.add(statusPane, BorderLayout.SOUTH);
 
@@ -289,6 +292,10 @@ public class UI extends JFrame implements ActionListener {
 		_status.setText(message);
 	}
 
+	public void setTimeCounter (int timeLeft) {
+		_timeCounter.setText("Time left (sec): " + timeLeft);
+	}
+	
 	/*
 	 * Add a document listener class to dynamically show robot position.
 	 */
@@ -329,6 +336,7 @@ public class UI extends JFrame implements ActionListener {
 					String speed = doc.getText(0, doc.getLength());
 					if (speed.matches("[0-9]+")) {
 						_controller.setExploreSpeed(Integer.parseInt(speed));
+						
 					} else {
 						_status.setText("robot speed not set");
 					}
@@ -340,6 +348,7 @@ public class UI extends JFrame implements ActionListener {
 					String coverage = doc.getText(0, doc.getLength());
 					if (coverage.matches("[0-9]+")) {
 						_controller.setCoverage(Integer.parseInt(coverage));
+						_coverageUpdate.setText("Coverage (%): 0");
 					} else {
 						_status.setText("target coverage not set");
 					}
@@ -351,6 +360,7 @@ public class UI extends JFrame implements ActionListener {
 					String timeLimit = doc.getText(0, doc.getLength());
 					if (timeLimit.matches("[0-9]+")) {
 						_controller.setExploreTimeLimit(Integer.parseInt(timeLimit));
+						_timeCounter.setText("Time left (sec): " + timeLimit);
 					} else {
 						_status.setText("exploring time limit not set");
 					}

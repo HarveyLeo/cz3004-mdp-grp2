@@ -2,10 +2,15 @@ package simulator;
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import algorithms.MazeExplorer;
 import datatypes.Orientation;
@@ -15,6 +20,7 @@ import simulator.arena.Arena;
 public class Controller {
 	private static Controller _instance;
 	private UI _ui;
+	private Timer _timer;
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
 	private int _speed, _coverage, _timeLimit;
@@ -115,6 +121,27 @@ public class Controller {
 		_ui.setStatus("exploring time limit set");
 	}
 
+	class TimeClass implements ActionListener {
+		int _counter; 
+		
+		public TimeClass(int timeLimit) {
+			_counter = timeLimit;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			_counter--;
+			
+			if (_counter >= 0) {
+				_ui.setTimeCounter(_counter);
+				if (_counter == 0) {
+					_timer.stop();
+					Toolkit.getDefaultToolkit().beep();
+				}
+			} 
+		}
+	}
+	
 	public void exploreMaze() {
 		_ui.refreshInput();
 		Arena arena = Arena.getInstance();
@@ -122,6 +149,9 @@ public class Controller {
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
+			TimeClass timeActionListener = new TimeClass(_timeLimit);
+			_timer = new Timer(1000, timeActionListener);
+			_timer.start();
 			_ui.setStatus("robot exploring");
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
