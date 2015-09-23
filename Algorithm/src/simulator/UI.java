@@ -149,25 +149,25 @@ public class UI extends JFrame implements ActionListener {
 		exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[0]);
 		_exploreTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[0].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[0].getDocument().addDocumentListener(new InitialPositionListener());
 		_exploreTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
 		exploreInputPane.add(exploreCtrlLabels[1]);
 		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[1]);
 		_exploreTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[1].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
 		_exploreTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
 		exploreInputPane.add(exploreCtrlLabels[2]);
 		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[2]);
 		_exploreTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[2].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[2].getDocument().addDocumentListener(new InitialPositionListener());
 		_exploreTextFields[2].getDocument().putProperty("name", "Target Coverage");
 		exploreInputPane.add(exploreCtrlLabels[3]);
 		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[3]);
 		_exploreTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[3].getDocument().addDocumentListener(new InitPositionListener());
+		_exploreTextFields[3].getDocument().addDocumentListener(new InitialPositionListener());
 		_exploreTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
 
 		JPanel exploreBtnPane = new JPanel();
@@ -307,7 +307,7 @@ public class UI extends JFrame implements ActionListener {
 	/*
 	 * Add a document listener class to dynamically show robot position.
 	 */
-	class InitPositionListener implements DocumentListener {
+	class InitialPositionListener implements DocumentListener {
 		public void insertUpdate(DocumentEvent e) {
 			update(e);
 		}
