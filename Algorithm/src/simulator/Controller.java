@@ -104,6 +104,10 @@ public class Controller {
 				}
 			}
 		}
+		
+		Arena arena = Arena.getInstance();
+		arena.setLayout(mapGrids);
+		
 		_ui.setStatus("finished map clearing");
 	}
 
