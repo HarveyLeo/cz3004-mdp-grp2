@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.FileSystems;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -22,6 +24,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import simulator.arena.Arena;
+import simulator.arena.FileReaderWriter;
 
 import java.awt.Font;
 
@@ -100,6 +103,7 @@ public class UI extends JFrame implements ActionListener {
 				}
 			}
 		}
+		loadArenaFromDisk();
 		_mapPane.add(map);
 		JButton loadMap = new JButton("Load");
 		loadMap.setActionCommand("LoadMap");
@@ -327,9 +331,9 @@ public class UI extends JFrame implements ActionListener {
 						int index = position.indexOf(",");
 						int x = Integer.parseInt(position.substring(0, index));
 						int y = Integer.parseInt(position.substring(index + 1));
-						_controller.InitRobotInMaze(_mazeGrids, x, y);
+						_controller.resetRobotInMaze(_mazeGrids, x, y);
 					} else {
-						_controller.initMaze(_mazeGrids);
+						_controller.resetMaze(_mazeGrids);
 						_status.setText("robot initial position not set");
 					}
 				} catch (BadLocationException ex) {
@@ -374,6 +378,28 @@ public class UI extends JFrame implements ActionListener {
 			}
 		}
 
+	}
+	
+	private void loadArenaFromDisk() {
+		FileReaderWriter fileReader;
+		try {
+			fileReader = new FileReaderWriter(FileSystems.getDefault().getPath(Controller.ARENA_DESCRIPTOR_PATH));
+			String arenaDescriptor = fileReader.read();
+			if (! arenaDescriptor.equals("")) {
+				for (int i = 0; i < Arena.MAP_WIDTH; i++) {
+					for (int j = 0; j < Arena.MAP_LENGTH; j++) {
+						if (arenaDescriptor.charAt(Arena.MAP_LENGTH * i + j) == '1') {
+							_mapGrids[19 - i][j].setBackground(Color.RED);
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Arena arena = Arena.getInstance();
+		arena.setLayout(_mapGrids);
 	}
 
 	public void refreshInput() {

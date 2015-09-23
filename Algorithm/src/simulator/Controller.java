@@ -5,21 +5,25 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.FileSystems;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
-import javax.swing.border.CompoundBorder;
 
 import algorithms.MazeExplorer;
 import datatypes.Orientation;
 import simulator.arena.Arena;
+import simulator.arena.FileReaderWriter;
 
 
 public class Controller {
+	
+	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
+	
 	private static Controller _instance;
 	private UI _ui;
 	private Timer _timer;
@@ -67,6 +71,28 @@ public class Controller {
 	public void loadMap(JButton[][] mapGrids) {
 		Arena arena = Arena.getInstance();
 		arena.setLayout(mapGrids);
+		
+		Boolean[][] layout = arena.getLayout();
+		String arenaDescriptor = "";
+		
+		for (int i = 0; i < Arena.MAP_WIDTH; i++) {
+			for (int j = 0; j < Arena.MAP_LENGTH; j++) {
+				if (layout[j][i] == true) {
+					arenaDescriptor += "1";
+				} else {
+					arenaDescriptor += "0";
+				}
+			}
+			arenaDescriptor = arenaDescriptor + System.getProperty("line.separator");
+		}
+		
+		try {
+			FileReaderWriter fileWriter = new FileReaderWriter(FileSystems.getDefault().getPath(ARENA_DESCRIPTOR_PATH));
+			fileWriter.write(arenaDescriptor);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		_ui.setStatus("finished map loading");
 	}
 
@@ -81,10 +107,10 @@ public class Controller {
 		_ui.setStatus("finished map clearing");
 	}
 
-	public void InitRobotInMaze(JButton[][] mazeGrids, int x, int y) {
+	public void resetRobotInMaze(JButton[][] mazeGrids, int x, int y) {
 		if (x < 2 || x > 14 || y < 2 || y > 9) {
 			_ui.setStatus("warning: robot position out of range");
-			initMaze(mazeGrids);
+			resetMaze(mazeGrids);
 		} else {
 			for (int i = x - 1; i <= x + 1; i++) {
 				for (int j = y - 1; j <= y + 1; j++) {
@@ -102,7 +128,7 @@ public class Controller {
 		}
 	}
 
-	public void initMaze(JButton[][] mazeGrids) {
+	public void resetMaze(JButton[][] mazeGrids) {
 		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
 			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				mazeGrids[x][y].setBackground(Color.BLACK);
@@ -152,7 +178,6 @@ public class Controller {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			_counter--;
-			JButton[][] mazeGrids = _ui.getMazeGrids();;
 			
 			if (_counter >= 0) {
 				_ui.setTimeCounter(_counter);
@@ -358,4 +383,5 @@ public class Controller {
 		//testing
 		System.out.println("UI's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 	}
+
 }
