@@ -6,11 +6,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import javax.swing.border.CompoundBorder;
 
 import algorithms.MazeExplorer;
 import datatypes.Orientation;
@@ -23,10 +25,19 @@ public class Controller {
 	private Timer _timer;
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
-	private int _speed, _coverage, _timeLimit;
+	private int _speed, _targetCoverage, _timeLimit;
+	private boolean _isTimeout, _hasReachedTargetCoverage;
 
 	private Controller() {
 		_ui = new UI();
+	}
+	
+	public boolean isTimeout() {
+		return _isTimeout;
+	}
+	
+	public boolean hasReachedTargetCoverage() {
+		return _hasReachedTargetCoverage;
 	}
 
 	public static Controller getInstance() {
@@ -111,13 +122,23 @@ public class Controller {
 		if (coverage > 100) {
 			_ui.setStatus("warning: target coverage out of range");
 		} else {
-			_coverage = coverage;
+			_targetCoverage = coverage;
+			if (_targetCoverage == 0) {
+				_hasReachedTargetCoverage = true;
+			} else {
+				_hasReachedTargetCoverage = false;
+			}
 			_ui.setStatus("target coverage set");
 		}
 	}
 
 	public void setExploreTimeLimit(int limit) {
 		_timeLimit = limit;
+		if (_timeLimit == 0) {
+			_isTimeout = true;
+		} else {
+			_isTimeout = false;
+		}
 		_ui.setStatus("exploring time limit set");
 	}
 
@@ -131,11 +152,14 @@ public class Controller {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			_counter--;
+			JButton[][] mazeGrids = _ui.getMazeGrids();;
 			
 			if (_counter >= 0) {
 				_ui.setTimeCounter(_counter);
+				
 				if (_counter == 0) {
 					_timer.stop();
+					_isTimeout = true;
 					Toolkit.getDefaultToolkit().beep();
 				}
 			} 
@@ -156,17 +180,46 @@ public class Controller {
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					explorer.explore(_robotPosition, _speed, _coverage, _timeLimit);
+					explorer.explore(_robotPosition, _speed);
 					return null;
 				}
-
 				@Override
 				public void done() {
 					_ui.setStatus("robot exploration completed");
 				}
 			};
-			
 			exploreMaze.execute();
+			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					int numExplored, coverage;
+					JButton[][] mazeGrids = _ui.getMazeGrids();
+					while (!_hasReachedTargetCoverage && !_isTimeout) { //TODO bug
+						numExplored = 0;
+						for (int x = 0; x < Arena.MAP_WIDTH; x++) {
+							for (int y = 0; y < Arena.MAP_LENGTH; y++) {
+								if (mazeGrids[x][y].getBackground() == Color.GREEN || mazeGrids[x][y].getBackground() == Color.CYAN) {
+									numExplored ++;
+								}
+							}
+						}
+						coverage = 100 * numExplored / (Arena.MAP_LENGTH * Arena.MAP_WIDTH);
+						_ui.setCoverage(coverage);
+						if (coverage >= _targetCoverage) {
+							_hasReachedTargetCoverage = true;
+						}
+					}
+					if (_timer.isRunning()) {
+						_timer.stop();
+					}
+					return null;
+				}
+				@Override
+				public void done() {
+					_ui.setStatus("target coverage reached");
+				}
+			};
+			updateCoverage.execute();
 		}
 	}
 

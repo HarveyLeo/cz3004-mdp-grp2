@@ -2,6 +2,7 @@ package algorithms;
 
 import datatypes.Movement;
 import datatypes.Orientation;
+import simulator.Controller;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 import simulator.robot.Sensor;
@@ -39,8 +40,8 @@ public class MazeExplorer {
         return _instance;
     }
     
-	public void explore(int[] robotPosition, int speed, int coverage, int timeLimit) {
-		
+	public void explore(int[] robotPosition, int speed) {
+
 		init();
 		
 		_robotPosition[0] = robotPosition[0];
@@ -81,7 +82,8 @@ public class MazeExplorer {
 	private void exploreAlongWall (int[] goalPos, int speed) {
 
 		long stepTime = 1000 / speed;
-		while (!isGoalPos(_robotPosition, goalPos)) {
+		Controller controller = Controller.getInstance();
+		while (!isGoalPos(_robotPosition, goalPos) && !controller.isTimeout() && !controller.hasReachedTargetCoverage()) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
@@ -114,7 +116,7 @@ public class MazeExplorer {
 				_robot.turnLeft(stepTime);
 			}
 			//testing
-			System.out.println("Brain's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
+			System.out.println("Maze Explorer's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 		}
 	}
 

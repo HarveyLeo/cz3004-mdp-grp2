@@ -296,6 +296,10 @@ public class UI extends JFrame implements ActionListener {
 		_timeCounter.setText("Time left (sec): " + timeLeft);
 	}
 	
+	public void setCoverage (int coverage) {
+		_coverageUpdate.setText("Coverage (%): " + coverage);
+	}
+	
 	/*
 	 * Add a document listener class to dynamically show robot position.
 	 */
@@ -373,7 +377,9 @@ public class UI extends JFrame implements ActionListener {
 	}
 
 	public void refreshInput() {
-		_exploreTextFields[0].setText(_exploreTextFields[0].getText());	
+		for (int i = 0; i < 4; i++) {
+			_exploreTextFields[i].setText(_exploreTextFields[i].getText());
+		}
 //		_ffpTextFields[0].setText(_ffpTextFields[0].getText());	
 	}
 }
