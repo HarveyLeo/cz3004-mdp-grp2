@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import datatypes.Orientation;
+import simulator.Controller;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 
@@ -16,7 +17,7 @@ public class AStarPathFinder {
 	private Node[][] _nodes;
 	private Robot _robot;
 	private int[] _robotPosition;
-	private Orientation _robotOrientation;
+
 	
 	private AStarPathFinder(int[][] mazeRef) {
 		_virtualMap = new VirtualMap(mazeRef);
@@ -32,7 +33,6 @@ public class AStarPathFinder {
 		_robotPosition = new int[2];
 		_robotPosition[0] = MazeExplorer.START[0];
 		_robotPosition[1] = MazeExplorer.START[1];
-		_robotOrientation = Orientation.NORTH;
 	}
 	
     public static AStarPathFinder getInstance() {
@@ -43,19 +43,20 @@ public class AStarPathFinder {
         return _instance;
     }
 	
-	public Path findPath() {
+	public Path findFastestPath() {
 		
 		_closed.clear();
 		_open.clear();
 
 		_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]._pathCost = 0;
+		_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]._ori = Orientation.NORTH;
 		_open.add(_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]);
 		
 		//testing
 		boolean[][] cleared = _virtualMap.getCleared();
 		int value;
 		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
-			for (int b =0; b < Arena.MAP_LENGTH; b++) {
+			for (int b = 0; b < Arena.MAP_LENGTH; b++) {
 				if (cleared[b][a]) {
 					value = 1;
 				} else {
@@ -89,13 +90,14 @@ public class AStarPathFinder {
 					
 
 					if (isValidLocation(_virtualMap.getCleared(), neighborX, neighborY)) {
-						int pathCostOfNeighbor = current._pathCost + getEdgeCost(_robotOrientation, current._x, current._y, neighborX, neighborY);
+						int pathCostOfNeighbor = current._pathCost + getEdgeCost(current._ori, current._x, current._y, neighborX, neighborY);
 						int heuristicOfNeighbor = getHeuristicCost(neighborX, neighborY);
 						Node neighbor = _nodes[neighborX][neighborY];
 						if (_virtualMap.checkIfVisited(neighborX, neighborY) == false) {
 							neighbor._pathCost = pathCostOfNeighbor;
 							neighbor._heuristic = heuristicOfNeighbor;
 							neighbor._parent = current;
+							neighbor._ori = getOrientationIfMoveToNeighbor(current._ori, current._x, current._y, neighborX, neighborY);
 							addToOpen(neighbor);
 							_virtualMap.setVisited(neighborX, neighborY);
 						} else if (isInOpenList(neighbor)){
@@ -104,6 +106,7 @@ public class AStarPathFinder {
 								neighbor._pathCost = pathCostOfNeighbor;
 								neighbor._heuristic = heuristicOfNeighbor;
 								neighbor._parent = current;
+								neighbor._ori = getOrientationIfMoveToNeighbor(current._ori, current._x, current._y, neighborX, neighborY);
 								addToOpen(neighbor);	
 							}
 						}
@@ -120,9 +123,26 @@ public class AStarPathFinder {
 		}
 		path.prependStep(MazeExplorer.START[0],MazeExplorer.START[1]);
 		
+		//testing
 		System.out.println(path.toString());
 		
 		return path;
+	}
+
+	private Orientation getOrientationIfMoveToNeighbor(Orientation curOri, int curX, int curY, int nextX, int nextY) {
+		Orientation nextOri = null;
+	
+		if (nextY == curY + 1) {
+			nextOri = Orientation.NORTH;
+		} else if (nextY == curY - 1) {
+			nextOri = Orientation.SOUTH;
+		} else if (nextX == curX + 1) {
+			nextOri = Orientation.EAST;
+		} else if (nextX == curX - 1) {
+			nextOri = Orientation.WEST;
+		}
+				
+		return nextOri;
 	}
 
 	private void removeFromOpen(Node node) {
@@ -233,6 +253,7 @@ public class AStarPathFinder {
 		private int _y;
 		private int _pathCost;
 		private Node _parent;
+		private Orientation _ori;
 		private int _heuristic;
 
 		public Node(int x, int y) {

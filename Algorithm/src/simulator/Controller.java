@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -16,6 +17,7 @@ import javax.swing.Timer;
 
 import algorithms.AStarPathFinder;
 import algorithms.MazeExplorer;
+import algorithms.Path;
 import datatypes.Orientation;
 import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
@@ -391,7 +393,28 @@ public class Controller {
 
 	public void findFastestPath() {
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-		pathFinder.findPath();
+		
+		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
+			Path _fastestPath;
+			@Override
+			protected Void doInBackground() throws Exception {
+				_fastestPath = pathFinder.findFastestPath();
+				return null;
+			}
+			@Override
+			public void done() {
+				ArrayList<Path.Step> steps = _fastestPath.getSteps();
+				JButton[][] mazeGrids = _ui.getMazeGrids();
+				for (Path.Step step : steps) {
+					int x = step.getX();
+					int y = step.getY();
+					mazeGrids[19-y][x].setBackground(Color.YELLOW);
+				}
+				_ui.setStatus("fastest path found");
+			}
+		};
+		findFastestPath.execute();
+		
 	}
 
 }
