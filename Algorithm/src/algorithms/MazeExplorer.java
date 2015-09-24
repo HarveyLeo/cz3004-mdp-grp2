@@ -42,10 +42,7 @@ public class MazeExplorer {
     
 	public void explore(int[] robotPosition, int speed) {
 
-		init();
-		
-		_robotPosition[0] = robotPosition[0];
-		_robotPosition[1] = robotPosition[1];
+		init(robotPosition);
 		
 		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
 			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
@@ -58,12 +55,14 @@ public class MazeExplorer {
 
 		exploreAlongWall (GOAL, speed);
 		exploreAlongWall (START, speed);
-		
+
 	}
 
-	private void init() {
+	private void init(int[] robotPosition) {
 		_robot = new Robot();
 		_robotPosition = new int[2];
+		_robotPosition[0] = robotPosition[0];
+		_robotPosition[1] = robotPosition[1];
 		_robotOrientation = Orientation.NORTH;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];

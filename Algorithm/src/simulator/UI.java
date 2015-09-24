@@ -182,6 +182,8 @@ public class UI extends JFrame implements ActionListener {
 		JLabel[] ffpCtrlLabels = new JLabel[2];
 		_ffpTextFields = new JTextField[2];
 		JButton ffpBtn = new JButton("Navigate");
+		ffpBtn.setActionCommand("FindFastestPath");
+		ffpBtn.addActionListener(this);
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 2; i++) {
@@ -289,6 +291,8 @@ public class UI extends JFrame implements ActionListener {
 			_controller.clearMap(_mapGrids);
 		} else if (cmd.equals("ExploreMaze")) {
         	_controller.exploreMaze();
+		} else if (cmd.equals("FindFastestPath")) {
+			_controller.findFastestPath();
 		}
 	}
 

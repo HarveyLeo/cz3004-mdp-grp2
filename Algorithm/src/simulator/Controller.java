@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
+import algorithms.AStarPathFinder;
 import algorithms.MazeExplorer;
 import datatypes.Orientation;
 import simulator.arena.Arena;
@@ -386,6 +387,11 @@ public class Controller {
 		}
 		//testing
 		System.out.println("UI's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
+	}
+
+	public void findFastestPath() {
+		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+		pathFinder.findPath();
 	}
 
 }
