@@ -304,7 +304,7 @@ public class UI extends JFrame implements ActionListener {
 		_timeCounter.setText("Time left (sec): " + timeLeft);
 	}
 	
-	public void setCoverage (int coverage) {
+	public void setCoverage (String coverage) {
 		_coverageUpdate.setText("Coverage (%): " + coverage);
 	}
 	

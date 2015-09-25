@@ -95,8 +95,7 @@ public class MazeExplorer {
 	
 	private void exploreAlongWall (int[] goalPos) {
 
-		Controller controller = Controller.getInstance();
-		while (!isGoalPos(_robotPosition, goalPos) && !controller.isTimeout() && !controller.hasReachedTargetCoverage()) {
+		while (!isGoalPos(_robotPosition, goalPos)) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {

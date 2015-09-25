@@ -34,15 +34,12 @@ public class Controller {
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
 	private int _speed, _targetCoverage, _timeLimit;
-	private boolean _isTimeout, _hasReachedTargetCoverage;
+	private boolean _hasReachedStart, _hasReachedTargetCoverage;
 
 	private Controller() {
 		_ui = new UI();
 	}
-	
-	public boolean isTimeout() {
-		return _isTimeout;
-	}
+
 	
 	public boolean hasReachedTargetCoverage() {
 		return _hasReachedTargetCoverage;
@@ -168,11 +165,6 @@ public class Controller {
 
 	public void setExploreTimeLimit(int limit) {
 		_timeLimit = limit;
-		if (_timeLimit == 0) {
-			_isTimeout = true;
-		} else {
-			_isTimeout = false;
-		}
 		_ui.setStatus("exploring time limit set");
 	}
 
@@ -192,7 +184,6 @@ public class Controller {
 				
 				if (_counter == 0) {
 					_timer.stop();
-					_isTimeout = true;
 					Toolkit.getDefaultToolkit().beep();
 				}
 			} 
@@ -215,11 +206,13 @@ public class Controller {
 				@Override
 				protected Void doInBackground() throws Exception {
 					robot.setSpeed(_speed);
+					_hasReachedStart = false;
 					explorer.explore(_robotPosition);
 					return null;
 				}
 				@Override
 				public void done() {
+					_hasReachedStart = true;
 					_ui.setStatus("robot exploration completed");
 				}
 			};
@@ -227,19 +220,20 @@ public class Controller {
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					int numExplored, coverage;
+					int numExplored;
+					float coverage;
 					JButton[][] mazeGrids = _ui.getMazeGrids();
-					while (!_hasReachedTargetCoverage && !_isTimeout) { //TODO bug
+					while (!_hasReachedStart) { 
 						numExplored = 0;
 						for (int x = 0; x < Arena.MAP_WIDTH; x++) {
 							for (int y = 0; y < Arena.MAP_LENGTH; y++) {
-								if (mazeGrids[x][y].getBackground() == Color.GREEN || mazeGrids[x][y].getBackground() == Color.CYAN) {
+								if (mazeGrids[x][y].getBackground() != Color.BLACK) {
 									numExplored ++;
 								}
 							}
 						}
-						coverage = 100 * numExplored / (Arena.MAP_LENGTH * Arena.MAP_WIDTH);
-						_ui.setCoverage(coverage);
+						coverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
+						_ui.setCoverage(String.format("%.1f", coverage));
 						if (coverage >= _targetCoverage) {
 							_hasReachedTargetCoverage = true;
 						}
@@ -249,6 +243,7 @@ public class Controller {
 					}
 					return null;
 				}
+				
 				@Override
 				public void done() {
 					_ui.setStatus("target coverage reached");
@@ -413,7 +408,6 @@ public class Controller {
 			}
 			@Override
 			public void done() {
-	
 				_ui.setStatus("fastest path found");
 			}
 		};
