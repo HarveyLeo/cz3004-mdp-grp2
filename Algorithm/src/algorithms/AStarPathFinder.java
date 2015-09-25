@@ -47,8 +47,8 @@ public class AStarPathFinder {
 		_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]._ori = Orientation.NORTH;
 		_open.add(_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]);
 		
-		//testing
-		boolean[][] cleared = _virtualMap.getCleared();
+		//testing - check virtual map
+/*		boolean[][] cleared = _virtualMap.getCleared();
 		int value;
 		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
 			for (int b = 0; b < Arena.MAP_LENGTH; b++) {
@@ -60,7 +60,7 @@ public class AStarPathFinder {
 				System.out.print(value + " ");
 			}
 			System.out.println();
-		}
+		}*/
 
 		
 		while (_open.size() != 0) {
@@ -117,11 +117,7 @@ public class AStarPathFinder {
 			target = target._parent;
 		}
 		path.prependStep(MazeExplorer.START[0],MazeExplorer.START[1]);
-		
-		//testing
-		System.out.println(path.toString());
-		
-		
+				
 		return path;
 	}
 
@@ -133,27 +129,29 @@ public class AStarPathFinder {
 		Orientation nextOrientation;
 		ArrayList<Path.Step> steps = fastestPath.getSteps();
 		
+		int count = 0;
 		
-		
-		for (int i = 0; i < steps.size(); i++) {
+		for (int i = 0; i < steps.size() - 1; i++) {
+			
 			currentPosition[0] = steps.get(i).getX();
 			currentPosition[1] = steps.get(i).getY();
 			nextPosition[0] = steps.get(i+1).getX();
 			nextPosition[1] = steps.get(i+1).getY();
+
 			nextOrientation = getOrientationIfMoveToNeighbor(currentOrientation, 
 					currentPosition[0], currentPosition[1],
 					nextPosition[0], nextPosition[1]);
-			int count = 0;
 			if (nextOrientation == currentOrientation) {
 				count++;
 			} else {
 				_robot.moveForward(count);
+				count = 1;
 				ChangeRobotOrientation(currentOrientation, nextOrientation);
 			}
 			currentOrientation = nextOrientation;
 		}
 		
-
+		_robot.moveForward(count);
 		
 	}
 

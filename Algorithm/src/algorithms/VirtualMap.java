@@ -9,15 +9,15 @@ public class VirtualMap {
 	
 	public VirtualMap(int[][] mazeRef) {
 		
-		//testing
-		System.out.println("=========Explore Result===========");
+		//testing - check result of exploration
+/*		System.out.println("=========Explore Result===========");
 		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
 			for (int b =0; b < Arena.MAP_LENGTH; b++) {
 				System.out.print(mazeRef[b][a] + " ");
 			}
 			System.out.println();
 		}
-		System.out.println("==============END=================");
+		System.out.println("==============END=================");*/
 		
 		_visited = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_cleared = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];

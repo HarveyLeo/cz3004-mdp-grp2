@@ -132,8 +132,6 @@ public class MazeExplorer {
 				setIsExplored(_robotPosition, _robotOrientation);
 				_robot.turnLeft();
 			}
-			//testing
-			System.out.println("Maze Explorer's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 		}
 	}
 
@@ -328,7 +326,7 @@ public class MazeExplorer {
 		switch (ori) {
 		case NORTH:
 			frontSensorPosition[0] = robotPosition[0];
-			frontSensorPosition[1] = robotPosition[1] + 1;
+			frontSensorPosition[1] = robotPosition[1];
 			frontleftSensorPosition[0] = robotPosition[0] - 1;
 			frontleftSensorPosition[1] = robotPosition[1];
 			frontrightSensorPosition[0] = robotPosition[0] + 1;
@@ -387,7 +385,7 @@ public class MazeExplorer {
 			
 		case SOUTH:
 			frontSensorPosition[0] = robotPosition[0];
-			frontSensorPosition[1] = robotPosition[1] - 1;
+			frontSensorPosition[1] = robotPosition[1];
 			frontleftSensorPosition[0] = robotPosition[0] + 1;
 			frontleftSensorPosition[1] = robotPosition[1];
 			frontrightSensorPosition[0] = robotPosition[0] - 1;
@@ -445,7 +443,7 @@ public class MazeExplorer {
 			}
 			break;
 		case EAST:
-			frontSensorPosition[0] = robotPosition[0] + 1;
+			frontSensorPosition[0] = robotPosition[0];
 			frontSensorPosition[1] = robotPosition[1];
 			frontleftSensorPosition[0] = robotPosition[0];
 			frontleftSensorPosition[1] = robotPosition[1] + 1;
@@ -504,7 +502,7 @@ public class MazeExplorer {
 			}
 			break;
 		case WEST:
-			frontSensorPosition[0] = robotPosition[0] - 1;
+			frontSensorPosition[0] = robotPosition[0];
 			frontSensorPosition[1] = robotPosition[1];
 			frontleftSensorPosition[0] = robotPosition[0];
 			frontleftSensorPosition[1] = robotPosition[1] - 1;

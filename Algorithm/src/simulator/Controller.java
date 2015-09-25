@@ -390,8 +390,6 @@ public class Controller {
 				}
 			}
 		}
-		//testing
-		System.out.println("UI's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);
 	}
 
 	public void findFastestPath() {
@@ -402,6 +400,7 @@ public class Controller {
 			@Override
 			protected Void doInBackground() throws Exception {
 				_fastestPath = pathFinder.findFastestPath();
+				pathFinder.moveRobotAlongFastestPath(_fastestPath);
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
 				for (Path.Step step : steps) {
@@ -409,7 +408,6 @@ public class Controller {
 					int y = step.getY();
 					mazeGrids[19-y][x].setBackground(Color.YELLOW);
 				}
-				pathFinder.moveRobotAlongFastestPath(_fastestPath);
 				return null;
 			}
 			@Override

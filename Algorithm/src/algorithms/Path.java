@@ -14,16 +14,6 @@ public class Path {
 		return _steps;
 	}
 	
-
-	//testing
-	public String toString() {
-		String pathString = "";
-		for (Step step : _steps) {
-			pathString = pathString + "(" + step.getX() + "," + step.getY() + ")";
-		}
-		return pathString;
-	}
-	
 	public class Step {
 		private int _x;
 		private int _y;
