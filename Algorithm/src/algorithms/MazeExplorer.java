@@ -40,7 +40,7 @@ public class MazeExplorer {
         return _instance;
     }
     
-	public void explore(int[] robotPosition, int speed) {
+	public void explore(int[] robotPosition) {
 
 		init(robotPosition);
 		
@@ -53,13 +53,32 @@ public class MazeExplorer {
 		
 		setIsExplored(robotPosition, _robotOrientation);
 
-		exploreAlongWall (GOAL, speed);
-		exploreAlongWall (START, speed);
+		exploreAlongWall (GOAL);
+		exploreAlongWall (START);
+		
+		adjustOrientationToNorth();
 
 	}
 
+	private void adjustOrientationToNorth() {
+		switch(_robotOrientation) {
+			case NORTH:
+				break;
+			case SOUTH:
+				_robot.turnRight();
+				_robot.turnRight();
+				break;
+			case EAST:
+				_robot.turnLeft();
+				break;
+			case WEST:
+				_robot.turnRight();
+		}
+		
+	}
+
 	private void init(int[] robotPosition) {
-		_robot = new Robot();
+		_robot = Robot.getInstance();
 		_robotPosition = new int[2];
 		_robotPosition[0] = robotPosition[0];
 		_robotPosition[1] = robotPosition[1];
@@ -78,9 +97,8 @@ public class MazeExplorer {
 		}
 	}
 	
-	private void exploreAlongWall (int[] goalPos, int speed) {
+	private void exploreAlongWall (int[] goalPos) {
 
-		long stepTime = 1000 / speed;
 		Controller controller = Controller.getInstance();
 		while (!isGoalPos(_robotPosition, goalPos) && !controller.isTimeout() && !controller.hasReachedTargetCoverage()) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
@@ -88,31 +106,31 @@ public class MazeExplorer {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight(stepTime);
+					_robot.turnRight();
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
 						updateRobotPositionAfterMF();
 						setIsExplored(_robotPosition, _robotOrientation);
-						_robot.moveForward(stepTime);
+						_robot.moveForward();
 					} else {
 						updateRobotOrientation(Movement.TURN_LEFT);
-						_robot.turnLeft(stepTime);
+						_robot.turnLeft();
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight(stepTime);
+					_robot.turnRight();
 					updateRobotPositionAfterMF();
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.moveForward(stepTime);
+					_robot.moveForward();
 				}
 			} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 
 				updateRobotPositionAfterMF();
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.moveForward(stepTime);
+				_robot.moveForward();
 			} else {
 				updateRobotOrientation(Movement.TURN_LEFT);
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.turnLeft(stepTime);
+				_robot.turnLeft();
 			}
 			//testing
 			System.out.println("Maze Explorer's robot position: " + _robotPosition[0] + " " + _robotPosition[1]);

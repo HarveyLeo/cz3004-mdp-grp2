@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import datatypes.Orientation;
-import simulator.Controller;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 
@@ -16,7 +15,6 @@ public class AStarPathFinder {
 	private SortedList<Node> _open;
 	private Node[][] _nodes;
 	private Robot _robot;
-	private int[] _robotPosition;
 
 	
 	private AStarPathFinder(int[][] mazeRef) {
@@ -29,10 +27,7 @@ public class AStarPathFinder {
 				_nodes[x][y] = new Node(x, y);
 			}
 		}
-		_robot = new Robot();
-		_robotPosition = new int[2];
-		_robotPosition[0] = MazeExplorer.START[0];
-		_robotPosition[1] = MazeExplorer.START[1];
+		_robot = Robot.getInstance();
 	}
 	
     public static AStarPathFinder getInstance() {
@@ -126,7 +121,87 @@ public class AStarPathFinder {
 		//testing
 		System.out.println(path.toString());
 		
+		
 		return path;
+	}
+
+	public void moveRobotAlongFastestPath(Path fastestPath) {
+
+		int[] currentPosition = new int[2];
+		int[] nextPosition = new int[2];
+		Orientation currentOrientation = Orientation.NORTH;
+		Orientation nextOrientation;
+		ArrayList<Path.Step> steps = fastestPath.getSteps();
+		
+		
+		
+		for (int i = 0; i < steps.size(); i++) {
+			currentPosition[0] = steps.get(i).getX();
+			currentPosition[1] = steps.get(i).getY();
+			nextPosition[0] = steps.get(i+1).getX();
+			nextPosition[1] = steps.get(i+1).getY();
+			nextOrientation = getOrientationIfMoveToNeighbor(currentOrientation, 
+					currentPosition[0], currentPosition[1],
+					nextPosition[0], nextPosition[1]);
+			int count = 0;
+			if (nextOrientation == currentOrientation) {
+				count++;
+			} else {
+				_robot.moveForward(count);
+				ChangeRobotOrientation(currentOrientation, nextOrientation);
+			}
+			currentOrientation = nextOrientation;
+		}
+		
+
+		
+	}
+
+
+
+	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri) {
+		switch (curOri) {
+			case NORTH:
+				if (nextOri == Orientation.EAST) {
+					_robot.turnRight();
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnLeft();
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnRight();
+					_robot.turnRight();
+				}
+				break;
+			case SOUTH:
+				if (nextOri == Orientation.EAST) {
+					_robot.turnLeft();
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnRight();
+				} else if (nextOri == Orientation.NORTH) {
+					_robot.turnRight();
+					_robot.turnRight();
+				}
+				break;
+			case EAST:
+				if (nextOri == Orientation.NORTH) {
+					_robot.turnLeft();
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnRight();
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnRight();
+					_robot.turnRight();
+				}
+				break;
+			case WEST:
+				if (nextOri == Orientation.NORTH) {
+					_robot.turnRight();
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnLeft();
+				} else if (nextOri == Orientation.EAST) {
+					_robot.turnRight();
+					_robot.turnRight();
+				}
+		}
+		
 	}
 
 	private Orientation getOrientationIfMoveToNeighbor(Orientation curOri, int curX, int curY, int nextX, int nextY) {

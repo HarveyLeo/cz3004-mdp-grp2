@@ -5,16 +5,29 @@ import simulator.Controller;
 import simulator.arena.Arena;
 
 public class Robot {
+	private static Robot _instance;
 	private Sensor _front;
 	private Sensor _frontleft, _frontright;
 	private Sensor _right, _left;
+	private int _speed;
 	
-	public Robot() {
+	private Robot() {
 		_front = new Sensor(Sensor.LONG_RANGE);
 		_frontleft = new Sensor(Sensor.SHORT_RANGE);
 		_frontright = new Sensor(Sensor.SHORT_RANGE);
 		_left = new Sensor(Sensor.SHORT_RANGE);
 		_right = new Sensor(Sensor.SHORT_RANGE);
+	}
+	
+	public static Robot getInstance() {
+		if (_instance == null) {
+			_instance = new Robot();
+		}
+		return _instance;
+	}
+	
+	public void setSpeed(int speed) {
+		_speed = speed;
 	}
 	
 	
@@ -95,7 +108,8 @@ public class Robot {
 		return numOfClearGrids;
 	}
 
-	public void turnRight(long stepTime) {
+	public void turnRight() {
+		int stepTime = 1000 / _speed;
 		try {
 			Thread.sleep(stepTime);
 		} catch (InterruptedException e) {
@@ -105,7 +119,8 @@ public class Robot {
 		controller.turnRobotRight();
 	}
 
-	public void moveForward(long stepTime) {
+	public void moveForward() {
+		int stepTime = 1000 / _speed;
 		try {
 			Thread.sleep(stepTime);
 		} catch (InterruptedException e) {
@@ -116,7 +131,8 @@ public class Robot {
 		
 	}
 
-	public void turnLeft(long stepTime) {
+	public void turnLeft() {
+		int stepTime = 1000 / _speed;
 		try {
 			Thread.sleep(stepTime);
 		} catch (InterruptedException e) {
@@ -124,5 +140,21 @@ public class Robot {
 		}
 		Controller controller = Controller.getInstance();
 		controller.turnRobotLeft();
+	}
+
+	public void moveForward(int count) {
+		int stepTime = 1000 / _speed;
+		Controller controller = Controller.getInstance();
+		
+		for (int i = 0; i < count; i++) {
+			try {
+				Thread.sleep(stepTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	
+			controller.moveRobotForward();
+		}
+		
 	}
 }

@@ -21,6 +21,7 @@ import algorithms.Path;
 import datatypes.Orientation;
 import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
+import simulator.robot.Robot;
 
 
 public class Controller {
@@ -202,6 +203,7 @@ public class Controller {
 		_ui.refreshInput();
 		Arena arena = Arena.getInstance();
 		MazeExplorer explorer = MazeExplorer.getInstance();
+		Robot robot = Robot.getInstance();
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
@@ -212,7 +214,8 @@ public class Controller {
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					explorer.explore(_robotPosition, _speed);
+					robot.setSpeed(_speed);
+					explorer.explore(_robotPosition);
 					return null;
 				}
 				@Override
@@ -399,10 +402,6 @@ public class Controller {
 			@Override
 			protected Void doInBackground() throws Exception {
 				_fastestPath = pathFinder.findFastestPath();
-				return null;
-			}
-			@Override
-			public void done() {
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
 				for (Path.Step step : steps) {
@@ -410,6 +409,12 @@ public class Controller {
 					int y = step.getY();
 					mazeGrids[19-y][x].setBackground(Color.YELLOW);
 				}
+				pathFinder.moveRobotAlongFastestPath(_fastestPath);
+				return null;
+			}
+			@Override
+			public void done() {
+	
 				_ui.setStatus("fastest path found");
 			}
 		};
