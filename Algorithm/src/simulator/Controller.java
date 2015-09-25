@@ -399,7 +399,8 @@ public class Controller {
 			Path _fastestPath;
 			@Override
 			protected Void doInBackground() throws Exception {
-				_fastestPath = pathFinder.findFastestPath();
+				MazeExplorer explorer = MazeExplorer.getInstance();
+				_fastestPath = pathFinder.findFastestPath(explorer.getMazeRef());
 				pathFinder.moveRobotAlongFastestPath(_fastestPath);
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();

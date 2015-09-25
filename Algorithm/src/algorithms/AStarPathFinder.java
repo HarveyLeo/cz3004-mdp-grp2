@@ -15,30 +15,17 @@ public class AStarPathFinder {
 	private SortedList<Node> _open;
 	private Node[][] _nodes;
 	private Robot _robot;
-
-	
-	private AStarPathFinder(int[][] mazeRef) {
-		_virtualMap = new VirtualMap(mazeRef);
-		_closed = new ArrayList<Node>();
-		_open = new SortedList<Node>();
-		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		for (int x = 0; x < Arena.MAP_LENGTH; x++) {
-			for (int y = 0; y < Arena.MAP_WIDTH; y++) {
-				_nodes[x][y] = new Node(x, y);
-			}
-		}
-		_robot = Robot.getInstance();
-	}
 	
     public static AStarPathFinder getInstance() {
         if (_instance == null) {
-        	MazeExplorer mazeExplorer = MazeExplorer.getInstance();
-            _instance = new AStarPathFinder(mazeExplorer.getMazeRef());
+            _instance = new AStarPathFinder();
         }
         return _instance;
     }
 	
-	public Path findFastestPath() {
+	public Path findFastestPath(int[][] mazeRef) {
+		
+		init(mazeRef);
 		
 		_closed.clear();
 		_open.clear();
@@ -119,6 +106,19 @@ public class AStarPathFinder {
 		path.prependStep(MazeExplorer.START[0],MazeExplorer.START[1]);
 				
 		return path;
+	}
+
+	private void init(int[][] mazeRef) {
+		_virtualMap = new VirtualMap(mazeRef);
+		_closed = new ArrayList<Node>();
+		_open = new SortedList<Node>();
+		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+		for (int x = 0; x < Arena.MAP_LENGTH; x++) {
+			for (int y = 0; y < Arena.MAP_WIDTH; y++) {
+				_nodes[x][y] = new Node(x, y);
+			}
+		}
+		_robot = Robot.getInstance();
 	}
 
 	public void moveRobotAlongFastestPath(Path fastestPath) {

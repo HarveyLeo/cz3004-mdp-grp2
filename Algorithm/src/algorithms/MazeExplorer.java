@@ -25,10 +25,6 @@ public class MazeExplorer {
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
 	
-	private MazeExplorer() {
-		
-	}
-	
 	public int[][] getMazeRef() {
 		return _mazeRef;
 	}
@@ -160,7 +156,7 @@ public class MazeExplorer {
 				}
 				break;
 			case MOVE_FORWARD:
-				_robotOrientation = _robotOrientation;
+				
 		}
 	}
 	
