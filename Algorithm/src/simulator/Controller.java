@@ -213,10 +213,6 @@ public class Controller {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
 			TimeClass timeActionListener = new TimeClass(_timeLimit, _speed);
-			_timer = new Timer(1000, timeActionListener);
-			_timer.start();
-			_ui.setStatus("robot exploring");
-			_hasReachedTimeThreshold = false;
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
@@ -231,14 +227,11 @@ public class Controller {
 					_ui.setStatus("robot exploration completed");
 				}
 			};
-			exploreMaze.execute();
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
 				float _coverage;
-				
 				@Override
 				protected Void doInBackground() throws Exception {
 					int numExplored;
-					
 					JButton[][] mazeGrids = _ui.getMazeGrids();
 					while (!_hasReachedStart) { 
 						numExplored = 0;
@@ -257,7 +250,6 @@ public class Controller {
 					}
 					return null;
 				}
-				
 				@Override
 				public void done() {
 					if (_coverage >= _targetCoverage) {
@@ -267,7 +259,13 @@ public class Controller {
 					}
 				}
 			};
-//			System.out.println("updating coverage");
+			
+		
+			_timer = new Timer(1000, timeActionListener);
+			_timer.start();
+			_ui.setStatus("robot exploring");
+			_hasReachedTimeThreshold = false;
+			exploreMaze.execute();
 			updateCoverage.execute();
 		}
 	}
