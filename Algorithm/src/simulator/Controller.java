@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,6 +36,7 @@ public class Controller {
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
 	private int _speed, _targetCoverage, _timeLimit;
+	private float _actualCoverage;
 	private boolean _hasReachedStart, _hasReachedTimeThreshold;
 
 	private Controller() {
@@ -54,6 +56,7 @@ public class Controller {
 
 	public void run() {
 		_ui.setVisible(true);
+		_ui.refreshInput();
 	}
 
 	public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
@@ -165,41 +168,48 @@ public class Controller {
 
 	class TimeClass implements ActionListener {
 		int _counter; 
-		float _threshold;
 		
-		public TimeClass(int timeLimit, int speed) {
+		public TimeClass(int timeLimit) {
 			_counter = timeLimit;
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			
 			_counter--;
 			_ui.setTimeCounter(_counter);
 			
 			if (_counter >= 0) {
-				SwingWorker<Void, Void> getThreshold = new SwingWorker<Void, Void>() {
+				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
 					Path _backPath;
 					@Override
 					protected Void doInBackground() throws Exception {
+						float threshold;
+						
 						MazeExplorer explorer = MazeExplorer.getInstance();
 						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
-						_threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
-						//testing
-//						System.out.println("threshold: " + _threshold);
+						threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
+						publish(threshold);
 						return null;
 					}
+					@Override
+					protected void process(List<Float> chunks) {
+						Float curThreshold = chunks.get(chunks.size() - 1);
+						if (_counter <= curThreshold) {
+							_hasReachedTimeThreshold = true;
+						}
+					}
+					
 				};
-				getThreshold.execute();
-				if (_counter <= _threshold) {
-					_hasReachedTimeThreshold = true;
-				}
-
 				
 				if (_counter == 0) {
 					_timer.stop();
 					Toolkit.getDefaultToolkit().beep();
 				}
+				
+				getThreshold.execute();
+			
 			} 
 		}
 	}
@@ -212,7 +222,7 @@ public class Controller {
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
-			TimeClass timeActionListener = new TimeClass(_timeLimit, _speed);
+			TimeClass timeActionListener = new TimeClass(_timeLimit);
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
@@ -224,11 +234,14 @@ public class Controller {
 				@Override
 				public void done() {
 					_hasReachedStart = true;
-					_ui.setStatus("robot exploration completed");
+					if (_actualCoverage < _targetCoverage) {
+						_ui.setStatus("exploration completed: not reach target coverage");
+					} else {
+						_ui.setStatus("exploration completed: reach target coverage");
+					}
 				}
 			};
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
-				float _coverage;
 				@Override
 				protected Void doInBackground() throws Exception {
 					int numExplored;
@@ -242,21 +255,13 @@ public class Controller {
 								}
 							}
 						}
-						_coverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
-						_ui.setCoverage(String.format("%.1f", _coverage));
+						_actualCoverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
+						_ui.setCoverage(String.format("%.1f", _actualCoverage));
 					}
 					if (_timer.isRunning()) {
 						_timer.stop();
 					}
 					return null;
-				}
-				@Override
-				public void done() {
-					if (_coverage >= _targetCoverage) {
-						_ui.setStatus("target coverage reached through exploration");
-					} else {
-						_ui.setStatus("target coverage not reached through exploration");
-					}
 				}
 			};
 			
