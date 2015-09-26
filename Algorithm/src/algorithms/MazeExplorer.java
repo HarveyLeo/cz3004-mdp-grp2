@@ -52,6 +52,12 @@ public class MazeExplorer {
 		exploreAlongWall (GOAL);
 		exploreAlongWall (START);
 		
+		if (!isGoalPos(_robotPosition, START)) {
+			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+			Path backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
+			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation);
+		}
+
 		adjustOrientationToNorth();
 
 	}
@@ -94,8 +100,10 @@ public class MazeExplorer {
 	}
 	
 	private void exploreAlongWall (int[] goalPos) {
+		
+		Controller controller = Controller.getInstance();
 
-		while (!isGoalPos(_robotPosition, goalPos)) {
+		while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {

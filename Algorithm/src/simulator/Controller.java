@@ -27,6 +27,7 @@ import simulator.robot.Robot;
 public class Controller {
 	
 	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
+	private static final int THRESHOLD_BUFFER_TIME = 5;
 	
 	private static Controller _instance;
 	private UI _ui;
@@ -34,7 +35,7 @@ public class Controller {
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
 	private int _speed, _targetCoverage, _timeLimit;
-	private boolean _hasReachedStart, _hasReachedTargetCoverage;
+	private boolean _hasReachedStart, _hasReachedTargetCoverage, _hasReachedTimeThreshold;
 
 	private Controller() {
 		_ui = new UI();
@@ -43,6 +44,10 @@ public class Controller {
 	
 	public boolean hasReachedTargetCoverage() {
 		return _hasReachedTargetCoverage;
+	}
+	
+	public boolean hasReachedTimeThreshold() {
+		return _hasReachedTimeThreshold;
 	}
 
 	public static Controller getInstance() {
@@ -170,17 +175,36 @@ public class Controller {
 
 	class TimeClass implements ActionListener {
 		int _counter; 
+		float _threshold;
 		
-		public TimeClass(int timeLimit) {
+		public TimeClass(int timeLimit, int speed) {
 			_counter = timeLimit;
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			_counter--;
+			_ui.setTimeCounter(_counter);
 			
 			if (_counter >= 0) {
-				_ui.setTimeCounter(_counter);
+				SwingWorker<Void, Void> getThreshold = new SwingWorker<Void, Void>() {
+					Path _backPath;
+					@Override
+					protected Void doInBackground() throws Exception {
+						MazeExplorer explorer = MazeExplorer.getInstance();
+						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
+						_threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
+						//testing
+						System.out.println("threshold: " + _threshold);
+						return null;
+					}
+				};
+				getThreshold.execute();
+				if (_counter <= _threshold) {
+					_hasReachedTimeThreshold = true;
+				}
+
 				
 				if (_counter == 0) {
 					_timer.stop();
@@ -198,10 +222,11 @@ public class Controller {
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
-			TimeClass timeActionListener = new TimeClass(_timeLimit);
+			TimeClass timeActionListener = new TimeClass(_timeLimit, _speed);
 			_timer = new Timer(1000, timeActionListener);
 			_timer.start();
 			_ui.setStatus("robot exploring");
+			_hasReachedTimeThreshold = false;
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
@@ -395,8 +420,9 @@ public class Controller {
 			@Override
 			protected Void doInBackground() throws Exception {
 				MazeExplorer explorer = MazeExplorer.getInstance();
-				_fastestPath = pathFinder.findFastestPath(explorer.getMazeRef());
-				pathFinder.moveRobotAlongFastestPath(_fastestPath);
+				_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+						MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH);
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
 				for (Path.Step step : steps) {

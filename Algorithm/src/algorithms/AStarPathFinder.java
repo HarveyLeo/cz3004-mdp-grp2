@@ -23,16 +23,16 @@ public class AStarPathFinder {
         return _instance;
     }
 	
-	public Path findFastestPath(int[][] mazeRef) {
+	public Path findFastestPath(int startX, int startY, int destinationX, int destinationY, int[][] mazeRef) {
 		
 		init(mazeRef);
 		
 		_closed.clear();
 		_open.clear();
 
-		_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]._pathCost = 0;
-		_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]._ori = Orientation.NORTH;
-		_open.add(_nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]);
+		_nodes[startX][startY]._pathCost = 0;
+		_nodes[startX][startY]._ori = Orientation.NORTH;
+		_open.add(_nodes[startX][startY]);
 		
 		//testing - check virtual map
 /*		boolean[][] cleared = _virtualMap.getCleared();
@@ -52,7 +52,7 @@ public class AStarPathFinder {
 		
 		while (_open.size() != 0) {
 			Node current = _open.getFirstNode();
-			if (current == _nodes[MazeExplorer.GOAL[0]][MazeExplorer.GOAL[1]]) {
+			if (current == _nodes[destinationX][destinationY]) {
 				break;
 			}
 			_open.remove(current);
@@ -73,7 +73,7 @@ public class AStarPathFinder {
 
 					if (isValidLocation(_virtualMap.getCleared(), neighborX, neighborY)) {
 						int pathCostOfNeighbor = current._pathCost + getEdgeCost(current._ori, current._x, current._y, neighborX, neighborY);
-						int heuristicOfNeighbor = getHeuristicCost(neighborX, neighborY);
+						int heuristicOfNeighbor = getHeuristicCost(neighborX, neighborY, destinationX, destinationY);
 						Node neighbor = _nodes[neighborX][neighborY];
 						if (_virtualMap.checkIfVisited(neighborX, neighborY) == false) {
 							neighbor._pathCost = pathCostOfNeighbor;
@@ -98,12 +98,12 @@ public class AStarPathFinder {
 		}
 		
 		Path path = new Path();
-		Node target = _nodes[MazeExplorer.GOAL[0]][MazeExplorer.GOAL[1]];
-		while (target != _nodes[MazeExplorer.START[0]][MazeExplorer.START[1]]) {
+		Node target = _nodes[destinationX][destinationY];
+		while (target != _nodes[startX][startY]) {
 			path.prependStep(target._x, target._y);
 			target = target._parent;
 		}
-		path.prependStep(MazeExplorer.START[0],MazeExplorer.START[1]);
+		path.prependStep(startX,startY);
 				
 		return path;
 	}
@@ -121,11 +121,10 @@ public class AStarPathFinder {
 		_robot = Robot.getInstance();
 	}
 
-	public void moveRobotAlongFastestPath(Path fastestPath) {
+	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation) {
 
 		int[] currentPosition = new int[2];
 		int[] nextPosition = new int[2];
-		Orientation currentOrientation = Orientation.NORTH;
 		Orientation nextOrientation;
 		ArrayList<Path.Step> steps = fastestPath.getSteps();
 		
@@ -152,6 +151,8 @@ public class AStarPathFinder {
 		}
 		
 		_robot.moveForward(count);
+		
+		return currentOrientation;
 		
 	}
 
@@ -230,9 +231,9 @@ public class AStarPathFinder {
 		_open.add(node);	
 	}
 
-	private int getHeuristicCost(int x, int y) {
+	private int getHeuristicCost(int x, int y, int destinationX, int destinationY) {
 		int heuristic;
-		heuristic = ( MazeExplorer.GOAL[0] - x ) + ( MazeExplorer.GOAL[1] - y );
+		heuristic = ( destinationX - x ) + ( destinationY - y );
 		return heuristic;
 	}
 

@@ -14,6 +14,10 @@ public class Path {
 		return _steps;
 	}
 	
+	public int getNumOfSteps() {
+		return _steps.size();
+	}
+	
 	public class Step {
 		private int _x;
 		private int _y;
