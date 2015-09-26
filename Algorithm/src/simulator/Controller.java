@@ -27,7 +27,7 @@ import simulator.robot.Robot;
 public class Controller {
 	
 	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
-	private static final int THRESHOLD_BUFFER_TIME = 5;
+	private static final int THRESHOLD_BUFFER_TIME = 3;
 	
 	private static Controller _instance;
 	private UI _ui;
@@ -35,15 +35,10 @@ public class Controller {
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
 	private int _speed, _targetCoverage, _timeLimit;
-	private boolean _hasReachedStart, _hasReachedTargetCoverage, _hasReachedTimeThreshold;
+	private boolean _hasReachedStart, _hasReachedTimeThreshold;
 
 	private Controller() {
 		_ui = new UI();
-	}
-
-	
-	public boolean hasReachedTargetCoverage() {
-		return _hasReachedTargetCoverage;
 	}
 	
 	public boolean hasReachedTimeThreshold() {
@@ -159,11 +154,6 @@ public class Controller {
 			_ui.setStatus("warning: target coverage out of range");
 		} else {
 			_targetCoverage = coverage;
-			if (_targetCoverage == 0) {
-				_hasReachedTargetCoverage = true;
-			} else {
-				_hasReachedTargetCoverage = false;
-			}
 			_ui.setStatus("target coverage set");
 		}
 	}
@@ -196,7 +186,7 @@ public class Controller {
 						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
 						_threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
 						//testing
-						System.out.println("threshold: " + _threshold);
+//						System.out.println("threshold: " + _threshold);
 						return null;
 					}
 				};
@@ -243,10 +233,12 @@ public class Controller {
 			};
 			exploreMaze.execute();
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
+				float _coverage;
+				
 				@Override
 				protected Void doInBackground() throws Exception {
 					int numExplored;
-					float coverage;
+					
 					JButton[][] mazeGrids = _ui.getMazeGrids();
 					while (!_hasReachedStart) { 
 						numExplored = 0;
@@ -257,11 +249,8 @@ public class Controller {
 								}
 							}
 						}
-						coverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
-						_ui.setCoverage(String.format("%.1f", coverage));
-						if (coverage >= _targetCoverage) {
-							_hasReachedTargetCoverage = true;
-						}
+						_coverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
+						_ui.setCoverage(String.format("%.1f", _coverage));
 					}
 					if (_timer.isRunning()) {
 						_timer.stop();
@@ -271,9 +260,14 @@ public class Controller {
 				
 				@Override
 				public void done() {
-					_ui.setStatus("target coverage reached");
+					if (_coverage >= _targetCoverage) {
+						_ui.setStatus("target coverage reached through exploration");
+					} else {
+						_ui.setStatus("target coverage not reached through exploration");
+					}
 				}
 			};
+//			System.out.println("updating coverage");
 			updateCoverage.execute();
 		}
 	}
