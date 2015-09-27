@@ -1,6 +1,5 @@
 #include "DualVNH5019MotorShield.h"
 #include "PinChangeInt.h"
-#include <SharpIR.h>
 
 DualVNH5019MotorShield md;
 
@@ -10,9 +9,6 @@ DualVNH5019MotorShield md;
 #define MAX_SPEED 400
 #define SPEED 200
 
-#define DIST A2 //DIST: pin where long range sensor is attached to
-#define model 20150
-
 #define LF A0   //Left-front
 #define L  A1   //Left
 #define CF  A2  //Centre-front
@@ -21,18 +17,14 @@ DualVNH5019MotorShield md;
 #define SR 0    //Short-range sensor
 #define LR 1    //Long-range sensor
 
-SharpIR sharp(DIST,50,90,model);
-
 int right_encoder_val = 0, left_encoder_val = 0;
 void RightEncoderInc(){right_encoder_val++;}
 void LeftEncoderInc(){left_encoder_val++;}
-
 
 void setup()
 {
   Serial.begin(115200);
   md.init();
-  pinMode(DIST,INPUT);
   PCintPort::attachInterrupt(motor_R_encoder, RightEncoderInc, CHANGE);
   PCintPort::attachInterrupt(motor_L_encoder, LeftEncoderInc, CHANGE);
 }
