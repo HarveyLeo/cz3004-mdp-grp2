@@ -13,11 +13,13 @@ DualVNH5019MotorShield md;
 #define DIST A2 //DIST: pin where long range sensor is attached to
 #define model 20150
 
-#define LF A0
-#define L  A1
-#define F  A2
-#define R  A3
-#define RF A4
+#define LF A0   //Left-front
+#define L  A1   //Left
+#define CF  A2  //Centre-front
+#define R  A3   //Right
+#define RF A4   //Right-front
+#define SR 0    //Short-range sensor
+#define LR 1    //Long-range sensor
 
 SharpIR sharp(DIST,50,90,model);
 
@@ -29,152 +31,220 @@ void LeftEncoderInc(){left_encoder_val++;}
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Dual VNH5019 Motor Shield");
   md.init();
   pinMode(DIST,INPUT);
-  
   PCintPort::attachInterrupt(motor_R_encoder, RightEncoderInc, CHANGE);
   PCintPort::attachInterrupt(motor_L_encoder, LeftEncoderInc, CHANGE);
 }
 
 void loop()
 {
-   char commands[10];
-  int index = 0;
+  char command_buffer[10];
+  int i = 0, arg = 0, digit = 1;
   char newChar;
   left_encoder_val = 0; 
   right_encoder_val = 0; 
 
+  while (1){
+    if (Serial.available()){
+      newChar = Serial.read();
+      command_buffer[i] = newChar;
+      i++;
+      if (newChar == '|'){
+        i = 1;
+        break;
+      }
+    }  
+  }
 
+  //First character in array is the command
+  char command = command_buffer[0];
 
-// while (1){
-//
-//    if (Serial.available()){
-//      newChar = Serial.read();
-//      commands[index] = newChar;
-//      index++;
-//      if (newChar == '|'){
-//        index = 0;
-//        break;
-//      }
-//    }  
-//  }
-
-  char command = commands[0];
-  int grids = 1;
+  //Converts subsequent characters in the array into an integer
+  while(command_buffer[i] != '|'){
+    arg = arg + ( digit * (command_buffer[i] - 48) );
+    digit *= 10;
+    i++;
+  }
+  Serial.println(arg);
   
   //Hardcode here for testing
-  command = 'T';
+  //command = 'C';
+  //arg = 0;
     
   switch ( command ) {
   case 'W':
     {
       delay(2000);
-      moveForward(grids);
+      if(arg == 0) moveForward(1);
+      else moveForward(arg);
+      sendSensors();
       break;
     }
     case 'A':
     {
       delay(2000);
-      rotateLeft(90);
-      
+      if(arg == 0) rotateLeft(90);
+      else rotateLeft(arg);
+      sendSensors();
       break;
     }
     case 'D':
     {
       delay(2000);
-      rotateRight(90);
+      if(arg == 0) rotateRight(90);
+      else rotateRight(arg);
+      sendSensors();
       break;
     }
-    case 'C':
-  {
-    senseDistance();
-    delay(1000);
-    break;
-  }
-    case 'T':
-  {
-    avoid();
-    break;
-  }
-  default:
-    {
+    case 'E':
+   {
+      sendSensors();
       break;
-    }
-    memset(commands,0,sizeof(commands));
+   }
+   case 'C':
+   {
+      frontAlignment();
+      sendSensors();
+      break;
+   }
+     case 'T':
+   {
+     delay(3000);
+     avoid();
+     break;
+   }
+    default:
+   {
+     break;
+   }
+    memset(command_buffer,0,sizeof(command_buffer));
   }
 }
 
+//This function is avoid any 1x1 obstacle placed in the path of the robot
 void avoid(){
-  delay(3000);
+  int CFdistance, RFdistance, LFdistance, Ldistance, Rdistance;
+ 
   while(1){
     moveForward(1);
-    delay(1000);
-    int temp = sensorRead(15,5,LF);
-    Serial.println(temp);
-    if(temp >= 275 && temp <= 435){
+    
+    int LFreading = sensorRead(20,LF);
+    int CFreading = sensorRead(60,CF);
+    int RFreading = sensorRead(20,RF);
+    int Lreading = sensorRead(20,L);
+    int Rreading = sensorRead(20,R);
+
+    Serial.print("LF:");
+    Serial.println(LFreading);
+    LFdistance = 6088 / (LFreading  + 7) - 1;
+    Serial.println(LFdistance);
+    Serial.println("CF:");
+    Serial.println(CFreading);
+    CFdistance = 15500.0 / (CFreading +29) -5;
+    Serial.println(CFdistance);
+    Serial.print("RF:");
+    Serial.println(RFreading);
+    RFdistance = 6088 / (RFreading  + 7) - 1;
+    Serial.println(RFdistance);
+    Serial.print("L:");
+    Serial.println(Lreading);
+    Ldistance = 6088 / (Lreading  + 7) - 1;
+    Serial.println(Ldistance);
+    Serial.print("R:");
+    Serial.println(Rreading);
+    Rdistance = 6088 / (Rreading  + 7) - 1;
+    Serial.println(Rdistance);
+    
+    if (RFreading >= 275 && RFreading <= 435){ //Obstacle at RF sensor
+      Serial.println("RF Detected");
+      delay(1000);
       rotateRight(90);
-      delay(2000);
+      delay(1000);
+      moveForward(3);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(4);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(3);
+      delay(1000);
+      rotateRight(90);
     }
+    else if(CFdistance >=20 && CFdistance <= 23){ //Obstacle at CF sensor
+      Serial.println("CF Detected");
+      delay(1000);
+      rotateRight(90);
+      delay(1000);
+      moveForward(2);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(4);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(2);
+      delay(1000);
+      rotateRight(90);
+    }
+    else if( LFreading >= 275 && LFreading <= 435){ //Obstacle at LF sensor
+      Serial.println("LF Detected");
+      delay(1000);
+      rotateRight(90);
+      delay(1000);
+      moveForward(1);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(4);
+      delay(1000);
+      rotateLeft(90);
+      delay(1000);
+      moveForward(1);
+      delay(1000);
+      rotateRight(90);
+      
+    }
+    
+    delay(1000);
   }
 }
-  
-//  if ((LF < 400)&&(RF<400)){
-//      moveForward(1);
-//      delay(1000);
-//  }
-//  else if ((LF > 400) && (RF>400)){
-//    if ( L >= 400 ){
-//      rotateRight(90);
-//      delay(1000);
-//      }
-//    else {     
-//      rotateLeft(90);
-//      delay(1000);
-//    }
-//  }
-
 
 
 int rotateRight(int angle){
   left_encoder_val = 0;
   right_encoder_val = 0;
-  int pwm1=300, pwm2=300, output=0,LeftPosition,RightPosition;
-  int target_Angle;
+  int pwm1=300, pwm2=300, output=0;
+  int angle_offset;
 
   if (angle <= 15){
-    target_Angle = angle * 8.4;  
+    angle_offset = angle * 8.4;  
     pwm1=150;
     pwm2=150;
   }
   else if ((angle > 15) && (angle <= 30))
-    target_Angle = angle * 8.4;  
+    angle_offset = angle * 8.4;  
   else if ((angle > 30) && (angle <= 45))
-    target_Angle = angle * 7.95;
+    angle_offset = angle * 7.95;
 
   else if ((angle > 45) && (angle <= 90)) //Only this one calibrated 
-    target_Angle = angle * 8.95;
+    angle_offset = angle * 8.95;
 
   else if ((angle > 90) && (angle <= 360))  
-    target_Angle = angle * 9.17;
+    angle_offset = angle * 9.17;
   else if ((angle > 360) && (angle <= 720))  
-    target_Angle = angle * 9.0;
+    angle_offset = angle * 9.0;
   else if ((angle > 720) && (angle <= 1080)) 
-    target_Angle = angle * 9.0;
+    angle_offset = angle * 9.0;
 
   while(1){
-
-    LeftPosition =  left_encoder_val;
-    RightPosition =  right_encoder_val;  
-
-    //  output = pidControlLeftAndRight(motor1_encoder,motor2_encoder);
-   // output = pidControlLeftAndRight(LeftPosition,RightPosition); //hardcoded
-
-
-    //   md.setSpeeds(pwm1-output, -(pwm2+output));
+        
     md.setSpeeds(-(pwm1-output), pwm2+output);
 
-    if((RightPosition >= target_Angle - 70)&&(angle > 8)){ //used to be left position
+    if((right_encoder_val >= angle_offset - 70)&&(angle > 8)){ 
       md.setBrakes(400, 400);
       delay(100);
       md.setBrakes(0, 0);
@@ -182,57 +252,46 @@ int rotateRight(int angle){
     }
 
 
-    if((RightPosition >= target_Angle - 5)&&(angle < 9)){
+    if((right_encoder_val >= angle_offset - 5)&&(angle < 9)){
       md.setBrakes(400, 400);
       delay(100);
       md.setBrakes(0, 0);
       break;
     }
   }
-
- // if (angle == 90 && getSensor == 1)
-  //  exportSensors(); 
 }
 
 int rotateLeft(int angle){
   left_encoder_val = 0;
   right_encoder_val = 0;
-  int pwm1=300, pwm2=300, output=0,LeftPosition,RightPosition;
-  int target_Angle;
+  int pwm1=300, pwm2=300, output=0;
+  int angle_offset;
 
   if (angle <= 15){
-    target_Angle = angle * 8.4;
+    angle_offset = angle * 8.4;
     pwm1=150;
     pwm2=150;
   }
   else if ((angle > 15) && (angle <= 30))
-    target_Angle = angle * 8.4;
+    angle_offset = angle * 8.4;
   else if ((angle > 30) && (angle <= 45))
-    target_Angle = angle * 7.95;
+    angle_offset = angle * 7.95;
     
   else if ((angle > 45) && (angle <= 90))   //Only this one calibrated 
-    target_Angle = angle * 9.13;
+    angle_offset = angle * 9.13;
 
   else if ((angle > 90) && (angle <= 360))  
-    target_Angle = angle * 9.17;
+    angle_offset = angle * 9.17;
   else if ((angle > 360) && (angle <= 720))  
-    target_Angle = angle * 9.22;
-  else if ((angle >= 720) && (angle <= 1080))
-    target_Angle = angle * 9.2;
+    angle_offset = angle * 9.22;
+  else if ((angle > 720) && (angle <= 1080))
+    angle_offset = angle * 9.2;
 
   while(1){
 
-    LeftPosition =  left_encoder_val;
-    RightPosition =  right_encoder_val;  
-
-    //  output = pidControlLeftAndRight(motor1_encoder,motor2_encoder);
-   // output = pidControlLeftAndRight(LeftPosition,RightPosition); //hardcoded
-
-
     md.setSpeeds(pwm1-output, -(pwm2+output));
-    //md.setSpeeds(-(pwm1-output), pwm2+output);
 
-    if((LeftPosition >= target_Angle - 70)&&(angle > 8)){ 
+    if((left_encoder_val >= angle_offset - 70)&&(angle > 8)){ 
       md.setBrakes(400, 400);
       delay(100);
       md.setBrakes(0, 0);
@@ -240,16 +299,31 @@ int rotateLeft(int angle){
     }
 
 
-    if((LeftPosition >= target_Angle - 5)&&(angle < 9)){
+    if((left_encoder_val >= angle_offset - 5)&&(angle < 9)){
       md.setBrakes(400, 400);
       delay(100);
       md.setBrakes(0, 0);
       break;
     }
   }
+}
 
- // if (angle == 90 && getSensor == 1)
-  //  exportSensors(); 
+//Function for making a left turn on a 2x2 grid.
+void turnLeft(){
+  md.setSpeeds(200,300);
+  delay(750);
+  md.setBrakes(400,400);
+  delay(100);
+  md.setBrakes(0,0);
+}
+
+//Function for making a right turn on a 2x2 grid.
+void turnRight(){
+  md.setSpeeds(300,200);
+  delay(750);
+  md.setBrakes(400,400);
+  delay(100);
+  md.setBrakes(0,0);
 }
 
 void moveForward(int distance){
@@ -259,13 +333,17 @@ void moveForward(int distance){
   int pwmR = SPEED;
   int pwmL = SPEED;
   int output=0;
-  int leftOffset =0; 
 
   int multiplier;
   switch(distance){
-    case 2: multiplier = 585; break;
-    case 3: multiplier = 560; break;
-    case 4: multiplier = 560; break;
+    case 2: multiplier = 580; break;
+    case 3: multiplier = 585; break;
+    case 4: multiplier = 590; break;
+    case 5: multiplier = 590; break;
+    case 6: multiplier = 590; break;
+    case 7: multiplier = 590; break;
+    case 8: multiplier = 590; break;
+    case 9: multiplier = 590; break;
     case 10: multiplier = 600; break;
     case 11: multiplier = 600; break;
     case 12: multiplier = 600; break;
@@ -276,22 +354,21 @@ void moveForward(int distance){
   
   }
   int target_Distance = multiplier * distance;
-
-  //if(  
+  
   while(1){
                   if(right_encoder_val > target_Distance){ // break
-                    //md.setBrakes(SPEED, SPEED);
-                   // delay(0);
                     md.setBrakes(MAX_SPEED, MAX_SPEED-20);
                     delay(100);
                     md.setBrakes(0, 0);
                     break;
                   }
                   output = pidControlForward(left_encoder_val,right_encoder_val);
-                  md.setSpeeds(pwmR-output+leftOffset,pwmL+output);
+                  md.setSpeeds(pwmR-output,pwmL+output);
       }
+      
 }
 
+//This function is used to implement the PID control
 int pidControlForward(int left_encoder_val, int right_encoder_val) {
   int error,prevError,pwmL=SPEED,pwmR=SPEED;
   float integral,derivative,output;
@@ -309,23 +386,46 @@ int pidControlForward(int left_encoder_val, int right_encoder_val) {
   return pwmL;
 }
 
-void senseDistance() {
-   delay(1000);    // it gives you time to open the serial monitor after you upload the sketch  
-
-  unsigned long pepe1=millis();  // takes the time before the loop on the library begins
-  
-  int dis=sharp.distance();  // this returns the distance to the object you're measuring
-
-  Serial.print("Mean distance: ");  // returns it to the serial monitor
-  Serial.println(dis);
-  
-  unsigned long pepe2=millis()-pepe1;  // the following gives you the time taken to get the measurement
-  Serial.print("Time taken (ms): ");
-  Serial.println(pepe2);  
-
-  Serial.print(distanceInGrids(dis));
-  Serial.println(" grids away from obstacle!");
+//Function to align robot to front wall
+void frontAlignment(){
+  angleAlign();
+  delay(100);
 }
+
+//Angle alignment to ensure robot is facing perpendicular to wall.
+void angleAlign(){
+  while(1){
+    int LFreading = sensorRead(20,LF);
+    int RFreading = sensorRead(20,RF);
+    int error = LFreading - RFreading;
+
+    if(error>5) rotateRight(3);
+    else if (error<-5) rotateLeft(3);
+    else break;
+  }
+  delay(100);
+  distAlign();
+}
+
+//Distance alignment to ensure robot is approx 15cm from wall to front sensors
+void distAlign(){
+  while(1){
+    int LFdistance = distanceInCM(sensorRead(20,LF),LF);
+
+    if(LFdistance < 365) md.setSpeeds(100,100);
+    else if(LFdistance > 375) md.setSpeeds(-100,-100);
+    else break;
+  }
+   md.setBrakes(400, 400);
+   delay(50);
+   md.setBrakes(0, 0);
+
+   //Recursive call if angle is misaligned after distance alignment.
+   int angleError = sensorRead(20,LF) - sensorRead(20,RF);
+   if(angleError>5 || angleError<-5) frontAlignment();
+
+}
+//Standard insertion sort algorithm
 void insertionsort(int array[], int length){
   int i,j;
   int temp;
@@ -342,38 +442,80 @@ void insertionsort(int array[], int length){
   }
 }
 
-int sensorRead(int in, int out, int sensor){
-  int x[in];
+//This function returns the average 10-bit ADC reading where n is the number of samples
+int sensorRead(int n, int sensor){
+  int x[n];
   int i;
   int sum = 0;
-  int start = (in - out)/2;
-  int average;
-  for(i=0;i<in;i++){
+  for(i=0;i<n;i++){
     x[i] = analogRead(sensor);
   }
-  insertionsort(x, in);
-  for(i = start; i < start+out; i++){
-    sum = sum + x[i];
-  }
-  average = sum/out;
-  return average;
+  insertionsort(x, n);
+  return x[n/2];          //Return Median
 }
 
-int distanceInGrids(int dis){
-  int grids;
-  if (dis>= 7 && dis <= 17)
-      grids = 1;
-  else if (dis >= 18 && dis <= 29)
-      grids = 2;
-  else if (dis >= 30 && dis <= 42)
-      grids = 3;
-  else if (dis >= 43 && dis <= 60)
-      grids = 4;
-  else
-      grids = 0;
+//This function sends the sensor data to the RPi
+void sendSensors(){
+  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,LF),LF),SR));
+  Serial.print(":");
+  Serial.print(distanceInGrids(distanceInCM(sensorRead(60,CF),CF),LR));
+  Serial.print(":");
+  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,RF),RF),SR));
+  Serial.print(":");
+  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,L),L),SR));
+  Serial.print(":");
+  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,R),R),SR));
+  Serial.print("|");
+}
 
-  return grids;
+//This function converts the ADC readings into centimeters
+int distanceInCM(int reading, int sensor){
+    int cm;
+
+    switch(sensor){
+      case LF:
+        cm = 6088 / (reading  + 7) - 1;
+        break;
+      case CF: //Long range
+        cm = 15500.0 / (reading +29) -5;
+        break;
+      case RF:
+        cm = 6088 / (reading  + 7) - 1;
+        break;      
+      case L:
+        cm = 6088 / (reading  + 7) - 1;
+        break;      
+      case R:
+        cm = 6088 / (reading  + 7) - 1;
+        break;      
+      default:
+        return -1;
+    }      
+   return cm;  
+}
+
+//This function converts the cm readings into grids based on sensor type
+int distanceInGrids(int dis, int sensorType){
+  int grids;
   
+  if(sensorType == SR){ //Short range effective up to 2 grids away
+      if (dis > 28) grids = 0;
+      else if (dis>= 12 && dis <= 18) grids = 1;
+      else if (dis >= 22 && dis <= 28) grids = 2;
+      //else if (dis >= 32 && dis <= 38) grids = 3;
+      else grids = -1;
+  }
+  else if(sensorType == LR){ //Long range effective up to 5 grids away
+      if (dis > 58) grids = 0;
+      else if (dis>= 12 && dis <= 22) grids = 1;
+      else if (dis > 22 && dis <= 28) grids = 2;
+      else if (dis >= 32 && dis <= 38) grids = 3;
+      else if (dis >= 42 && dis <= 48) grids = 4;
+      else if (dis >= 52 && dis <= 58) grids = 5;
+      else grids = -1;
+  }
+  
+  return grids;
 }
 
 void stopIfFault()
@@ -389,3 +531,22 @@ void stopIfFault()
     while(1);
   }
 }
+
+//void senseDistance() {
+//   delay(1000);    // it gives you time to open the serial monitor after you upload the sketch  
+//
+//  unsigned long pepe1=millis();  // takes the time before the loop on the library begins
+//  
+//  int dis=sharp.distance();  // this returns the distance to the object you're measuring
+//
+//  Serial.print("Mean distance: ");  // returns it to the serial monitor
+//  Serial.println(dis);
+//  
+//  unsigned long pepe2=millis()-pepe1;  // the following gives you the time taken to get the measurement
+//  Serial.print("Time taken (ms): ");
+//  Serial.println(pepe2);  
+//
+//  Serial.print(distanceInGrids(dis));
+//  Serial.println(" grids away from obstacle!");
+//}
+
