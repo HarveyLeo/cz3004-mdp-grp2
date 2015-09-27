@@ -29,7 +29,6 @@ import simulator.arena.FileReaderWriter;
 import java.awt.Font;
 
 import javax.swing.JTextField;
-import javax.swing.SwingWorker;
 
 import java.awt.FlowLayout;
 
@@ -39,10 +38,11 @@ public class UI extends JFrame implements ActionListener {
 	private static final String FFP_PANEL = "Find fastest path";
 	private static final long serialVersionUID = 1L;
 	private JPanel _contentPane, _mapPane, _ctrlPane, _mazePane;
-	private JLabel _status, _timeCounter, _coverageUpdate;
+	private JLabel _status, _timer, _coverageUpdate;
 	private JButton[][] _mapGrids, _mazeGrids;
 	private Controller _controller;
 	private JTextField[] _exploreTextFields, _ffpTextFields;
+	private JButton _exploreBtn, _ffpBtn;
 
 	/**
 	 * Create the simulator.
@@ -59,6 +59,15 @@ public class UI extends JFrame implements ActionListener {
 		pack();
 	}
 
+	public void setExploreBtnEnabled() {
+		_exploreBtn.setEnabled(true);
+	}
+		
+	public void setFfpBtnEnabled() {
+		_ffpBtn.setEnabled(true);
+	}
+	
+	
 	public JPanel getContentPane() {
 		return _contentPane;
 	}
@@ -133,9 +142,9 @@ public class UI extends JFrame implements ActionListener {
 		// Add control panel for exploring.
 		JLabel[] exploreCtrlLabels = new JLabel[4];
 		_exploreTextFields = new JTextField[4];
-		JButton exploreBtn = new JButton("Explore");
-		exploreBtn.setActionCommand("ExploreMaze");
-		exploreBtn.addActionListener(this);
+		_exploreBtn = new JButton("Explore");
+		_exploreBtn.setActionCommand("ExploreMaze");
+		_exploreBtn.addActionListener(this);
 		exploreCtrlLabels[0] = new JLabel("Robot initial position: ");
 		exploreCtrlLabels[1] = new JLabel("Speed (steps/sec): ");
 		exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
@@ -175,7 +184,7 @@ public class UI extends JFrame implements ActionListener {
 		_exploreTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
 
 		JPanel exploreBtnPane = new JPanel();
-		exploreBtnPane.add(exploreBtn);
+		exploreBtnPane.add(_exploreBtn);
 
 		JPanel exploreCtrlPane = new JPanel();
 		exploreCtrlPane.add(exploreInputPane);
@@ -185,9 +194,9 @@ public class UI extends JFrame implements ActionListener {
 		// Add control panel for finding fastest path.
 		JLabel[] ffpCtrlLabels = new JLabel[2];
 		_ffpTextFields = new JTextField[2];
-		JButton ffpBtn = new JButton("Navigate");
-		ffpBtn.setActionCommand("FindFastestPath");
-		ffpBtn.addActionListener(this);
+		_ffpBtn = new JButton("Navigate");
+		_ffpBtn.setActionCommand("FindFastestPath");
+		_ffpBtn.addActionListener(this);
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 2; i++) {
@@ -199,13 +208,17 @@ public class UI extends JFrame implements ActionListener {
 		ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		ffpInputPane.add(_ffpTextFields[0]);
 		_ffpTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_ffpTextFields[0].setEditable(false);
 		ffpInputPane.add(ffpCtrlLabels[1]);
+		_ffpTextFields[1].setText("120");
 		ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		ffpInputPane.add(_ffpTextFields[1]);
 		_ffpTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+		_ffpTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
+		_ffpTextFields[1].getDocument().putProperty("name", "Robot FFP Time Limit");
 
 		JPanel ffpBtnPane = new JPanel();
-		ffpBtnPane.add(ffpBtn);
+		ffpBtnPane.add(_ffpBtn);
 
 		JPanel ffpCtrlPane = new JPanel();
 		ffpCtrlPane.add(ffpInputPane);
@@ -228,13 +241,13 @@ public class UI extends JFrame implements ActionListener {
 		statusConsole.setPreferredSize(new Dimension(280, 100));
 		_status = new JLabel("waiting for commands...");
 		_status.setHorizontalAlignment(JLabel.CENTER);
-		_timeCounter = new JLabel();
-		_timeCounter.setHorizontalAlignment(JLabel.CENTER);
+		_timer = new JLabel();
+		_timer.setHorizontalAlignment(JLabel.CENTER);
 		_coverageUpdate = new JLabel();
 		_coverageUpdate.setHorizontalAlignment(JLabel.CENTER);
 		statusConsole.add(_status);
 		statusConsole.add(_coverageUpdate);
-		statusConsole.add(_timeCounter);
+		statusConsole.add(_timer);
 		statusPane.add(statusConsole, BorderLayout.CENTER);
 		_ctrlPane.add(statusPane, BorderLayout.SOUTH);
 
@@ -294,8 +307,10 @@ public class UI extends JFrame implements ActionListener {
 		} else if (cmd.equals("ClearMap")) {
 			_controller.clearMap(_mapGrids);
 		} else if (cmd.equals("ExploreMaze")) {
+			_exploreBtn.setEnabled(false);
         	_controller.exploreMaze();
 		} else if (cmd.equals("FindFastestPath")) {
+			_ffpBtn.setEnabled(false);
 			_controller.findFastestPath();
 		}
 	}
@@ -304,12 +319,24 @@ public class UI extends JFrame implements ActionListener {
 		_status.setText(message);
 	}
 
-	public void setTimeCounter (int timeLeft) {
-		_timeCounter.setText("Time left (sec): " + timeLeft);
+	public void setTimer (int timeLeft) {
+		_timer.setText("Time left (sec): " + timeLeft);
 	}
 	
-	public void setCoverage (String coverage) {
-		_coverageUpdate.setText("Coverage (%): " + coverage);
+	public String getTimerMessage () {
+		return _timer.getText();
+	}
+	
+	public void setTimer (String message) {
+		_timer.setText(message);
+	}
+	
+	public void setCoverageUpdate (Float coverage) {
+		_coverageUpdate.setText("Coverage (%): " + 	String.format("%.1f", coverage));
+	}
+	
+	public void setCoverageUpdate (String message) {
+		_coverageUpdate.setText(message);
 	}
 	
 	/*
@@ -351,8 +378,8 @@ public class UI extends JFrame implements ActionListener {
 				try {
 					String speed = doc.getText(0, doc.getLength());
 					if (speed.matches("[0-9]+")) {
-						_controller.setExploreSpeed(Integer.parseInt(speed));
-						
+						_controller.setRobotSpeed(Integer.parseInt(speed));
+						_ffpTextFields[0].setText(speed);
 					} else {
 						_status.setText("robot speed not set");
 					}
@@ -376,9 +403,22 @@ public class UI extends JFrame implements ActionListener {
 					String timeLimit = doc.getText(0, doc.getLength());
 					if (timeLimit.matches("[0-9]+")) {
 						_controller.setExploreTimeLimit(Integer.parseInt(timeLimit));
-						_timeCounter.setText("Time left (sec): " + timeLimit);
+						_timer.setText("Time left (sec): " + timeLimit);
 					} else {
-						_status.setText("exploring time limit not set");
+						_status.setText("time limit for exploring not set");
+					}
+				} catch (BadLocationException ex) {
+					ex.printStackTrace();
+				}
+			} else if (name.equals("Robot FFP Time Limit")) {
+				try {
+					String timeLimit = doc.getText(0, doc.getLength());
+					if (timeLimit.matches("[0-9]+")) {
+						_controller.setFFPTimeLimit(Integer.parseInt(timeLimit));
+						_coverageUpdate.setText("");
+						_timer.setText("Time left (sec): " + timeLimit);
+					} else {
+						_status.setText("time limit for fastest path not set");
 					}
 				} catch (BadLocationException ex) {
 					ex.printStackTrace();
@@ -410,10 +450,17 @@ public class UI extends JFrame implements ActionListener {
 		arena.setLayout(_mapGrids);
 	}
 
-	public void refreshInput() {
+	public void refreshExploreInput() {
 		for (int i = 0; i < 4; i++) {
 			_exploreTextFields[i].setText(_exploreTextFields[i].getText());
 		}
-//		_ffpTextFields[0].setText(_ffpTextFields[0].getText());	
 	}
+	
+	public void refreshFfpInput() {
+		for (int i = 0; i < 2; i++) {
+			_ffpTextFields[i].setText(_ffpTextFields[i].getText());
+		}
+
+	}
+	
 }

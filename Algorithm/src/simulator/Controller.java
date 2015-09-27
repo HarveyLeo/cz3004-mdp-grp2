@@ -32,10 +32,10 @@ public class Controller {
 	
 	private static Controller _instance;
 	private UI _ui;
-	private Timer _timer;
+	private Timer _exploreTimer, _ffpTimer;
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
-	private int _speed, _targetCoverage, _timeLimit;
+	private int _speed, _targetCoverage, _exploreTimeLimit, _ffpTimeLimit;
 	private float _actualCoverage;
 	private boolean _hasReachedStart, _hasReachedTimeThreshold;
 
@@ -56,7 +56,7 @@ public class Controller {
 
 	public void run() {
 		_ui.setVisible(true);
-		_ui.refreshInput();
+		_ui.refreshExploreInput();
 	}
 
 	public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
@@ -147,7 +147,7 @@ public class Controller {
 		}
 	}
 
-	public void setExploreSpeed(int speed) {
+	public void setRobotSpeed(int speed) {
 		_speed = speed;
 		_ui.setStatus("robot speed set");
 	}
@@ -162,14 +162,20 @@ public class Controller {
 	}
 
 	public void setExploreTimeLimit(int limit) {
-		_timeLimit = limit;
-		_ui.setStatus("exploring time limit set");
+		_exploreTimeLimit = limit;
+		_ui.setStatus("time limit for exploring set");
 	}
 
-	class TimeClass implements ActionListener {
+	public void setFFPTimeLimit(int limit) {
+		_ffpTimeLimit = limit;
+		_ui.setStatus("time limit for fastest path set");
+	}
+	
+	
+	class ExploreTimeClass implements ActionListener {
 		int _counter; 
 		
-		public TimeClass(int timeLimit) {
+		public ExploreTimeClass(int timeLimit) {
 			_counter = timeLimit;
 		}
 		
@@ -177,7 +183,7 @@ public class Controller {
 		public void actionPerformed(ActionEvent e) {
 			
 			_counter--;
-			_ui.setTimeCounter(_counter);
+			_ui.setTimer(_counter);
 			
 			if (_counter >= 0) {
 				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
@@ -204,7 +210,8 @@ public class Controller {
 				};
 				
 				if (_counter == 0) {
-					_timer.stop();
+					_exploreTimer.stop();
+					_ui.setTimer("exploration: time out");
 					Toolkit.getDefaultToolkit().beep();
 				}
 				
@@ -214,15 +221,40 @@ public class Controller {
 		}
 	}
 	
+	class FastestPathTimeClass implements ActionListener {
+		int _timeLimit;
+		int _counter; 
+		
+		public FastestPathTimeClass(int timeLimit) {
+			_timeLimit = timeLimit;
+			_counter = 0;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			_timeLimit--;
+			_counter++;
+			_ui.setCoverageUpdate("Time passed (sec): " + _counter);
+			_ui.setTimer(_timeLimit);
+			if (_timeLimit == 0) {
+				_ffpTimer.stop();
+				_ui.setCoverageUpdate("");
+				_ui.setTimer("fastest path: time out");
+				Toolkit.getDefaultToolkit().beep();
+			}			
+		}
+	}
+	
 	public void exploreMaze() {
-		_ui.refreshInput();
+		_ui.refreshExploreInput();
 		Arena arena = Arena.getInstance();
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		Robot robot = Robot.getInstance();
 		if (arena.getLayout() == null) {
 			_ui.setStatus("warning: no layout loaded yet");
 		} else {
-			TimeClass timeActionListener = new TimeClass(_timeLimit);
+			ExploreTimeClass timeActionListener = new ExploreTimeClass(_exploreTimeLimit);
 			SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
@@ -234,11 +266,19 @@ public class Controller {
 				@Override
 				public void done() {
 					_hasReachedStart = true;
+					_ui.setStatus("exploration completed");
 					if (_actualCoverage < _targetCoverage) {
-						_ui.setStatus("exploration completed: not reach target coverage");
+						_ui.setCoverageUpdate("exploration: not reach target coverage");
 					} else {
-						_ui.setStatus("exploration completed: reach target coverage");
+						_ui.setCoverageUpdate("exploration: reach target coverage");
+					}	
+					if (!_ui.getTimerMessage().equals("exploration: time out")) {
+						_ui.setTimer("exploration: within time limit");
 					}
+					if (_exploreTimer.isRunning()) {
+						_exploreTimer.stop();
+					}
+					_ui.setExploreBtnEnabled();
 				}
 			};
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
@@ -256,18 +296,15 @@ public class Controller {
 							}
 						}
 						_actualCoverage = (float)(100 * numExplored) / (float)(Arena.MAP_LENGTH * Arena.MAP_WIDTH);
-						_ui.setCoverage(String.format("%.1f", _actualCoverage));
-					}
-					if (_timer.isRunning()) {
-						_timer.stop();
+						_ui.setCoverageUpdate( _actualCoverage);
 					}
 					return null;
 				}
 			};
 			
 		
-			_timer = new Timer(1000, timeActionListener);
-			_timer.start();
+			_exploreTimer = new Timer(1000, timeActionListener);
+			_exploreTimer.start();
 			_ui.setStatus("robot exploring");
 			_hasReachedTimeThreshold = false;
 			exploreMaze.execute();
@@ -410,6 +447,10 @@ public class Controller {
 	}
 
 	public void findFastestPath() {
+		_ui.refreshFfpInput();
+		
+		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
+		
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		
 		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
@@ -432,10 +473,20 @@ public class Controller {
 			@Override
 			public void done() {
 				_ui.setStatus("fastest path found");
+				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
+					_ui.setTimer("fastest path: within time limit");
+				}
+				if (_ffpTimer.isRunning()) {
+					_ffpTimer.stop();
+				}
+				_ui.setFfpBtnEnabled();
 			}
 		};
-		findFastestPath.execute();
 		
+		_ffpTimer = new Timer(1000, timeActionListener);
+		_ffpTimer.start();
+		_ui.setStatus("robot finding fastest path");
+		findFastestPath.execute();
 	}
 
 }
