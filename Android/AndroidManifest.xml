@@ -17,18 +17,26 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".BluetoothConnection"
-            android:label="@string/app_name" >
+        <activity 
+            android:name=".MainActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".BluetoothConnection"
+            android:label="@string/app_name" >
+        </activity>
         <service 
             android:name=".BluetoothService"
             android:label="@string/app_name"
-            android:exported="false"/>       
+            android:exported="false"/>     
+        <activity
+            android:name=".BluetoothCommunication"
+            android:label="@string/app_name" >
+        </activity>  
     </application>
 
 </manifest>

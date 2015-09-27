@@ -2,87 +2,100 @@ package com.example.mdpandroidapp;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BluetoothConnection extends Activity {
+public class BluetoothCommunication extends Activity{
 	
 	//for logging purpose
 	private String logMessage = "";
 	private TextView debugView;
-
-	//to change button text and color
-	private Button listDeviceButton;
-	private Button connnectAsClientButton;
 	private TextView connectionStatusText;
-	private Button connectAsServerButton;
-
+	
 	//for connection to BluetoothService
 	private boolean bound = false;
 	private BluetoothService bluetoothService;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_bluetooth_connection);
-		debugView = (TextView)findViewById(R.id.text_debug);
+		setContentView(R.layout.activity_bluetooth_communication);
 		
-		listDeviceButton = (Button)findViewById(R.id.button_list_device);
-		connnectAsClientButton = (Button)findViewById(R.id.button_connect_client);
-		connectionStatusText = (TextView)findViewById(R.id.text_connection_status);
-		connectAsServerButton = (Button)findViewById(R.id.button_connect_server);
+		debugView = (TextView)findViewById(R.id.text_comm_debug);
+		connectionStatusText = (TextView)findViewById(R.id.text_comm_status);
 		
 		//Register the BroadcastReceiver
-		IntentFilter filter = new IntentFilter(BluetoothService.EVENT_DEVICE_LIST_UPDATED);
-		filter.addAction(BluetoothService.EVENT_STATE_NONE);
+		IntentFilter filter = new IntentFilter(BluetoothService.EVENT_STATE_NONE);
 		filter.addAction(BluetoothService.EVENT_STATE_LISTEN);
 		filter.addAction(BluetoothService.EVENT_STATE_CONNECTING);
 		filter.addAction(BluetoothService.EVENT_STATE_CONNECTED);
 		filter.addAction(BluetoothService.EVENT_MESSAGE_RECEIVED);
 		registerReceiver(mReceiver, filter);
 		
-		//Create listener for ListView
-		AdapterView.OnItemClickListener itemClickListener = new 
-			AdapterView.OnItemClickListener(){
-			public void onItemClick(AdapterView<?> ListView, View
-				itemView, int position, long id){
-
-				String deviceInfo = (String)ListView.getItemAtPosition(position);
-				String[] deviceData = deviceInfo.split("\n");
-				bluetoothService.setDeviceInfo(deviceData[0], deviceData[1]);
-				logMsg(String.format("Select name: %s, MAC: %s", 
-						deviceData[0], deviceData[1]));
-				singleDeviceListView(deviceData[0], deviceData[1]);
+		try{
+			BluetoothDBHelper dbHelper = new BluetoothDBHelper(this);
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			
+			Cursor cursor = db.query("STRING_MESS", 
+				new String[]{"NAME", "DESCRIPTION"},
+				null, null, null, null, null);
+			
+			if (cursor.moveToFirst()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text01);
+				editText.setText(text);
 			}
-		};
+			if (cursor.moveToNext()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text02);
+				editText.setText(text);
+			}
+			if (cursor.moveToNext()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text03);
+				editText.setText(text);
+			}
+			if (cursor.moveToNext()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text04);
+				editText.setText(text);
+			}
+			if (cursor.moveToNext()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text05);
+				editText.setText(text);
+			}
+			if (cursor.moveToNext()){
+				String text = cursor.getString(1);
+				EditText editText = (EditText)findViewById(R.id.edit_text06);
+				editText.setText(text);
+			}
+			cursor.close();
+			db.close();
+		}catch (SQLiteException e) { 
+			Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+		}
 
-		//Add the listener to the ListView
-		ListView listView = (ListView)findViewById(R.id.list_devices);
-		listView.setOnItemClickListener(itemClickListener);
-	}
-	
-	private void singleDeviceListView(String deviceName, String MACAddress){
-		ArrayList<String> singleDevice = new ArrayList<String>();
-		singleDevice.add(deviceName + "\n" + MACAddress);
-		setDeviceListView(singleDevice);
 	}
 	
 	/*Activity LifeCycle
@@ -94,14 +107,14 @@ public class BluetoothConnection extends Activity {
 		super.onStart();
 		//Bind this activity to BluetoothService
 		Intent intent = new Intent(this, BluetoothService.class);
-		bindService(intent, connection, Context.BIND_AUTO_CREATE);
+		bindService(intent, connection, Context.BIND_AUTO_CREATE); 
 	}
 	
 	@Override
 	protected void onResume(){
+		
 		super.onResume();
 		if (bluetoothService == null){
-			
 			logMsg("Bluetooth State None");
 			setConnectStatus("Bluetooth State None");
 			return;
@@ -149,39 +162,97 @@ public class BluetoothConnection extends Activity {
 			bound = false;
 		}
 	}
-
-	/*Handle button's onClick event
+	
+	/*Handle Button Click here
 	 * 
 	 */
 	
-	public void onTurnOnBtnClick(View view){
-		Intent turnonBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		this.startActivity(turnonBTIntent);
+	public void onSendClick(View view){
+		onSaveTextDBClick(null);
+		EditText editText;
+		Button sendBtn = (Button) view;
+		switch(sendBtn.getId()){
+		case R.id.button_send01:
+			editText = (EditText)findViewById(R.id.edit_text01);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		case R.id.button_send02:
+			editText = (EditText)findViewById(R.id.edit_text02);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		case R.id.button_send03:
+			editText = (EditText)findViewById(R.id.edit_text03);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		case R.id.button_send04:
+			editText = (EditText)findViewById(R.id.edit_text04);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		case R.id.button_send05:
+			editText = (EditText)findViewById(R.id.edit_text05);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		case R.id.button_send06:
+			editText = (EditText)findViewById(R.id.edit_text06);
+			bluetoothService.write(editText.getText().toString());
+			break;
+		default:
+			break;
+		}
 	}
 	
-	public void onTurnOffBtnClick(View view){
-		bluetoothService.turnOffBT();
+	public void onSaveTextDBClick(View view){
+		EditText editText;
+		
+		editText = (EditText)findViewById(R.id.edit_text01);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text01", editText.getText().toString()});
+		
+		editText = (EditText)findViewById(R.id.edit_text02);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text02", editText.getText().toString()});
+		editText = (EditText)findViewById(R.id.edit_text03);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text03", editText.getText().toString()});
+		
+		editText = (EditText)findViewById(R.id.edit_text04);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text04", editText.getText().toString()});
+		editText = (EditText)findViewById(R.id.edit_text05);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text05", editText.getText().toString()});
+		
+		editText = (EditText)findViewById(R.id.edit_text06);
+		new UpdateStringTask().execute(
+			new String[] {"edit_text06", editText.getText().toString()});
 	}
 	
-	public void onConnectServerBtnClick(View view){
-		bluetoothService.connectAsServer();
-	}
-	
-	public void onListDeviceBtnClick(View view){
-		bluetoothService.performDiscovery();
-	}
-	
-	public void onConnectClientBtnClick(View view){
-		bluetoothService.connectAsClient();
-	}
-	
-	public void onDeviceStringCommClick(View view){
-		bluetoothService.write("test");
-	}
-	
-	public void onBackClick(View view){
+	public void onCommBackClick(View view){
 		this.onStop();
 		this.finish();
+	}
+	
+	private class UpdateStringTask extends AsyncTask<String, Void, Boolean>{
+		
+		@Override
+		protected Boolean doInBackground(String... name) {
+			String[] values = (String[]) name;
+			ContentValues stringValues = new ContentValues();
+			stringValues.put("DESCRIPTION", values[1]);
+			BluetoothDBHelper dbHelper = 
+				new BluetoothDBHelper(BluetoothCommunication.this);
+			try{
+				SQLiteDatabase db = dbHelper.getWritableDatabase();
+				db.update("STRING_MESS", stringValues, "NAME = ?", 
+					new String[] {values[0]});
+				db.close();
+				return true;
+			}catch(SQLiteException e){
+				return false;
+			}
+		}
+		@Override
+		protected void onPostExecute(Boolean success){ }
 	}
 	
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver(){
@@ -189,10 +260,7 @@ public class BluetoothConnection extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent){
 			String action = intent.getAction();
-			if(BluetoothService.EVENT_DEVICE_LIST_UPDATED.equals(action)){
-				ArrayList<String> arrayList = bluetoothService.getDeviceList();
-				setDeviceListView(arrayList);
-			}else if(BluetoothService.EVENT_STATE_NONE.equals(action)){
+			if(BluetoothService.EVENT_STATE_NONE.equals(action)){
 				logMsg("Bluetooth State None");
 				setConnectStatus("Bluetooth State None");
 			}else if(BluetoothService.EVENT_STATE_LISTEN.equals(action)){
@@ -210,13 +278,6 @@ public class BluetoothConnection extends Activity {
 		}
 	};
 	
-	private void setDeviceListView(ArrayList<String> arrayList){
-		ArrayAdapter mArrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, 
-			arrayList);
-		ListView deviceList = (ListView)findViewById(R.id.list_devices);
-		deviceList.setAdapter(mArrayAdapter);
-	}
-	
 	private void logMsg(String message){
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Date date = new Date();
@@ -226,13 +287,6 @@ public class BluetoothConnection extends Activity {
 	
 	private void setConnectStatus(String message){
 		connectionStatusText.setText("Status: "+message);
-	}
-	
-	private void showToast(String str){
-		int duration = Toast.LENGTH_SHORT;
-		CharSequence text = str;
-		Toast toast = Toast.makeText(this, text, duration);
-		toast.show();
 	}
 	
 	private ServiceConnection connection = new ServiceConnection(){
@@ -270,4 +324,5 @@ public class BluetoothConnection extends Activity {
 			bound = false;
 		}
 	};
+	
 }

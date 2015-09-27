@@ -29,6 +29,9 @@ public class BluetoothService extends Service{
 	 * 
 	 * */
 
+	private static Toast toast;
+	private static Boolean displayToast = true;
+	
 	private static Handler mHandler;
 	
 	//BluetoothService states
@@ -350,7 +353,6 @@ public class BluetoothService extends Service{
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
 		}
 	}
 	
@@ -416,6 +418,16 @@ public class BluetoothService extends Service{
 		default:
 			break;
 		}
+	}
+	
+	public void startToast(){
+		displayToast = true;
+	}
+	
+	public void stopToast(){
+		displayToast = false;
+		if (toast != null)
+			toast.cancel();
 	}
 	
 	private synchronized void stopService(){
@@ -592,9 +604,11 @@ public class BluetoothService extends Service{
 				try{
 					//Read from the InputStream
 					bytes = mmInStream.read(buffer);
+					buffer[bytes] = '\0';
 					//Send the obtained bytes to the UI activity
 					mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
 						.sendToTarget();	
+					buffer = new byte[1024];
 				}catch(IOException e){
 					mHandler.obtainMessage(MESSAGE_TOAST, 1, -1, 
 						"Bluetooth failed to read from connection").sendToTarget();
@@ -656,7 +670,8 @@ public class BluetoothService extends Service{
 	}
 	
 	private void showToast(String msg){
-		Toast toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
-		toast.show();
+		toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+		if (displayToast)
+			toast.show();
 	}
 }

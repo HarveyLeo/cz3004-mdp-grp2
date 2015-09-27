@@ -1,0 +1,131 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
+   	android:paddingLeft="16dp"
+   	android:paddingRight="16dp"
+   	android:paddingTop="16dp"
+   	android:orientation="vertical"
+    tools:context="com.example.mdpandroidapp.BluetoothConnection" >
+
+	<ImageView
+	    android:layout_width="200dp"
+	    android:layout_height="100dp"
+	    android:layout_gravity="center_horizontal"
+	    android:src="@drawable/bluetooth"/>
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+    	android:layout_height="35dp"
+    	android:orientation="horizontal">
+		<Button 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+		    android:layout_weight="1"
+		    android:text="On BT"
+		    android:onClick="onTurnOnBtnClick"/>
+		
+		<Button 
+		    android:layout_width="0dp"
+		    android:layout_height="match_parent"
+		    android:layout_weight="1"
+		    android:text="Off BT"
+		    android:onClick="onTurnOffBtnClick"/>
+	</LinearLayout>
+	
+	<Button 
+	    android:id="@+id/button_connect_server"
+	    android:layout_width="match_parent"
+	    android:layout_height="35dp"
+	    android:text="Connect As Server"
+	    android:onClick="onConnectServerBtnClick"/>
+	
+	<View
+	    android:layout_width="match_parent"
+	    android:layout_height="3dp"
+	    android:background="@android:color/darker_gray"/>
+	
+	<Button 
+	    android:id="@+id/button_list_device"
+	    android:layout_width="match_parent"
+	    android:layout_height="35dp"
+	    android:text="List Device to Connect to"
+	    android:onClick="onListDeviceBtnClick"/>
+	
+	<ListView 
+	    android:id="@+id/list_devices"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"/>
+	
+	<View
+	    android:layout_width="match_parent"
+	    android:layout_height="3dp"
+	    android:background="@android:color/darker_gray"/>
+        
+	<ScrollView
+      	android:layout_width="match_parent"
+   		android:layout_height="wrap_content">
+   		
+	    <LinearLayout
+	        android:layout_width="match_parent"
+   			android:layout_height="wrap_content"
+   			android:orientation="vertical">
+        
+	        <Button 
+	            android:id="@+id/button_connect_client"
+	            android:layout_width="match_parent"
+	            android:layout_height="50dp"
+	            android:text="Connect As Client"
+	            android:onClick="onConnectClientBtnClick"/>
+	        
+	        <TextView
+	            android:id="@+id/text_connection_status"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:text="Connection status: Communicate with Device"/>
+	        
+	        <TextView
+	            android:id="@+id/text_reconnecting_attempts"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:text="Reconnecting Attempts: 0"/>
+	        
+	        <View
+			    android:layout_width="match_parent"
+			    android:layout_height="3dp"
+			    android:background="@android:color/darker_gray"/>
+	        
+	        <Button 
+	            android:layout_width="match_parent"
+	            android:layout_height="50dp"
+	            android:text="Communicate String Message"
+	            android:onClick="onDeviceStringCommClick"/>
+	        
+	        <View
+			    android:layout_width="match_parent"
+			    android:layout_height="3dp"
+			    android:background="@android:color/darker_gray"/>
+	        
+	       <Button 
+			    android:layout_width="100dp"
+		    	android:layout_height="50dp"
+		    	android:layout_gravity="start"
+		    	android:text="Back"
+		    	android:onClick="onBackClick"/>
+	        
+	        <View
+			    android:layout_width="match_parent"
+			    android:layout_height="3dp"
+			    android:background="@android:color/darker_gray"/>
+	        
+	        <TextView
+	            android:id="@+id/text_debug"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:text="Display debug msg here"/>
+        
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>
