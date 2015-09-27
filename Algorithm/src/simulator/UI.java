@@ -59,12 +59,12 @@ public class UI extends JFrame implements ActionListener {
 		pack();
 	}
 
-	public void setExploreBtnEnabled() {
-		_exploreBtn.setEnabled(true);
+	public void setExploreBtnEnabled(boolean value) {
+		_exploreBtn.setEnabled(value);
 	}
 		
-	public void setFfpBtnEnabled() {
-		_ffpBtn.setEnabled(true);
+	public void setFfpBtnEnabled(boolean value) {
+		_ffpBtn.setEnabled(value);
 	}
 	
 	
@@ -197,6 +197,7 @@ public class UI extends JFrame implements ActionListener {
 		_ffpBtn = new JButton("Navigate");
 		_ffpBtn.setActionCommand("FindFastestPath");
 		_ffpBtn.addActionListener(this);
+		_ffpBtn.setEnabled(false);
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 2; i++) {
@@ -327,7 +328,7 @@ public class UI extends JFrame implements ActionListener {
 		return _timer.getText();
 	}
 	
-	public void setTimer (String message) {
+	public void setTimerMessage (String message) {
 		_timer.setText(message);
 	}
 	

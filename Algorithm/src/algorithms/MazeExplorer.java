@@ -24,9 +24,14 @@ public class MazeExplorer {
 	private Robot _robot;
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
+	private boolean _hasExploredTillGoal;
 	
 	public int[][] getMazeRef() {
 		return _mazeRef;
+	}
+	
+	public boolean hasExploredTillGoal() {
+		return _hasExploredTillGoal;
 	}
 	
     public static MazeExplorer getInstance() {
@@ -50,6 +55,14 @@ public class MazeExplorer {
 		setIsExplored(robotPosition, _robotOrientation);
 
 		exploreAlongWall (GOAL);
+		
+		Controller controller = Controller.getInstance();
+		if (!controller.hasReachedTimeThreshold()) {
+			_hasExploredTillGoal = true;
+		} else {
+			_hasExploredTillGoal = false;
+		}
+		
 		exploreAlongWall (START);
 		
 		if (!isGoalPos(_robotPosition, START)) {
@@ -85,6 +98,7 @@ public class MazeExplorer {
 		_robotPosition[0] = robotPosition[0];
 		_robotPosition[1] = robotPosition[1];
 		_robotOrientation = Orientation.NORTH;
+		_hasExploredTillGoal = false;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {

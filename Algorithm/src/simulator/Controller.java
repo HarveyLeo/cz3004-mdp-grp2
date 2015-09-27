@@ -211,7 +211,7 @@ public class Controller {
 				
 				if (_counter == 0) {
 					_exploreTimer.stop();
-					_ui.setTimer("exploration: time out");
+					_ui.setTimerMessage("exploration: time out");
 					Toolkit.getDefaultToolkit().beep();
 				}
 				
@@ -240,7 +240,7 @@ public class Controller {
 			if (_timeLimit == 0) {
 				_ffpTimer.stop();
 				_ui.setCoverageUpdate("");
-				_ui.setTimer("fastest path: time out");
+				_ui.setTimerMessage("fastest path: time out");
 				Toolkit.getDefaultToolkit().beep();
 			}			
 		}
@@ -266,19 +266,23 @@ public class Controller {
 				@Override
 				public void done() {
 					_hasReachedStart = true;
-					_ui.setStatus("exploration completed");
-					if (_actualCoverage < _targetCoverage) {
-						_ui.setCoverageUpdate("exploration: not reach target coverage");
-					} else {
-						_ui.setCoverageUpdate("exploration: reach target coverage");
-					}	
+				
+					_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
+					
 					if (!_ui.getTimerMessage().equals("exploration: time out")) {
-						_ui.setTimer("exploration: within time limit");
+						_ui.setTimerMessage("explored within time limit");
 					}
 					if (_exploreTimer.isRunning()) {
 						_exploreTimer.stop();
 					}
-					_ui.setExploreBtnEnabled();
+					if (explorer.hasExploredTillGoal()) {
+						_ui.setStatus("exploration reaches goal zone");
+						_ui.setFfpBtnEnabled(true);
+					} else {
+						_ui.setStatus("exploration not reaches goal zone");
+					}
+					_ui.setExploreBtnEnabled(true);
+					
 				}
 			};
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
@@ -474,12 +478,11 @@ public class Controller {
 			public void done() {
 				_ui.setStatus("fastest path found");
 				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
-					_ui.setTimer("fastest path: within time limit");
+					_ui.setTimerMessage("fastest path: within time limit");
 				}
 				if (_ffpTimer.isRunning()) {
 					_ffpTimer.stop();
 				}
-				_ui.setFfpBtnEnabled();
 			}
 		};
 		
