@@ -7,15 +7,14 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,7 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BluetoothCommunication extends Activity {
+public class BluetoothConnection extends Activity {
 
 	//for logging purpose
 	private String logMessage = "";
@@ -36,6 +35,10 @@ public class BluetoothCommunication extends Activity {
 	private TextView connectionStatusText;
 	private Button connectAsServerButton;
 
+	//for connection to BluetoothService
+	private boolean bound = false;
+	private BluetoothService bluetoothService;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,40 +50,13 @@ public class BluetoothCommunication extends Activity {
 		connectionStatusText = (TextView)findViewById(R.id.text_connection_status);
 		connectAsServerButton = (Button)findViewById(R.id.button_connect_server);
 		
-		BluetoothMgr.getInstance().setContext(getApplicationContext());
-		BluetoothMgr.getInstance().setHandler(new Handler(){
-			@Override
-			public void handleMessage(Message msg){
-				super.handleMessage(msg);
-				switch(msg.what){
-				case BluetoothMgr.MESSAGE_READ:
-					showToast("Message received");
-					String receivedMessage = new String((byte[])msg.obj);
-					logMsg("Message received: "+receivedMessage);
-					break;
-				case BluetoothMgr.MESSAGE_SENT:
-					showToast("Message sent");
-					String sentMessage = new String((byte[])msg.obj);
-					logMsg("Message sent: "+sentMessage);
-					break;
-				default:
-					break;
-				}
-			}
-		});
-		
 		//Register the BroadcastReceiver
-		IntentFilter filter = new IntentFilter(BluetoothMgr.EVENT_NO_BLUETOOTH_DEVICE_SELECTED);
-		filter.addAction(BluetoothMgr.EVENT_BLUETOOTH_NOT_ENABLED);
-		filter.addAction(BluetoothMgr.EVENT_BLUETOOTH_NOT_SUPPORTED);
-		filter.addAction(BluetoothMgr.EVENT_DEVICE_LIST_UPDATED);
-		filter.addAction(BluetoothMgr.EVENT_BLUETOOTH_CONNECTION_FAILED);
-		filter.addAction(BluetoothMgr.EVENT_DEVICE_NOT_CONNECTED);
-		filter.addAction(BluetoothMgr.EVENT_STATE_NONE);
-		filter.addAction(BluetoothMgr.EVENT_STATE_LISTEN);
-		filter.addAction(BluetoothMgr.EVENT_STATE_CONNECTING);
-		filter.addAction(BluetoothMgr.EVENT_STATE_CONNECTED);
-		
+		IntentFilter filter = new IntentFilter(BluetoothService.EVENT_DEVICE_LIST_UPDATED);
+		filter.addAction(BluetoothService.EVENT_STATE_NONE);
+		filter.addAction(BluetoothService.EVENT_STATE_LISTEN);
+		filter.addAction(BluetoothService.EVENT_STATE_CONNECTING);
+		filter.addAction(BluetoothService.EVENT_STATE_CONNECTED);
+		filter.addAction(BluetoothService.EVENT_MESSAGE_RECEIVED);
 		registerReceiver(mReceiver, filter);
 		
 		//Create listener for ListView
@@ -91,11 +67,9 @@ public class BluetoothCommunication extends Activity {
 
 				String deviceInfo = (String)ListView.getItemAtPosition(position);
 				String[] deviceData = deviceInfo.split("\n");
-				BluetoothMgr.getInstance().setDeviceInfo(deviceData[0], 
-					deviceData[1]);
+				bluetoothService.setDeviceInfo(deviceData[0], deviceData[1]);
 				logMsg(String.format("Select name: %s, MAC: %s", 
 						deviceData[0], deviceData[1]));
-
 				singleDeviceListView(deviceData[0], deviceData[1]);
 			}
 		};
@@ -106,11 +80,65 @@ public class BluetoothCommunication extends Activity {
 	}
 	
 	private void singleDeviceListView(String deviceName, String MACAddress){
-		ArrayList singleDevice = new ArrayList();
+		ArrayList<String> singleDevice = new ArrayList<String>();
 		singleDevice.add(deviceName + "\n" + MACAddress);
 		setDeviceListView(singleDevice);
 	}
 	
+	/*Activity LifeCycle
+	 * 
+	 */
+	
+	@Override
+	protected void onStart(){
+		super.onStart();
+		//Bind this activity to BluetoothService
+		Intent intent = new Intent(this, BluetoothService.class);
+		bindService(intent, connection, Context.BIND_AUTO_CREATE);
+	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
+		if (bluetoothService == null){
+			return;
+		}
+		int mState = bluetoothService.getState();
+		switch(mState){
+			case BluetoothService.STATE_NONE:
+				logMsg("Bluetooth State None");
+				setConnectStatus("Bluetooth State None");
+				break;
+			case BluetoothService.STATE_LISTEN:
+				logMsg("Bluetooth State Listening");
+				setConnectStatus("Bluetooth State Listening");
+				break;
+			case BluetoothService.STATE_CONNECTING:
+				logMsg("Bluetooth State Connecting");
+				setConnectStatus("Bluetooth State Connecting");
+				break;
+			case BluetoothService.STATE_CONNECTED:
+				logMsg("Bluetooth State Connected");
+				setConnectStatus("Bluetooth State Connected");
+				break;
+			default:
+				break;
+		}
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+		try{
+			unregisterReceiver(mReceiver);
+		}catch (IllegalArgumentException e){
+		}
+		if (bound){
+			unbindService(connection);
+			bound = false;
+		}
+	}
+
 	/*Handle button's onClick event
 	 * 
 	 */
@@ -121,23 +149,23 @@ public class BluetoothCommunication extends Activity {
 	}
 	
 	public void onTurnOffBtnClick(View view){
-		BluetoothMgr.getInstance().turnOffBT();
+		bluetoothService.turnOffBT();
 	}
 	
 	public void onConnectServerBtnClick(View view){
-		BluetoothMgr.getInstance().connectAsServer();
+		bluetoothService.connectAsServer();
 	}
 	
 	public void onListDeviceBtnClick(View view){
-		BluetoothMgr.getInstance().performDiscovery();
+		bluetoothService.performDiscovery();
 	}
 	
 	public void onConnectClientBtnClick(View view){
-		BluetoothMgr.getInstance().connectAsClient();
+		bluetoothService.connectAsClient();
 	}
 	
 	public void onDeviceStringCommClick(View view){
-		BluetoothMgr.getInstance().write("apple");
+		bluetoothService.write("apple");
 	}
 	
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver(){
@@ -145,54 +173,28 @@ public class BluetoothCommunication extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent){
 			String action = intent.getAction();
-			if(BluetoothMgr.getInstance().EVENT_NO_BLUETOOTH_DEVICE_SELECTED.equals(action)){
-				showToast("Select a Remote Device to connect");
-				logMsg("No Bluetooth device selected");
-			}else if(BluetoothMgr.getInstance().EVENT_BLUETOOTH_NOT_ENABLED.equals(action)){
-				showToast("This application required Bluetooth to be enabled");
-				logMsg("Bluetooth not enabled");
-				setConnectStatus("Bluetooth not enabled");
-			}else if(BluetoothMgr.getInstance().EVENT_BLUETOOTH_NOT_SUPPORTED.equals(action)){
-				showToast("This device does not support Bluetooth");
-				logMsg("Bluetooth not supported");
-				setConnectStatus("Bluetooth is not supported");
-			}else if(BluetoothMgr.getInstance().EVENT_DEVICE_LIST_UPDATED.equals(action)){
-				ArrayList arrayList = BluetoothMgr.getInstance().getDeviceList();
+			if(BluetoothService.EVENT_DEVICE_LIST_UPDATED.equals(action)){
+				ArrayList<String> arrayList = bluetoothService.getDeviceList();
 				setDeviceListView(arrayList);
-			}else if(BluetoothMgr.getInstance().EVENT_BLUETOOTH_CONNECTION_FAILED.equals(action)){
-				showToast("Bluetooth Connection failed");
-				logMsg("Bluetooth Connection failed");
-				setConnectStatus("Bluetooth connection failed");
-			}else if(BluetoothMgr.getInstance().EVENT_DEVICE_NOT_CONNECTED.equals(action)){
-				showToast("No remote device connected");
-				logMsg("No remote device connected");
-			}else if(BluetoothMgr.getInstance().EVENT_STATE_NONE.equals(action)){
+			}else if(BluetoothService.EVENT_STATE_NONE.equals(action)){
 				logMsg("Bluetooth State None");
-				showToast("Bluetooth State None");
 				setConnectStatus("Bluetooth State None");
-			}else if(BluetoothMgr.getInstance().EVENT_STATE_LISTEN.equals(action)){
+			}else if(BluetoothService.EVENT_STATE_LISTEN.equals(action)){
 				logMsg("Bluetooth State Listening");
-				showToast("Bluetooth State Listening");
-				setConnectStatus("Bluetooth state listening");
-			}else if(BluetoothMgr.getInstance().EVENT_STATE_CONNECTING.equals(action)){
-				showToast("Bluetooth State Connecting");
+				setConnectStatus("Bluetooth State Listening");
+			}else if(BluetoothService.EVENT_STATE_CONNECTING.equals(action)){
 				logMsg("Bluetooth State Connecting");
-				setConnectStatus("Bluetooth connection Connecting");
-			}else if(BluetoothMgr.getInstance().EVENT_STATE_CONNECTED.equals(action)){
-				showToast("Bluetooth State Connected");
+				setConnectStatus("Bluetooth State Connecting");
+			}else if(BluetoothService.EVENT_STATE_CONNECTED.equals(action)){
 				logMsg("Bluetooth State Connected");
 				setConnectStatus("Bluetooth State Connected");
+			}else if(BluetoothService.EVENT_MESSAGE_RECEIVED.equals(action)){
+				logMsg("Bluetooth received message: " + bluetoothService.getReceivedMsg());
 			}
 		}
 	};
 	
-	@Override
-	public void finish(){
-		unregisterReceiver(mReceiver);
-		super.finish();
-	}
-	
-	private void setDeviceListView(ArrayList arrayList){
+	private void setDeviceListView(ArrayList<String> arrayList){
 		ArrayAdapter mArrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, 
 			arrayList);
 		ListView deviceList = (ListView)findViewById(R.id.list_devices);
@@ -216,4 +218,18 @@ public class BluetoothCommunication extends Activity {
 		Toast toast = Toast.makeText(this, text, duration);
 		toast.show();
 	}
+	
+	private ServiceConnection connection = new ServiceConnection(){
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder binder){
+			BluetoothService.BluetoothBinder bluetoothBinder =
+				(BluetoothService.BluetoothBinder) binder;
+			bluetoothService = bluetoothBinder.getBluetooth();
+			bound = true;
+		}
+		@Override
+		public void onServiceDisconnected(ComponentName name){
+			bound = false;
+		}
+	};
 }
