@@ -265,7 +265,18 @@ public class Controller {
 				}
 				@Override
 				public void done() {
+					
+					String P1Descriptor, P2Descriptor;
+					
 					_hasReachedStart = true;
+					
+					P1Descriptor = explorer.getP1Descriptor();
+					
+					P2Descriptor = explorer.getP2Descriptor();
+					
+					System.out.println("P1 descriptor: " + P1Descriptor);
+					
+					System.out.println("P2 descriptor: " + P2Descriptor);
 				
 					_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
 					
@@ -285,6 +296,7 @@ public class Controller {
 					
 				}
 			};
+			
 			SwingWorker<Void, Void> updateCoverage = new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {

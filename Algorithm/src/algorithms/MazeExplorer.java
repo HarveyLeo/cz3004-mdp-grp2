@@ -30,6 +30,10 @@ public class MazeExplorer {
 		return _mazeRef;
 	}
 	
+	public Boolean[][] getIsExplored() {
+		return _isExplored;
+	}
+	
 	public boolean hasExploredTillGoal() {
 		return _hasExploredTillGoal;
 	}
@@ -40,6 +44,65 @@ public class MazeExplorer {
         }
         return _instance;
     }
+    
+	public String getP2Descriptor() {
+		String P2Binary = "";
+		for (int j = 0; j < Arena.MAP_WIDTH; j++) {
+			for (int i = 0; i < Arena.MAP_LENGTH; i++) {
+				if (_mazeRef[i][j] == IS_OBSTACLE) {
+					P2Binary = P2Binary + 1;
+				} else if (_mazeRef[i][j] == IS_EMPTY) {
+					P2Binary = P2Binary + 0;
+				}
+			}
+		}
+		
+		int remainder = P2Binary.length() % 8;
+		
+		
+		for (int i = 0; i < 8 - remainder; i++) {
+			P2Binary = P2Binary + "0";
+		}
+		
+		String temp, P2HexStr = "";
+		int index = 0;
+		
+		while (index < P2Binary.length()) {
+			temp = "";
+			for (int i = 0; i < 4; i++) {
+				temp = temp + P2Binary.charAt(index);
+				index++;
+			}
+			P2HexStr = P2HexStr + Integer.toString(Integer.parseInt(temp, 2), 16);
+		}
+		
+		return P2HexStr;
+	}
+	
+	public String getP1Descriptor() {
+		String P1Binary = "11";
+		int value;
+		for (int j = 0; j < Arena.MAP_WIDTH; j++) {
+			for (int i = 0; i < Arena.MAP_LENGTH; i++) {
+				value = (_isExplored[i][j]) ? 1 : 0;
+				P1Binary = P1Binary + value;
+			}
+		}
+		P1Binary = P1Binary + "11";
+		String temp, P1HexStr = "";
+		int index = 0;
+		
+		while (index < P1Binary.length()) {
+			temp = "";
+			for (int i = 0; i < 4; i++) {
+				temp = temp + P1Binary.charAt(index);
+				index++;
+			}
+			P1HexStr = P1HexStr + Integer.toString(Integer.parseInt(temp, 2), 16);
+		}
+
+		return P1HexStr;
+	}
     
 	public void explore(int[] robotPosition) {
 
