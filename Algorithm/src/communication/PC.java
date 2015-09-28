@@ -3,35 +3,47 @@ package communication;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class PC {
-	private ServerSocket _server;
-	private int _port = 9876;
 	
-	//Hostname: Harvey-PC; Port: 9876
+	private static final String RPI_IP_ADDRESS = "192.168.2.1";
+	private static final int RPI_PORT = 3000;
+	private static final int PC_PORT = 2000;
 	
-	public void startListening() throws IOException, ClassNotFoundException {
+	private DatagramSocket _socket;
+	private DatagramPacket _packet;
+	
+	
+	public static void main(String[] args) throws InterruptedException, IOException  {
+		PC pc = new PC();
+		pc.startComm();
+	}
+	
+	public void startComm() throws InterruptedException, IOException {
+		String command;
 		
-		_server = new ServerSocket(_port);
+		_socket = new DatagramSocket(PC_PORT);
+		command = "connect with RPi";
 		
-		while (true) {
-			Socket socket = _server.accept();
-			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-			String message = (String) ois.readObject();
-			//TODO pass the message to other classes and return cmd
-			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-			oos.writeObject("some cmd here");
-			ois.close();
-	        oos.close();
-	        socket.close();
-			if(message.equalsIgnoreCase("exit")) 
-				break;
-		}
+		byte[] sentPacketData = command.getBytes();
+		_packet = new DatagramPacket(sentPacketData, sentPacketData.length, InetAddress.getByName(RPI_IP_ADDRESS), RPI_PORT);
+		_socket.send(_packet);
+		Thread.sleep(100);
 		
-		_server.close();
+	    byte[] rcvBuffer = new byte[100];
+        _packet= new DatagramPacket(rcvBuffer, rcvBuffer.length);
+        _socket.receive(_packet);
+        byte[] receivedPacketData = _packet.getData();
+        String receivedMessage = new String(receivedPacketData);
+        System.out.println(receivedMessage);
+		
+        _socket.close();
 	}
 }
