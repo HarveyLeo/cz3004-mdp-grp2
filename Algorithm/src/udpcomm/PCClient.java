@@ -1,17 +1,12 @@
-package communication;
+package udpcomm;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
-public class PC {
+public class PCClient {
 	
 	private static final String RPI_IP_ADDRESS = "192.168.2.1";
 	private static final int RPI_PORT = 3000;
@@ -22,7 +17,7 @@ public class PC {
 	
 	
 	public static void main(String[] args) throws InterruptedException, IOException  {
-		PC pc = new PC();
+		PCClient pc = new PCClient();
 		pc.startComm();
 	}
 	

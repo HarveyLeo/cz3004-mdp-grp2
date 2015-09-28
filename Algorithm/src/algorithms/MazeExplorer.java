@@ -26,6 +26,10 @@ public class MazeExplorer {
 	private Orientation _robotOrientation;
 	private boolean _hasExploredTillGoal;
 	
+	private MazeExplorer() {
+		
+	}
+	
 	public int[][] getMazeRef() {
 		return _mazeRef;
 	}

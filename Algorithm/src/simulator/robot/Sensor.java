@@ -2,7 +2,7 @@ package simulator.robot;
 
 public class Sensor {
 	
-	public static final int SHORT_RANGE = 3;
+	public static final int SHORT_RANGE = 2;
 	public static final int LONG_RANGE = 5;
 	
 	private int _range;

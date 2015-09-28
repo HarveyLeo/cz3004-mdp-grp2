@@ -1,11 +1,11 @@
-package communication;
+package udpcomm;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class RPi {
+public class RPiServer {
 
 	
 	private static final String RPI_IP_ADDRESS = "192.168.2.1";
@@ -17,7 +17,7 @@ public class RPi {
 	
 	
 	public static void main(String[] args) throws InterruptedException, IOException  {
-		RPi rpi = new RPi();
+		RPiServer rpi = new RPiServer();
 		rpi.startComm();
 	}
 	
