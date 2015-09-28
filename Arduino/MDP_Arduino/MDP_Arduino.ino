@@ -10,7 +10,7 @@ DualVNH5019MotorShield md;
 #define SPEED 200
 
 #define LF A0   //Left-front
-#define L  A1   //Left
+#define L  A5   //Left
 #define CF  A2  //Centre-front
 #define R  A3   //Right
 #define RF A4   //Right-front
@@ -50,24 +50,25 @@ void loop()
   }
 
   //First character in array is the command
+
   char command = command_buffer[0];
 
   //Converts subsequent characters in the array into an integer
-  while(command_buffer[i] != '|'){
+   while(command_buffer[i] != '|'){
     arg = arg + ( digit * (command_buffer[i] - 48) );
     digit *= 10;
     i++;
   }
-  Serial.println(arg);
-  
+ // Serial.println(arg);
+ 
   //Hardcode here for testing
-  //command = 'C';
-  //arg = 0;
+ // command = 'L';
+ // arg = 90;
     
   switch ( command ) {
   case 'W':
     {
-      delay(2000);
+      delay(1000);
       if(arg == 0) moveForward(1);
       else moveForward(arg);
       sendSensors();
@@ -75,7 +76,7 @@ void loop()
     }
     case 'A':
     {
-      delay(2000);
+      delay(1000);
       if(arg == 0) rotateLeft(90);
       else rotateLeft(arg);
       sendSensors();
@@ -83,7 +84,7 @@ void loop()
     }
     case 'D':
     {
-      delay(2000);
+      delay(1000);
       if(arg == 0) rotateRight(90);
       else rotateRight(arg);
       sendSensors();
@@ -91,6 +92,7 @@ void loop()
     }
     case 'E':
    {
+      delay(1000);
       sendSensors();
       break;
    }
@@ -106,6 +108,18 @@ void loop()
      avoid();
      break;
    }
+     case 'L':
+     {
+      turnLeft();
+      sendSensors();
+      break;
+     }
+     case 'R':
+     {
+      turnRight();
+      sendSensors();
+      break;
+     }
     default:
    {
      break;
@@ -220,17 +234,17 @@ int rotateRight(int angle){
   else if ((angle > 15) && (angle <= 30))
     angle_offset = angle * 8.4;  
   else if ((angle > 30) && (angle <= 45))
-    angle_offset = angle * 7.95;
+    angle_offset = angle * 8.95;
 
   else if ((angle > 45) && (angle <= 90)) //Only this one calibrated 
     angle_offset = angle * 8.95;
 
   else if ((angle > 90) && (angle <= 360))  
-    angle_offset = angle * 9.17;
+    angle_offset = angle * 8.95;
   else if ((angle > 360) && (angle <= 720))  
-    angle_offset = angle * 9.0;
+    angle_offset = angle * 8.95;
   else if ((angle > 720) && (angle <= 1080)) 
-    angle_offset = angle * 9.0;
+    angle_offset = angle * 8.95;
 
   while(1){
         
@@ -267,17 +281,17 @@ int rotateLeft(int angle){
   else if ((angle > 15) && (angle <= 30))
     angle_offset = angle * 8.4;
   else if ((angle > 30) && (angle <= 45))
-    angle_offset = angle * 7.95;
+    angle_offset = angle * 9.0;
     
   else if ((angle > 45) && (angle <= 90))   //Only this one calibrated 
-    angle_offset = angle * 9.13;
+    angle_offset = angle * 8.9;
 
   else if ((angle > 90) && (angle <= 360))  
-    angle_offset = angle * 9.17;
+    angle_offset = angle * 8.9;
   else if ((angle > 360) && (angle <= 720))  
-    angle_offset = angle * 9.22;
+    angle_offset = angle * 8.9;
   else if ((angle > 720) && (angle <= 1080))
-    angle_offset = angle * 9.2;
+    angle_offset = angle * 8.9;
 
   while(1){
 
@@ -301,18 +315,18 @@ int rotateLeft(int angle){
 }
 
 //Function for making a left turn on a 2x2 grid.
-void turnLeft(){
-  md.setSpeeds(200,300);
-  delay(750);
+void turnRight(){
+  md.setSpeeds(50,250);
+  delay(1250);
   md.setBrakes(400,400);
   delay(100);
   md.setBrakes(0,0);
 }
 
 //Function for making a right turn on a 2x2 grid.
-void turnRight(){
-  md.setSpeeds(300,200);
-  delay(750);
+void turnLeft(){
+  md.setSpeeds(250,50);
+  delay(1250);
   md.setBrakes(400,400);
   delay(100);
   md.setBrakes(0,0);
@@ -390,9 +404,9 @@ void angleAlign(){
     int LFreading = sensorRead(20,LF);
     int RFreading = sensorRead(20,RF);
     int error = LFreading - RFreading;
-
-    if(error>5) rotateRight(3);
-    else if (error<-5) rotateLeft(3);
+    
+    if(error>5) rotateLeft(1);
+    else if (error<-5) rotateRight(1);
     else break;
   }
   delay(100);
@@ -404,14 +418,14 @@ void distAlign(){
   while(1){
     int LFdistance = distanceInCM(sensorRead(20,LF),LF);
 
-    if(LFdistance < 365) md.setSpeeds(100,100);
-    else if(LFdistance > 375) md.setSpeeds(-100,-100);
+    if(LFdistance > 15) md.setSpeeds(100,100);
+    else if(LFdistance < 15) md.setSpeeds(-100,-100);
     else break;
   }
    md.setBrakes(400, 400);
    delay(50);
    md.setBrakes(0, 0);
-
+   
    //Recursive call if angle is misaligned after distance alignment.
    int angleError = sensorRead(20,LF) - sensorRead(20,RF);
    if(angleError>5 || angleError<-5) frontAlignment();
@@ -448,15 +462,29 @@ int sensorRead(int n, int sensor){
 
 //This function sends the sensor data to the RPi
 void sendSensors(){
-  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,LF),LF),SR));
+  int cmLF, cmCF, cmRF, cmL, cmR;
+  cmLF = distanceInCM(sensorRead(20,LF),LF);
+  cmCF = distanceInCM(sensorRead(60,CF),CF);
+  cmRF = distanceInCM(sensorRead(20,RF),RF);
+  cmL = distanceInCM(sensorRead(20,L),L);
+  cmR = distanceInCM(sensorRead(20,R),R);
+  
+  
   Serial.print(":");
-  Serial.print(distanceInGrids(distanceInCM(sensorRead(60,CF),CF),LR));
+  Serial.print(distanceInGrids(cmLF,SR));
   Serial.print(":");
-  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,RF),RF),SR));
+  //Serial.println(cmLF);
+  Serial.print(distanceInGrids(cmCF,LR));
   Serial.print(":");
-  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,L),L),SR));
+  //Serial.println(cmCF);
+  Serial.print(distanceInGrids(cmRF,SR));
   Serial.print(":");
-  Serial.print(distanceInGrids(distanceInCM(sensorRead(20,R),R),SR));
+  //Serial.println(cmRF);
+  Serial.print(distanceInGrids(cmL,SR));
+  Serial.print(":");
+  //Serial.println(cmL);
+  Serial.print(distanceInGrids(cmR,SR));
+  //Serial.println(cmR);
   Serial.print("|");
 }
 
@@ -492,18 +520,18 @@ int distanceInGrids(int dis, int sensorType){
   
   if(sensorType == SR){ //Short range effective up to 2 grids away
       if (dis > 28) grids = 0;
-      else if (dis>= 12 && dis <= 18) grids = 1;
-      else if (dis >= 22 && dis <= 28) grids = 2;
+      else if (dis>= 10 && dis <= 19) grids = 1;
+      else if (dis >= 20 && dis <= 28) grids = 2;
       //else if (dis >= 32 && dis <= 38) grids = 3;
       else grids = -1;
   }
   else if(sensorType == LR){ //Long range effective up to 5 grids away
       if (dis > 58) grids = 0;
-      else if (dis>= 12 && dis <= 22) grids = 1;
-      else if (dis > 22 && dis <= 28) grids = 2;
-      else if (dis >= 32 && dis <= 38) grids = 3;
-      else if (dis >= 42 && dis <= 48) grids = 4;
-      else if (dis >= 52 && dis <= 58) grids = 5;
+      else if (dis>= 12 && dis <= 23) grids = 1;
+      else if (dis > 24 && dis <= 27) grids = 2;
+      else if (dis >= 30 && dis <= 37) grids = 3;
+      else if (dis >= 39 && dis <= 48) grids = 4;
+      else if (dis >= 49 && dis <= 58) grids = 5;
       else grids = -1;
   }
   
