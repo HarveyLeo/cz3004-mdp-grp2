@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class PCClient {
 	
-	private static final String RPI_IP_ADDRESS = "192.168.2.1";
-	private static final int RPI_PORT = 3000;
+	private static final String RPI_IP_ADDRESS = "192.168.2.2";
+	private static final int RPI_PORT = 3053;
 	
 	private static PCClient _instance;
 	private Socket _clientSocket;
@@ -29,11 +29,11 @@ public class PCClient {
 		
 		PCClient pcClient = PCClient.getInstance();
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
-		System.out.println("connected");
+		System.out.println("RPi connected");
 //		Scanner sc = new Scanner(System.in);
 		while (true) {
 //			String msgSent = sc.nextLine();
-			pcClient.sendMessage("Hello world");
+			pcClient.sendMessage("Ar|ML");
 			String msgReceived = pcClient.readMessage();
 			System.out.println("Message received:"+ msgReceived);
 		}

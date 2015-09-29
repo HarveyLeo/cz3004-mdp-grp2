@@ -110,6 +110,7 @@ public class AStarPathFinder {
 
 	private void init(int[][] mazeRef) {
 		_virtualMap = new VirtualMap(mazeRef);
+		_virtualMap.initVirtualMap(mazeRef);
 		_closed = new ArrayList<Node>();
 		_open = new SortedList<Node>();
 		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];

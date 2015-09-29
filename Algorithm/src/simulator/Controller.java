@@ -186,28 +186,27 @@ public class Controller {
 			_ui.setTimer(_counter);
 			
 			if (_counter >= 0) {
-				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
-					Path _backPath;
-					@Override
-					protected Void doInBackground() throws Exception {
-						float threshold;
-						
-						MazeExplorer explorer = MazeExplorer.getInstance();
-						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
-						threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
-						publish(threshold);
-						return null;
-					}
-					@Override
-					protected void process(List<Float> chunks) {
-						Float curThreshold = chunks.get(chunks.size() - 1);
-						if (_counter <= curThreshold) {
-							_hasReachedTimeThreshold = true;
-						}
-					}
-					
-				};
+//				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
+//					Path _backPath;
+//					@Override
+//					protected Void doInBackground() throws Exception {
+//						float threshold;
+//						MazeExplorer explorer = MazeExplorer.getInstance();
+//						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+//						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
+//						threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
+//						publish(threshold);
+//						return null;
+//					}
+//					@Override
+//					protected void process(List<Float> chunks) {
+//						Float curThreshold = chunks.get(chunks.size() - 1);
+//						if (_counter <= curThreshold) {
+//							_hasReachedTimeThreshold = true;
+//						}
+//					}
+//					
+//				};
 				
 				if (_counter == 0) {
 					_exploreTimer.stop();
@@ -215,7 +214,7 @@ public class Controller {
 					Toolkit.getDefaultToolkit().beep();
 				}
 				
-				getThreshold.execute();
+//				getThreshold.execute();
 			
 			} 
 		}

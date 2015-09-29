@@ -21,27 +21,59 @@ public class VirtualMap {
 		
 		_visited = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_cleared = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		
+	}
+
+	public void initVirtualMap(int[][] mazeRef) {
+
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
 				_visited[i][j] = false;
-				_cleared[i][j] = true;
+				if (i == 0 || i == Arena.MAP_LENGTH - 1 || j == 0 || j == Arena.MAP_WIDTH - 1) {
+					_cleared[i][j] = false;
+				} else {
+					_cleared[i][j] = true;
+				}
 			}
 		}
 		
-		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
-			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
-				if (i == 0 || i == Arena.MAP_LENGTH - 1 || j == 0 || j == Arena.MAP_WIDTH - 1) {
-					_cleared[i][j] = false;
-				} else if (mazeRef[i][j] != MazeExplorer.IS_EMPTY) {
-					for (int u = i - 1; u <= i + 1; u++) {
-						for (int v = j - 1; v <= j + 1; v++) {
-							_cleared[u][v] = false;
-						}
-					}
-				} 
+		int i, j, u, v;
+		
+		for (i = 0; i < Arena.MAP_LENGTH ; i++) {
+			for (j = 0; j < Arena.MAP_WIDTH ; j++) {
+				if (mazeRef[i][j] != MazeExplorer.IS_EMPTY) {
+					for (u = i - 1; u <= i + 1; u++) {
+							for (v = j - 1; v <= j + 1; v++) {
+								if (u >= 0 && v >= 0 && u < Arena.MAP_LENGTH && v < Arena.MAP_WIDTH) {
+									_cleared[u][v] = false;
+								}
+							}
+					} 
+				}
 			}
 		}
+		
+//		for (j = 0; j < Arena.MAP_WIDTH; j++ ) {
+//			if (mazeRef[0][j] != MazeExplorer.IS_EMPTY) {
+//				for (u = 0; u <= 1; u++) {
+//					for (v = j-1; v <= j+1; v++)
+//						_cleared[u][v] = false;
+//				}
+//			}
+//		}
+		
+//		for (j = 0; j < Arena.MAP_WIDTH; j++ ) {
+//			if (mazeRef[14][j] != MazeExplorer.IS_EMPTY) {
+//				for (u = 13; u <= 14; u++) {
+//					for (v = j-1; v <= j+1; v++) {
+//						if (v >= 0) {
+//							System.out.println(u + " " + v);
+//							_cleared[u][v] = false;
+//						}
+//					}
+//				}
+//			}
+//		}
+		
 	}
 
 	public boolean[][] getCleared() {
