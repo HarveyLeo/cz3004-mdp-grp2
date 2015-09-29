@@ -3,6 +3,7 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import datatypes.Movement;
 import datatypes.Orientation;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
@@ -35,19 +36,19 @@ public class AStarPathFinder {
 		_open.add(_nodes[startX][startY]);
 		
 		//testing - check virtual map
-/*		boolean[][] cleared = _virtualMap.getCleared();
-		int value;
-		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
-			for (int b = 0; b < Arena.MAP_LENGTH; b++) {
-				if (cleared[b][a]) {
-					value = 1;
-				} else {
-					value = 0;
-				}
-				System.out.print(value + " ");
-			}
-			System.out.println();
-		}*/
+//		boolean[][] cleared = _virtualMap.getCleared();
+//		int value;
+//		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
+//			for (int b = 0; b < Arena.MAP_LENGTH; b++) {
+//				if (cleared[b][a]) {
+//					value = 1;
+//				} else {
+//					value = 0;
+//				}
+//				System.out.print(value + " ");
+//			}
+//			System.out.println();
+//		}
 
 		
 		while (_open.size() != 0) {
@@ -109,8 +110,8 @@ public class AStarPathFinder {
 	}
 
 	private void init(int[][] mazeRef) {
-		_virtualMap = new VirtualMap(mazeRef);
-		_virtualMap.initVirtualMap(mazeRef);
+		_virtualMap = VirtualMap.getInstance();
+		_virtualMap.updateVirtualMap(mazeRef);
 		_closed = new ArrayList<Node>();
 		_open = new SortedList<Node>();
 		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
@@ -122,36 +123,70 @@ public class AStarPathFinder {
 		_robot = Robot.getInstance();
 	}
 
-	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation) {
+	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation, boolean isExploring) {
 
-		int[] currentPosition = new int[2];
+		int[] tempPosition = new int[2];
+		int[] robotPosition;
 		int[] nextPosition = new int[2];
 		Orientation nextOrientation;
 		ArrayList<Path.Step> steps = fastestPath.getSteps();
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		
+		robotPosition = fastestPath.getStep(0);
 		
 		int count = 0;
 		
 		for (int i = 0; i < steps.size() - 1; i++) {
 			
-			currentPosition[0] = steps.get(i).getX();
-			currentPosition[1] = steps.get(i).getY();
+			tempPosition[0] = steps.get(i).getX();
+			tempPosition[1] = steps.get(i).getY();
 			nextPosition[0] = steps.get(i+1).getX();
 			nextPosition[1] = steps.get(i+1).getY();
 
 			nextOrientation = getOrientationIfMoveToNeighbor(currentOrientation, 
-					currentPosition[0], currentPosition[1],
+					tempPosition[0], tempPosition[1],
 					nextPosition[0], nextPosition[1]);
 			if (nextOrientation == currentOrientation) {
 				count++;
 			} else {
-				_robot.moveForward(count);
+
+				if (isExploring) {
+					for (int v = 0; v < count; v++) {
+						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+						explorer.setIsExplored(robotPosition, currentOrientation);
+						_robot.moveForward();
+					}
+				} else {
+					_robot.moveForward(count);
+				}
 				count = 1;
-				ChangeRobotOrientation(currentOrientation, nextOrientation);
+				Movement move = ChangeRobotOrientation(currentOrientation, nextOrientation);
+				Orientation ori;
+				if (isExploring) {
+					if (move == Movement.TURN_RIGHT_TWICE) {
+						ori = explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(robotPosition, ori);
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(robotPosition, ori);
+					} else {
+						ori = explorer.updateRobotOrientation(move);
+						explorer.setIsExplored(robotPosition, ori);
+					}
+				}
 			}
 			currentOrientation = nextOrientation;
 		}
-		
-		_robot.moveForward(count);
+
+
+		if (isExploring) {
+			for (int v = 0; v < count; v++) {
+				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+				explorer.setIsExplored(robotPosition, currentOrientation);
+				_robot.moveForward();
+			}
+		} else {
+			_robot.moveForward(count);
+		}
 		
 		return currentOrientation;
 		
@@ -159,49 +194,61 @@ public class AStarPathFinder {
 
 
 
-	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri) {
+	private Movement ChangeRobotOrientation(Orientation curOri, Orientation nextOri) {
 		switch (curOri) {
 			case NORTH:
 				if (nextOri == Orientation.EAST) {
 					_robot.turnRight();
+					return Movement.TURN_RIGHT;
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnLeft();
+					return Movement.TURN_LEFT;
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
 					_robot.turnRight();
+					return Movement.TURN_RIGHT_TWICE;
 				}
 				break;
 			case SOUTH:
 				if (nextOri == Orientation.EAST) {
 					_robot.turnLeft();
+					return Movement.TURN_LEFT;
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
+					return Movement.TURN_RIGHT;
 				} else if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
 					_robot.turnRight();
+					return Movement.TURN_RIGHT_TWICE;
 				}
 				break;
 			case EAST:
 				if (nextOri == Orientation.NORTH) {
 					_robot.turnLeft();
+					return Movement.TURN_LEFT;
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
+					return Movement.TURN_RIGHT;
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
 					_robot.turnRight();
+					return Movement.TURN_RIGHT_TWICE;
 				}
 				break;
 			case WEST:
 				if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
+					return Movement.TURN_RIGHT;
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnLeft();
+					return Movement.TURN_LEFT;
 				} else if (nextOri == Orientation.EAST) {
 					_robot.turnRight();
 					_robot.turnRight();
+					return Movement.TURN_RIGHT_TWICE;
 				}
 		}
-		
+		return null;
 	}
 
 	private Orientation getOrientationIfMoveToNeighbor(Orientation curOri, int curX, int curY, int nextX, int nextY) {

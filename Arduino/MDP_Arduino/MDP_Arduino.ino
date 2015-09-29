@@ -51,8 +51,6 @@ void loop()
 
   //First character in array is the command
 
-  char command = command_buffer[0];
-
   //Converts subsequent characters in the array into an integer
    while(command_buffer[i] != '|'){
     arg = arg + ( digit * (command_buffer[i] - 48) );
@@ -61,14 +59,14 @@ void loop()
   }
  // Serial.println(arg);
  
+   char command = command_buffer[0];
   //Hardcode here for testing
-  //command = 'D';
-  //arg = 180;
+//  command = 'C';
+//  arg = 0;
     
   switch ( command ) {
   case 'W':
     {
-      delay(1000);
       if(arg == 0) moveForward(1);
       else moveForward(arg);
       sendSensors();
@@ -76,7 +74,6 @@ void loop()
     }
     case 'A':
     {
-      delay(1000);
       if(arg == 0) rotateLeft(90);
       else rotateLeft(arg);
       sendSensors();
@@ -84,7 +81,6 @@ void loop()
     }
     case 'D':
     {
-      delay(1000);
       if(arg == 0) rotateRight(90);
       else rotateRight(arg);
       sendSensors();
@@ -92,7 +88,6 @@ void loop()
     }
     case 'E':
    {
-      delay(1000);
       sendSensors();
       break;
    }
@@ -407,7 +402,10 @@ void angleAlign(){
     
     if(error>2) rotateLeft(1);
     else if (error<-2) rotateRight(1);
-    else break;
+    else {
+      rotateLeft(1);
+      break;
+    }
   }
   delay(100);
   distAlign();
@@ -416,10 +414,12 @@ void angleAlign(){
 //Distance alignment to ensure robot is approx 15cm from wall to front sensors
 void distAlign(){
   while(1){
+    
     int LFdistance = distanceInCM(sensorRead(20,LF),LF);
 
-    if(LFdistance > 15) md.setSpeeds(100,100);
-    else if(LFdistance < 15) md.setSpeeds(-100,-100);
+    if(LFdistance > 19) md.setSpeeds(150,150);
+    else if(LFdistance > 15) md.setSpeeds(80,80);
+    else if(LFdistance < 15) md.setSpeeds(-80,-80);
     else break;
   }
    md.setBrakes(400, 400);

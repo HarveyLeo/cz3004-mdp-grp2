@@ -6,8 +6,9 @@ public class VirtualMap {
 	
 	private boolean[][] _visited;
 	private boolean[][] _cleared;
+	private static VirtualMap _instance;
 	
-	public VirtualMap(int[][] mazeRef) {
+	private VirtualMap() {
 		
 		//testing - check result of exploration
 /*		System.out.println("=========Explore Result===========");
@@ -23,7 +24,15 @@ public class VirtualMap {
 		_cleared = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 	}
 
-	public void initVirtualMap(int[][] mazeRef) {
+	public static VirtualMap getInstance() {
+        if (_instance == null) {
+            _instance = new VirtualMap();
+        }
+        return _instance;
+    }
+	
+	
+	public void updateVirtualMap(int[][] mazeRef) {
 
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
@@ -51,29 +60,6 @@ public class VirtualMap {
 				}
 			}
 		}
-		
-//		for (j = 0; j < Arena.MAP_WIDTH; j++ ) {
-//			if (mazeRef[0][j] != MazeExplorer.IS_EMPTY) {
-//				for (u = 0; u <= 1; u++) {
-//					for (v = j-1; v <= j+1; v++)
-//						_cleared[u][v] = false;
-//				}
-//			}
-//		}
-		
-//		for (j = 0; j < Arena.MAP_WIDTH; j++ ) {
-//			if (mazeRef[14][j] != MazeExplorer.IS_EMPTY) {
-//				for (u = 13; u <= 14; u++) {
-//					for (v = j-1; v <= j+1; v++) {
-//						if (v >= 0) {
-//							System.out.println(u + " " + v);
-//							_cleared[u][v] = false;
-//						}
-//					}
-//				}
-//			}
-//		}
-		
 	}
 
 	public boolean[][] getCleared() {

@@ -334,7 +334,7 @@ public class Controller {
 			case NORTH:
 				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
 				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
-				_robotOrientation = Orientation.EAST;
+				_robotOrientation = Orientation.EAST;				
 				break;
 			case SOUTH:
 				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
@@ -475,7 +475,7 @@ public class Controller {
 				MazeExplorer explorer = MazeExplorer.getInstance();
 				_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
 						MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
-				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH);
+				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH, false);
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
 				for (Path.Step step : steps) {

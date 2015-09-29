@@ -18,6 +18,13 @@ public class Path {
 		return _steps.size();
 	}
 	
+	public int[] getStep (int index) {
+		int[] position = new int[2];
+		position[0] = _steps.get(0).getX();
+		position[1] = _steps.get(0).getY();
+		return position;
+	}
+	
 	public class Step {
 		private int _x;
 		private int _y;
