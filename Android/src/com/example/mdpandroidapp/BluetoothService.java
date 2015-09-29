@@ -71,7 +71,7 @@ public class BluetoothService extends Service{
 
 	//Random UUID
 	private static final UUID MY_UUID 
-		= UUID.fromString("661dd0dc-e688-4945-9921-6b13ba67b07e");
+		= UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	
 	//For connection and reconnection to remote device
 	private static String targetMACAddress = "";
@@ -113,6 +113,7 @@ public class BluetoothService extends Service{
 				switch(msg.what){
 				case MESSAGE_READ:
 					receivedMessage = new String((byte[])msg.obj);
+					receivedMessage = receivedMessage.trim();
 					showToast("Message received: " + receivedMessage);
 					sendIntentBroadcast(EVENT_MESSAGE_RECEIVED);
 					break;

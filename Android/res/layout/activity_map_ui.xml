@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:focusableInTouchMode="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <com.example.mdpandroidapp.PixelGridView
+        android:id="@+id/arenaMap"
+        android:layout_width="match_parent"
+    	android:layout_height="0dp"
+    	android:layout_weight="7"
+        />
+    
+    <ScrollView
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+    		android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <TextView
+                android:id="@+id/text_connection_status"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Display Connection Status Here"
+                />
+            <TextView
+                android:id="@+id/text_robot_status"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Display Robot Status Here"
+                />
+            <Switch 
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:textOn="Auto"
+    			android:textOff="Manual"
+    			android:onClick="onUpdateSwitchClick"
+                />
+            
+            <LinearLayout 
+                android:layout_width="match_parent"
+    			android:layout_height="50dp"
+            	android:orientation="horizontal">
+            	
+                <TextView
+	                android:layout_width="match_parent"
+	    			android:layout_height="wrap_content"
+	    			android:text="Start Coord:"
+                	/>
+                
+                <EditText
+	                android:id="@+id/edit_xcoord"
+	                android:layout_width="0dp"
+	    			android:layout_height="wrap_content"
+	    			android:layout_weight="1"
+	    			android:hint="X"
+                    />
+                
+                <EditText
+	                android:id="@+id/edit_ycoord"
+	                android:layout_width="0dp"
+	    			android:layout_height="wrap_content"
+	    			android:layout_weight="1"
+	    			android:hint="X"
+                    />
+                
+                <Button
+	                android:id="@+id/button_send_update"
+	                android:layout_width="0dp"
+	    			android:layout_height="wrap_content"
+	    			android:layout_weight="1"
+	    			android:text="Send"
+	    			android:onClick="onSendCoordBtnClick"
+                	/>
+                
+            </LinearLayout>
+            
+            <Button
+                android:id="@+id/button_move_left"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Move Left"
+    			android:onClick="onLeftBtnClick"
+                />
+            
+            <Button
+                android:id="@+id/button_move_right"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Move Right"
+    			android:onClick="onRightBtnClick"
+                />
+            
+            <Button
+                android:id="@+id/button_move_forward"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Move Forward"
+    			android:onClick="onForwardBtnClick"
+                />
+            
+            <TextView
+                android:id="@+id/text_map_debug"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="Display debug message here"
+                />
+            
+            
+        </LinearLayout>
+        
+    </ScrollView>
+
+</LinearLayout>

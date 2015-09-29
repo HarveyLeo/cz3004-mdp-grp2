@@ -17,7 +17,7 @@
 	
 	<LinearLayout
 	    android:layout_width="match_parent"
-    	android:layout_height="35dp"
+    	android:layout_height="wrap_content"
     	android:orientation="horizontal">
 		<Button 
 		    android:layout_width="0dp"
@@ -37,7 +37,7 @@
 	<Button 
 	    android:id="@+id/button_connect_server"
 	    android:layout_width="match_parent"
-	    android:layout_height="35dp"
+	    android:layout_height="wrap_content"
 	    android:text="Connect As Server"
 	    android:onClick="onConnectServerBtnClick"/>
 	
@@ -49,7 +49,7 @@
 	<Button 
 	    android:id="@+id/button_list_device"
 	    android:layout_width="match_parent"
-	    android:layout_height="35dp"
+	    android:layout_height="wrap_content"
 	    android:text="List Device to Connect to"
 	    android:onClick="onListDeviceBtnClick"/>
 	

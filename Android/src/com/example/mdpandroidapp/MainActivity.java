@@ -71,7 +71,8 @@ public class MainActivity extends Activity{
 	}
 	
 	public void onViewMapUIClick(View view){
-		
+		Intent intent = new Intent(this, MapUI.class);
+		startActivity(intent);
 	}
 	
 	public void onExitClick(View view){
