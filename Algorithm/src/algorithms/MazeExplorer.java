@@ -124,13 +124,13 @@ public class MazeExplorer {
 		exploreAlongWall (GOAL);
 		
 		Controller controller = Controller.getInstance();
+		
 		if (!controller.hasReachedTimeThreshold()) {
 			_hasExploredTillGoal = true;
+			exploreAlongWall (START);
 		} else {
 			_hasExploredTillGoal = false;
 		}
-		
-		exploreAlongWall (START);
 		
 		if (!isGoalPos(_robotPosition, START)) {
 			AStarPathFinder pathFinder = AStarPathFinder.getInstance();

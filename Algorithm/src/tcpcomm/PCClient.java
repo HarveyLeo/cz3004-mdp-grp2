@@ -29,11 +29,11 @@ public class PCClient {
 		
 		PCClient pcClient = PCClient.getInstance();
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
-		
-		Scanner sc = new Scanner(System.in);
+		System.out.println("connected");
+//		Scanner sc = new Scanner(System.in);
 		while (true) {
-			String msgSent = sc.nextLine();
-			pcClient.sendMessage(msgSent);
+//			String msgSent = sc.nextLine();
+			pcClient.sendMessage("Hello world");
 			String msgReceived = pcClient.readMessage();
 			System.out.println("Message received:"+ msgReceived);
 		}
@@ -51,8 +51,9 @@ public class PCClient {
 	}
 
 	public void sendMessage(String msg) throws IOException{
-		PrintWriter toRPi = new PrintWriter(_clientSocket.getOutputStream(), true);
+		PrintWriter toRPi = new PrintWriter(_clientSocket.getOutputStream());
 		toRPi.print(msg);
+		toRPi.flush();
 	}
 
 	public String readMessage() throws IOException{
