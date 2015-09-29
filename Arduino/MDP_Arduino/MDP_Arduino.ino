@@ -62,8 +62,8 @@ void loop()
  // Serial.println(arg);
  
   //Hardcode here for testing
- // command = 'L';
- // arg = 90;
+  //command = 'D';
+  //arg = 180;
     
   switch ( command ) {
   case 'W':
@@ -234,17 +234,17 @@ int rotateRight(int angle){
   else if ((angle > 15) && (angle <= 30))
     angle_offset = angle * 8.4;  
   else if ((angle > 30) && (angle <= 45))
-    angle_offset = angle * 8.95;
+    angle_offset = angle * 9.15;
 
   else if ((angle > 45) && (angle <= 90)) //Only this one calibrated 
-    angle_offset = angle * 8.95;
+    angle_offset = angle * 9.15;
 
   else if ((angle > 90) && (angle <= 360))  
-    angle_offset = angle * 8.95;
+    angle_offset = angle * 9.27;
   else if ((angle > 360) && (angle <= 720))  
-    angle_offset = angle * 8.95;
+    angle_offset = angle * 8.9;
   else if ((angle > 720) && (angle <= 1080)) 
-    angle_offset = angle * 8.95;
+    angle_offset = angle * 8.9;
 
   while(1){
         
@@ -284,7 +284,7 @@ int rotateLeft(int angle){
     angle_offset = angle * 9.0;
     
   else if ((angle > 45) && (angle <= 90))   //Only this one calibrated 
-    angle_offset = angle * 8.9;
+    angle_offset = angle * 9.15;
 
   else if ((angle > 90) && (angle <= 360))  
     angle_offset = angle * 8.9;
@@ -428,7 +428,7 @@ void distAlign(){
    
    //Recursive call if angle is misaligned after distance alignment.
    int angleError = sensorRead(20,LF) - sensorRead(20,RF);
-   if(angleError>5 || angleError<-5) frontAlignment();
+   if(angleError>2 || angleError<-2) frontAlignment();
 
 }
 //Standard insertion sort algorithm
