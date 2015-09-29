@@ -405,8 +405,8 @@ void angleAlign(){
     int RFreading = sensorRead(20,RF);
     int error = LFreading - RFreading;
     
-    if(error>5) rotateLeft(1);
-    else if (error<-5) rotateRight(1);
+    if(error>2) rotateLeft(1);
+    else if (error<-2) rotateRight(1);
     else break;
   }
   delay(100);
