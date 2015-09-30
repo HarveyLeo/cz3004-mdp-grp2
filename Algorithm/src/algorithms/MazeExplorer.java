@@ -546,6 +546,8 @@ public class MazeExplorer {
 				}
 				break;
 			case MOVE_FORWARD:
+				break;
+			case TURN_RIGHT_TWICE:
 				
 		}
 		return _robotOrientation;

@@ -6,17 +6,10 @@ import simulator.arena.Arena;
 
 public class Robot {
 	private static Robot _instance;
-	private Sensor _front;
-	private Sensor _frontleft, _frontright;
-	private Sensor _right, _left;
 	private int _speed;
 	
 	private Robot() {
-		_front = new Sensor(Sensor.LONG_RANGE);
-		_frontleft = new Sensor(Sensor.SHORT_RANGE);
-		_frontright = new Sensor(Sensor.SHORT_RANGE);
-		_left = new Sensor(Sensor.SHORT_RANGE);
-		_right = new Sensor(Sensor.SHORT_RANGE);
+
 	}
 	
 	public static Robot getInstance() {

@@ -35,7 +35,7 @@ public class Controller {
 	private Timer _exploreTimer, _ffpTimer;
 	private int[] _robotPosition = new int[2];
 	private Orientation _robotOrientation;
-	private int _speed, _targetCoverage, _exploreTimeLimit, _ffpTimeLimit;
+	private int _speed,  _exploreTimeLimit, _ffpTimeLimit;
 	private float _actualCoverage;
 	private boolean _hasReachedStart, _hasReachedTimeThreshold;
 
@@ -156,7 +156,6 @@ public class Controller {
 		if (coverage > 100) {
 			_ui.setStatus("warning: target coverage out of range");
 		} else {
-			_targetCoverage = coverage;
 			_ui.setStatus("target coverage set");
 		}
 	}
