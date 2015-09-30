@@ -38,6 +38,17 @@ public class MazeExplorer {
 		return _isExplored;
 	}
 	
+	public boolean areAllExplored() {
+		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
+			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
+				if (_isExplored[i][j] == false) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	public boolean hasExploredTillGoal() {
 		return _hasExploredTillGoal;
 	}
@@ -132,17 +143,21 @@ public class MazeExplorer {
 			_hasExploredTillGoal = false; //Timeout before reaching goal
 		}
 
+		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+		Path backPath;
 		if (!isGoalPos(_robotPosition, START)) { //Timeout before reaching start
-			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-			Path backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
+			backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, true);
 		} else {
-			while (!controller.hasReachedTimeThreshold()) {
+			while (!controller.hasReachedTimeThreshold() && !areAllExplored()) {
 				ExploreNextRound(_robotPosition);
 			}
 		}
-
+		
+		backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
+		_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, true);
 		adjustOrientationTo(Orientation.NORTH);
+		
 
 	}
 
@@ -171,11 +186,11 @@ public class MazeExplorer {
 					
 					fastestPath = pathFinder.findFastestPath(currentRobotPosition[0], currentRobotPosition[1], nextRobotPosition[0], nextRobotPosition[1], _mazeRef);
 					
-					//Testing
-					for (Path.Step step: fastestPath.getSteps()) {
-						System.out.print(step.getX() + " " + step.getY() + "      ");
-					}
-					
+//					//Testing
+//					for (Path.Step step: fastestPath.getSteps()) {
+//						System.out.print(step.getX() + " " + step.getY() + "      ");
+//					}
+//					
 					_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true);
 					
 					if (_robotPosition[0] > obsX) {
@@ -188,13 +203,10 @@ public class MazeExplorer {
 						adjustOrientationTo(Orientation.NORTH);
 					}
 					currentRobotPosition = nextRobotPosition;
-				//Testing
-//					if (_robotPosition[0] == 7) {
-//						return;
-//					}
-					System.out.println("robot position from MazeExplorer: " + _robotPosition[0] + " " + _robotPosition[1]);
-					System.out.println("robot ori from MazeExplorer: " + _robotOrientation);
-					/*return;*/
+//					//Testing
+//					System.out.println("robot position from MazeExplorer: " + _robotPosition[0] + " " + _robotPosition[1]);
+//					System.out.println("robot ori from MazeExplorer: " + _robotOrientation);
+					
 				}
 			}
 		}
@@ -205,9 +217,9 @@ public class MazeExplorer {
 		boolean[][] cleared = virtualMap.getCleared();
 		boolean isClearedAhead;
 		
-		for (int radius = 2; radius < Arena.MAP_WIDTH; radius ++) {
-			for (int y = 0; y < Arena.MAP_WIDTH; y++) {
-				for (int x = 0; x < Arena.MAP_LENGTH; x++) {
+		for (int radius = 2; radius <= Sensor.LONG_RANGE; radius ++) {
+			for (int y = 0; y <= obsY + radius; y++) {
+				for (int x = 0; x <= obsX + radius; x++) {
 					if (x == obsX - radius || x == obsX + radius || y == obsY - radius || y == obsY + radius) {
 						if (x >= 0 && y >= 0 && x < Arena.MAP_LENGTH && y < Arena.MAP_WIDTH) {
 							if (cleared[x][y]) {
