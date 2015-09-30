@@ -129,26 +129,27 @@ public class MazeExplorer {
 			_hasExploredTillGoal = true;
 			exploreAlongWall (START);
 		} else {
-			_hasExploredTillGoal = false;
+			_hasExploredTillGoal = false; //Timeout before reaching goal
 		}
 
-		if (!isGoalPos(_robotPosition, START)) {
+		if (!isGoalPos(_robotPosition, START)) { //Timeout before reaching start
 			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 			Path backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, true);
-		} else if (!controller.hasReachedTimeThreshold()) {
-			ExploreSecondRound();
+		} else {
+			while (!controller.hasReachedTimeThreshold()) {
+				ExploreNextRound(_robotPosition);
+			}
 		}
 
 		adjustOrientationTo(Orientation.NORTH);
 
 	}
 
-	private void ExploreSecondRound() {
+	private void ExploreNextRound(int[] currentRobotPosition) {
 		VirtualMap virtualMap = VirtualMap.getInstance();
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		Path fastestPath;
-		int[] currentRobotPosition = {MazeExplorer.START[0], MazeExplorer.START[1]};
 		int[] nextRobotPosition;
 		virtualMap.updateVirtualMap(_mazeRef);
 		for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
@@ -170,6 +171,11 @@ public class MazeExplorer {
 					
 					fastestPath = pathFinder.findFastestPath(currentRobotPosition[0], currentRobotPosition[1], nextRobotPosition[0], nextRobotPosition[1], _mazeRef);
 					
+					//Testing
+					for (Path.Step step: fastestPath.getSteps()) {
+						System.out.print(step.getX() + " " + step.getY() + "      ");
+					}
+					
 					_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true);
 					
 					if (_robotPosition[0] > obsX) {
@@ -181,10 +187,14 @@ public class MazeExplorer {
 					} else if  (_robotPosition[1] < obsY) {
 						adjustOrientationTo(Orientation.NORTH);
 					}
-/*					//Testing
+					currentRobotPosition = nextRobotPosition;
+				//Testing
+//					if (_robotPosition[0] == 7) {
+//						return;
+//					}
 					System.out.println("robot position from MazeExplorer: " + _robotPosition[0] + " " + _robotPosition[1]);
 					System.out.println("robot ori from MazeExplorer: " + _robotOrientation);
-					return;*/
+					/*return;*/
 				}
 			}
 		}
