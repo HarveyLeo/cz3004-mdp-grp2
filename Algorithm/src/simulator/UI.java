@@ -152,7 +152,7 @@ public class UI extends JFrame implements ActionListener {
 		for (int i = 0; i < 4; i++) {
 			_exploreTextFields[i] = new JTextField(10);
 		}
-
+		_exploreTextFields[0].setEditable(false);
 		JPanel exploreInputPane = new JPanel(new GridLayout(4, 2));
 		exploreInputPane.add(exploreCtrlLabels[0]);
 		exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -462,6 +462,64 @@ public class UI extends JFrame implements ActionListener {
 			_ffpTextFields[i].setText(_ffpTextFields[i].getText());
 		}
 
+	}
+
+	public boolean isIntExploreInput() {
+
+		String[] exploreInput = new String[4];
+		for (int i = 0; i < 4; i++) {
+			exploreInput[i] = _exploreTextFields[i].getText();
+		}
+		
+		if (! exploreInput[0].matches("[0-9]+,[0-9]+")) {
+			return false;
+		} else {
+			int posX, posY, index;
+			index = exploreInput[0].indexOf(",");
+			posX = Integer.parseInt(exploreInput[0].substring(0, index));
+			posY = Integer.parseInt(exploreInput[0].substring(index+1));
+			if (posX > Arena.MAP_LENGTH || posY > Arena.MAP_WIDTH) {
+				return false;
+			}
+		}
+		
+		if (!exploreInput[1].matches("[0-9]+")) {
+			return false;
+		}
+		
+		if (!exploreInput[2].matches("[0-9]+")) {
+			return false;
+		} else {
+			int coverage;
+			coverage = Integer.parseInt(exploreInput[2]);
+			if (coverage > 100) {
+				return false;
+			}
+		}
+		
+		if (!exploreInput[3].matches("[0-9]+")) {
+			return false;
+		}
+		
+		
+		return true;
+	}
+
+	public boolean isIntFFPInput() {
+		String[] ffpInput = new String[2];
+		for (int i = 0; i < 2; i++) {
+			ffpInput[i] = _ffpTextFields[i].getText();
+		}
+		
+		if (! ffpInput[0].matches("[0-9]+")) {
+			return false;
+		}
+		
+		if (! ffpInput[1].matches("[0-9]+")) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 }

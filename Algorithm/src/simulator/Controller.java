@@ -246,6 +246,13 @@ public class Controller {
 	}
 	
 	public void exploreMaze() {
+
+		if (!_ui.isIntExploreInput()) {
+			_ui.setStatus("invalid input for exploration");
+			_ui.setExploreBtnEnabled(true);
+			return;
+		}
+		
 		_ui.refreshExploreInput();
 		Arena arena = Arena.getInstance();
 		MazeExplorer explorer = MazeExplorer.getInstance();
@@ -326,6 +333,7 @@ public class Controller {
 			updateCoverage.execute();
 		}
 	}
+
 
 	public void turnRobotRight() {
 		JButton[][] mazeGrids = _ui.getMazeGrids();
@@ -462,8 +470,14 @@ public class Controller {
 	}
 
 	public void findFastestPath() {
-		_ui.refreshFfpInput();
+
+		if (!_ui.isIntFFPInput()) {
+			_ui.setStatus("invalid input for finding fastest path");
+			_ui.setFfpBtnEnabled(true);
+			return;
+		}
 		
+		_ui.refreshFfpInput();
 		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
 		
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
