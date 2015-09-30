@@ -13,6 +13,8 @@ public class PCClient {
 	
 	private static PCClient _instance;
 	private Socket _clientSocket;
+	private PrintWriter _toRPi;
+	private Scanner _fromRPi;
 	
 	private PCClient() {
 		
@@ -29,19 +31,18 @@ public class PCClient {
 		
 		PCClient pcClient = PCClient.getInstance();
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
-		System.out.println("RPi connected");
-//		Scanner sc = new Scanner(System.in);
+		System.out.println("RPi successfully connected");
 		while (true) {
-//			String msgSent = sc.nextLine();
-			pcClient.sendMessage("Ar|ML");
+			pcClient.sendMessage("A081|");
 			String msgReceived = pcClient.readMessage();
-			System.out.println("Message received:"+ msgReceived);
-		}
-		
+			System.out.println("Message received: "+ msgReceived);
+		}	
 	}
 	
 	public void setUpConnection (String IPAddress, int portNumber) throws UnknownHostException, IOException{
 		_clientSocket = new Socket(RPI_IP_ADDRESS, RPI_PORT);
+		_toRPi = new PrintWriter(_clientSocket.getOutputStream());
+		_fromRPi = new Scanner(_clientSocket.getInputStream());
 	}
 	
 	public void closeConnection() throws IOException {
@@ -51,14 +52,12 @@ public class PCClient {
 	}
 
 	public void sendMessage(String msg) throws IOException{
-		PrintWriter toRPi = new PrintWriter(_clientSocket.getOutputStream());
-		toRPi.print(msg);
-		toRPi.flush();
+		_toRPi.print(msg);
+		_toRPi.flush();
 	}
 
 	public String readMessage() throws IOException{
-		Scanner fromRPi = new Scanner(_clientSocket.getInputStream());
-		String messageReceived = fromRPi.nextLine();	
+		String messageReceived = _fromRPi.nextLine();
 		return messageReceived;
 	}
          

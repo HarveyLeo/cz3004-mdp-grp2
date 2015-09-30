@@ -170,15 +170,14 @@ public class MazeExplorer {
 		for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
 			for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
 				if (_mazeRef[obsX][obsY] == UNEXPLORED){
-					System.out.println("start to find nearest robot position to " + obsX + " " + obsY);
 					nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap);
 					
-					//testing
-					if (nextRobotPosition == null) {
-						System.out.println("null");
-					} else {
-						System.out.println("robot will move to " + nextRobotPosition[0] + " " + nextRobotPosition[1]);
-					}
+					//testing - print next position to move to
+//					if (nextRobotPosition == null) {
+//						System.out.println("null");
+//					} else {
+//						System.out.println("robot will move to " + nextRobotPosition[0] + " " + nextRobotPosition[1]);
+//					}
 					
 					if (nextRobotPosition == null) {
 						continue;
@@ -186,11 +185,6 @@ public class MazeExplorer {
 					
 					fastestPath = pathFinder.findFastestPath(currentRobotPosition[0], currentRobotPosition[1], nextRobotPosition[0], nextRobotPosition[1], _mazeRef);
 					
-//					//Testing
-//					for (Path.Step step: fastestPath.getSteps()) {
-//						System.out.print(step.getX() + " " + step.getY() + "      ");
-//					}
-//					
 					_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true);
 					
 					if (_robotPosition[0] > obsX) {
@@ -202,11 +196,7 @@ public class MazeExplorer {
 					} else if  (_robotPosition[1] < obsY) {
 						adjustOrientationTo(Orientation.NORTH);
 					}
-					currentRobotPosition = nextRobotPosition;
-//					//Testing
-//					System.out.println("robot position from MazeExplorer: " + _robotPosition[0] + " " + _robotPosition[1]);
-//					System.out.println("robot ori from MazeExplorer: " + _robotOrientation);
-					
+					currentRobotPosition = nextRobotPosition;					
 				}
 			}
 		}
