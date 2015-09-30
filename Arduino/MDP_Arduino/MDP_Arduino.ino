@@ -61,7 +61,7 @@ void loop()
  
    char command = command_buffer[0];
   //Hardcode here for testing
-//  command = 'C';
+//  command = 'W';
 //  arg = 0;
     
   switch ( command ) {
@@ -229,13 +229,13 @@ int rotateRight(int angle){
   else if ((angle > 15) && (angle <= 30))
     angle_offset = angle * 8.4;  
   else if ((angle > 30) && (angle <= 45))
-    angle_offset = angle * 9.15;
+    angle_offset = angle * 8.9;
 
-  else if ((angle > 45) && (angle <= 90)) //Only this one calibrated 
+  else if ((angle > 45) && (angle <= 90)) //9.15 When all fully charged
     angle_offset = angle * 9.15;
 
   else if ((angle > 90) && (angle <= 360))  
-    angle_offset = angle * 9.27;
+    angle_offset = angle * 8.9;
   else if ((angle > 360) && (angle <= 720))  
     angle_offset = angle * 8.9;
   else if ((angle > 720) && (angle <= 1080)) 
@@ -278,8 +278,8 @@ int rotateLeft(int angle){
   else if ((angle > 30) && (angle <= 45))
     angle_offset = angle * 9.0;
     
-  else if ((angle > 45) && (angle <= 90))   //Only this one calibrated 
-    angle_offset = angle * 9.15;
+  else if ((angle > 45) && (angle <= 90))   //8.9 When all fully charged 
+    angle_offset = angle * 8.9;
 
   else if ((angle > 90) && (angle <= 360))  
     angle_offset = angle * 8.9;
@@ -312,7 +312,7 @@ int rotateLeft(int angle){
 //Function for making a left turn on a 2x2 grid.
 void turnRight(){
   md.setSpeeds(50,250);
-  delay(1250);
+  delay(1250);  //1250 When all fully charged
   md.setBrakes(400,400);
   delay(100);
   md.setBrakes(0,0);
@@ -321,7 +321,7 @@ void turnRight(){
 //Function for making a right turn on a 2x2 grid.
 void turnLeft(){
   md.setSpeeds(250,50);
-  delay(1250);
+  delay(1225);    //1225 When all fully charged
   md.setBrakes(400,400);
   delay(100);
   md.setBrakes(0,0);
@@ -347,7 +347,7 @@ void moveForward(int distance){
     case 9: multiplier = 590; break;
     case 10: multiplier = 600; break;
     case 11: multiplier = 600; break;
-    case 12: multiplier = 600; break;
+    case 12: multiplier = 590; break;
     case 13: multiplier = 600; break;
     case 14: multiplier = 600; break;
     case 15: multiplier = 600; break;
