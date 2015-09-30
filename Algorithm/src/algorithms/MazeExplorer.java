@@ -145,12 +145,13 @@ public class MazeExplorer {
 
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		Path backPath;
+		boolean end = false;
 		if (!isGoalPos(_robotPosition, START)) { //Timeout before reaching start
 			backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, true);
 		} else {
-			while (!controller.hasReachedTimeThreshold() && !areAllExplored()) {
-				ExploreNextRound(_robotPosition);
+			while (!controller.hasReachedTimeThreshold() && !areAllExplored() && !end) {
+				end = ExploreNextRound(_robotPosition);
 			}
 		}
 		
@@ -161,17 +162,19 @@ public class MazeExplorer {
 
 	}
 
-	private void ExploreNextRound(int[] currentRobotPosition) {
+	private boolean ExploreNextRound(int[] currentRobotPosition) {
 		VirtualMap virtualMap = VirtualMap.getInstance();
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		Path fastestPath;
+		boolean isExhaustedViaFront = true, isExhaustedViaFrontside = true;
+		boolean end;
 		int[] nextRobotPosition;
 		virtualMap.updateVirtualMap(_mazeRef);
 		for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
 			for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
 				if (_mazeRef[obsX][obsY] == UNEXPLORED){
-					nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap);
-					
+					nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap, false);
+				
 					//testing - print next position to move to
 //					if (nextRobotPosition == null) {
 //						System.out.println("null");
@@ -179,7 +182,9 @@ public class MazeExplorer {
 //						System.out.println("robot will move to " + nextRobotPosition[0] + " " + nextRobotPosition[1]);
 //					}
 					
-					if (nextRobotPosition == null) {
+					if (nextRobotPosition != null) {
+						isExhaustedViaFront = false;
+					} else {
 						continue;
 					}
 					
@@ -196,13 +201,54 @@ public class MazeExplorer {
 					} else if  (_robotPosition[1] < obsY) {
 						adjustOrientationTo(Orientation.NORTH);
 					}
-					currentRobotPosition = nextRobotPosition;					
+				currentRobotPosition = nextRobotPosition;					
 				}
 			}
 		}
+		
+		if (isExhaustedViaFront) {
+			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
+				for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
+					if (_mazeRef[obsX][obsY] == UNEXPLORED){
+						//Testing
+//						System.out.println("obs: " + obsX + " " + obsY);
+						nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap, true);
+					
+						if (nextRobotPosition != null) {
+							
+							isExhaustedViaFrontside = false;
+						} else {
+							continue;
+						}
+						
+						fastestPath = pathFinder.findFastestPath(currentRobotPosition[0], currentRobotPosition[1], nextRobotPosition[0], nextRobotPosition[1], _mazeRef);
+						
+						_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true);
+						
+						if (_robotPosition[0] > obsX) {
+							adjustOrientationTo(Orientation.WEST);
+						} else if (_robotPosition[0] < obsX) {
+							adjustOrientationTo(Orientation.EAST);
+						} else if  (_robotPosition[1] > obsY) {
+							adjustOrientationTo(Orientation.SOUTH);
+						} else if  (_robotPosition[1] < obsY) {
+							adjustOrientationTo(Orientation.NORTH);
+						}
+						currentRobotPosition = nextRobotPosition;					
+					}
+				}
+			}
+		}
+		
+		if (isExhaustedViaFront && isExhaustedViaFrontside) {
+			end = true;
+		} else {
+			end = false;
+		}
+		return end;
 	}
 
-	private int[] getNearestRobotPositionTo (int obsX, int obsY, VirtualMap virtualMap) {
+	private int[] getNearestRobotPositionTo (int obsX, int obsY, VirtualMap virtualMap, boolean isExhausted) {
 		int nearestPosition[] = new int[2];
 		boolean[][] cleared = virtualMap.getCleared();
 		boolean isClearedAhead;
@@ -213,7 +259,7 @@ public class MazeExplorer {
 					if (x == obsX - radius || x == obsX + radius || y == obsY - radius || y == obsY + radius) {
 						if (x >= 0 && y >= 0 && x < Arena.MAP_LENGTH && y < Arena.MAP_WIDTH) {
 							if (cleared[x][y]) {
-								if ((x + y - obsX - obsY == radius || obsX + obsY - x - y == radius) && (x == obsX || y == obsY)) {
+								if ((Math.abs(obsX + obsY - x - y) == radius) && (x == obsX || y == obsY)) {
 									isClearedAhead = true;
 									if (x > obsX) {
 										for(int i = obsX + 1; i < x; i++) {
@@ -244,6 +290,81 @@ public class MazeExplorer {
 										nearestPosition[0] = x;
 										nearestPosition[1] = y;
 										return nearestPosition;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (isExhausted) {
+			for (int radius = 2; radius <= Sensor.SHORT_RANGE; radius ++) {
+				for (int y = obsY - radius; y <= obsY + radius; y++) {
+					for (int x = obsX - radius; x <= obsX + radius; x++) {
+						if (x == obsX - radius || x == obsX + radius || y == obsY - radius || y == obsY + radius) {
+							if (x >= 0 && y >= 0 && x < Arena.MAP_LENGTH && y < Arena.MAP_WIDTH) {
+								if (cleared[x][y]) {
+						
+									if (Math.abs(x-obsX) + Math.abs(x-obsY) == radius + 1 ) {
+								
+										isClearedAhead = true;
+										if (x == obsX + radius && y > obsY) {
+											for(int i = obsX + 1; i < x; i++) {
+													if (_mazeRef[i][obsY] != IS_EMPTY) {
+														isClearedAhead = false;
+												}
+											}
+										} else if(x == obsX + radius && y < obsY) {
+											for(int i = obsX + 1; i < x; i++) {
+												if (_mazeRef[i][obsY] != IS_EMPTY) {
+													isClearedAhead = false;
+											}
+										}
+										} else if (x == obsX - radius && y > obsY) {
+											for(int i = x + 1; i < obsX; i++) {
+												if (_mazeRef[i][obsY] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (x == obsX - radius && y < obsY) {
+											for(int i = x + 1; i < obsX; i++) {
+												if (_mazeRef[i][obsY] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (x < obsX && y == obsY + radius) {
+											for(int j = obsY + 1; j < y; j++) {
+												if (_mazeRef[obsX][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (x > obsX && y == obsY + radius) {
+											for(int j = obsY + 1; j < y; j++) {
+												if (_mazeRef[obsX][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (x < obsX && y == obsY - radius) {
+											for(int j = y + 1; j < obsY; j++) {
+												if (_mazeRef[obsX][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (x > obsX && y == obsY - radius) {
+											for(int j = y + 1; j < obsY; j++) {
+												if (_mazeRef[obsX][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										}
+										if (isClearedAhead) {
+											nearestPosition[0] = x;
+											nearestPosition[1] = y;
+									
+											return nearestPosition;
+										}
+									
 									}
 								}
 							}
