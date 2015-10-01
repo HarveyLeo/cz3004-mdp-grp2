@@ -71,7 +71,7 @@ public class Controller {
 		_ui.setVisible(true);
 		
 		if (RobotSystem.isRealRun()) {
-			
+
 			_pcClient = PCClient.getInstance();
 			
 			SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
@@ -87,20 +87,30 @@ public class Controller {
 						int index = msgRobotPosition.indexOf(",");
 						int posX = Integer.parseInt(msgRobotPosition.substring(0, index));
 						int posY = Integer.parseInt(msgRobotPosition.substring(index+1));
-						_robotPosition[0] = posX;
-						_robotPosition[1] = posY;
+						resetRobotInMaze(_ui.getMazeGrids(), posX, posY);
 						_ui.setStatus("initial robot position set");
 						String msgExplore = _pcClient.readMessage();
 						while (!msgExplore.equals(Message.START_EXPLORATION)) {
 							msgExplore = _pcClient.readMessage();
 						}
 						_ui.setStatus("start exploring");
+						//Testing
+						_pcClient.sendMessage("C|");
+						_pcClient.readMessage();
+						_pcClient.sendMessage("A|");
+						_pcClient.readMessage();
+						_pcClient.sendMessage("C|");
+						_pcClient.readMessage();
+						_pcClient.sendMessage("A|");
+						_pcClient.readMessage();
+						_pcClient.sendMessage("A|");
+						_pcClient.readMessage();
 						exploreMaze();
-						String msgFastest = _pcClient.readMessage();
-						while (!msgFastest.equals(Message.START_FASTEST)) {
-							msgFastest = _pcClient.readMessage();
-						}
-						findFastestPath();
+//						String msgFastest = _pcClient.readMessage();
+//						while (!msgFastest.equals(Message.START_FASTEST)) {
+//							msgFastest = _pcClient.readMessage();
+//						}
+//						findFastestPath();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -191,6 +201,7 @@ public class Controller {
 			}
 			_robotPosition[0] = x - 1;
 			_robotPosition[1] = y - 1;
+		
 			_robotOrientation = Orientation.NORTH;
 			_ui.setStatus("robot initial position set");
 		}
@@ -336,10 +347,15 @@ public class Controller {
 				}
 				_hasReachedStart = false;
 				explorer.explore(_robotPosition);
+
 				return null;
 			}
 			@Override
 			public void done() {
+				
+				//Testing
+				System.out.println("executing exploreMaze done()");
+				
 				
 				String P1Descriptor, P2Descriptor;
 				
@@ -349,9 +365,9 @@ public class Controller {
 				
 				P2Descriptor = explorer.getP2Descriptor();
 				
-				System.out.println("P1 descriptor: " + P1Descriptor);
-				
-				System.out.println("P2 descriptor: " + P2Descriptor);
+//				System.out.println("P1 descriptor: " + P1Descriptor);
+//				
+//				System.out.println("P2 descriptor: " + P2Descriptor);
 			
 				_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
 				
@@ -416,7 +432,7 @@ public class Controller {
 			case NORTH:
 				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
 				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
-				_robotOrientation = Orientation.EAST;				
+				_robotOrientation = Orientation.EAST;	
 				break;
 			case SOUTH:
 				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);

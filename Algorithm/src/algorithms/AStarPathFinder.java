@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import datatypes.Movement;
 import datatypes.Orientation;
+import main.RobotSystem;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 
@@ -152,9 +153,15 @@ public class AStarPathFinder {
 
 				if (isExploring) {
 					for (int v = 0; v < count; v++) {
-						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-						explorer.setIsExplored(robotPosition, currentOrientation);
+						if (!RobotSystem.isRealRun()) {
+							robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+							explorer.setIsExplored(robotPosition, currentOrientation);
+						}
 						_robot.moveForward();
+						if (RobotSystem.isRealRun()) {
+							robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+							explorer.setIsExplored(robotPosition, currentOrientation);
+						}
 					}
 				} else {
 					_robot.moveForward(count);
@@ -162,17 +169,17 @@ public class AStarPathFinder {
 				count = 1;
 				Movement move = ChangeRobotOrientation(currentOrientation, nextOrientation);
 				Orientation ori;
-				if (isExploring) {
-					if (move == Movement.TURN_RIGHT_TWICE) {
-						ori = explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(robotPosition, ori);
-						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(robotPosition, ori);
-					} else {
-						ori = explorer.updateRobotOrientation(move);
-						explorer.setIsExplored(robotPosition, ori);
-					}
-				}
+//				if (isExploring) {
+//					if (move == Movement.TURN_RIGHT_TWICE) {
+//						ori = explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+//						explorer.setIsExplored(robotPosition, ori);
+//						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+//						explorer.setIsExplored(robotPosition, ori);
+//					} else {
+//						ori = explorer.updateRobotOrientation(move);
+//						explorer.setIsExplored(robotPosition, ori);
+//					}
+//				}
 			}
 			currentOrientation = nextOrientation;
 		}
@@ -180,9 +187,15 @@ public class AStarPathFinder {
 
 		if (isExploring) {
 			for (int v = 0; v < count; v++) {
-				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-				explorer.setIsExplored(robotPosition, currentOrientation);
+				if (!RobotSystem.isRealRun()) {
+					robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+					explorer.setIsExplored(robotPosition, currentOrientation);
+				}
 				_robot.moveForward();
+				if (RobotSystem.isRealRun()) {
+					robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+					explorer.setIsExplored(robotPosition, currentOrientation);
+				}
 			}
 		} else {
 			_robot.moveForward(count);

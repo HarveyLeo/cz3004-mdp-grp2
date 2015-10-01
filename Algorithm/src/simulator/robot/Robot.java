@@ -122,6 +122,7 @@ public class Robot {
 		} else {
 			try {
 				pcClient.sendMessage(Message.TURN_RIGHT);
+	
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -136,6 +137,7 @@ public class Robot {
 	public void moveForward() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
