@@ -7,7 +7,7 @@ import simulator.Controller;
 
 public class RobotSystem {
 	
-	private static boolean _isRealRun = true;
+	private static boolean _isRealRun = false;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {

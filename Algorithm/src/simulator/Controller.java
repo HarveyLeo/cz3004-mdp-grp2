@@ -88,23 +88,22 @@ public class Controller {
 						int posX = Integer.parseInt(msgRobotPosition.substring(0, index));
 						int posY = Integer.parseInt(msgRobotPosition.substring(index+1));
 						resetRobotInMaze(_ui.getMazeGrids(), posX, posY);
-						_ui.setStatus("initial robot position set");
 						String msgExplore = _pcClient.readMessage();
 						while (!msgExplore.equals(Message.START_EXPLORATION)) {
 							msgExplore = _pcClient.readMessage();
 						}
 						_ui.setStatus("start exploring");
-						//Testing
-						_pcClient.sendMessage("C|");
-						_pcClient.readMessage();
-						_pcClient.sendMessage("A|");
-						_pcClient.readMessage();
-						_pcClient.sendMessage("C|");
-						_pcClient.readMessage();
-						_pcClient.sendMessage("A|");
-						_pcClient.readMessage();
-						_pcClient.sendMessage("A|");
-						_pcClient.readMessage();
+						//Testing - calibration at initial position
+//						_pcClient.sendMessage("C|");
+//						_pcClient.readMessage();
+//						_pcClient.sendMessage("A|");
+//						_pcClient.readMessage();
+//						_pcClient.sendMessage("C|");
+//						_pcClient.readMessage();
+//						_pcClient.sendMessage("A|");
+//						_pcClient.readMessage();
+//						_pcClient.sendMessage("A|");
+//						_pcClient.readMessage();
 						exploreMaze();
 //						String msgFastest = _pcClient.readMessage();
 //						while (!msgFastest.equals(Message.START_FASTEST)) {
@@ -265,6 +264,8 @@ public class Controller {
 						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
 						threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
+						//Testing
+						System.out.println("current threshold (sec): " + threshold);
 						publish(threshold);
 						return null;
 					}
@@ -336,6 +337,7 @@ public class Controller {
 		
 		if (RobotSystem.isRealRun()) {
 			_exploreTimeLimit = 360;
+			_speed = 1;
 		}
 
 		ExploreTimeClass timeActionListener = new ExploreTimeClass(_exploreTimeLimit);
@@ -357,13 +359,13 @@ public class Controller {
 				System.out.println("executing exploreMaze done()");
 				
 				
-				String P1Descriptor, P2Descriptor;
+//				String P1Descriptor, P2Descriptor;
 				
 				_hasReachedStart = true;
 				
-				P1Descriptor = explorer.getP1Descriptor();
+//				P1Descriptor = explorer.getP1Descriptor();
 				
-				P2Descriptor = explorer.getP2Descriptor();
+//				P2Descriptor = explorer.getP2Descriptor();
 				
 //				System.out.println("P1 descriptor: " + P1Descriptor);
 //				
@@ -534,7 +536,7 @@ public class Controller {
 		updateMazeColor();
 	}
 	
-	private void updateMazeColor() {
+	public void updateMazeColor() {
 		JButton[][] mazeGrids = _ui.getMazeGrids();
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		int[][] mazeRef = explorer.getMazeRef();
