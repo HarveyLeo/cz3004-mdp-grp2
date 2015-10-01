@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class PCClient {
 	
-	private static final String RPI_IP_ADDRESS = "192.168.2.2";
-	private static final int RPI_PORT = 3053;
+	public static final String RPI_IP_ADDRESS = "192.168.2.2";
+	public static final int RPI_PORT = 3053;
 	
 	private static PCClient _instance;
 	private Socket _clientSocket;
