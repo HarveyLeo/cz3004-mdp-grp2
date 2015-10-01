@@ -23,6 +23,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import main.RobotSystem;
 import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
 
@@ -96,30 +97,53 @@ public class UI extends JFrame implements ActionListener {
 		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
 			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
 				_mapGrids[x][y] = new JButton();
-				_mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
-				_mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
-				_mapGrids[x][y].setBackground(Color.GREEN);
-				_mapGrids[x][y].addActionListener(this);
-				map.add(_mapGrids[x][y]);
-				if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+				
+				if (RobotSystem.isRealRun()) {
 					_mapGrids[x][y].setEnabled(false);
-					_mapGrids[x][y].setBackground(Color.ORANGE);
-					if (x == 1 & y == 13) {
-						_mapGrids[x][y].setText("G");
-					} else if (x == 18 && y == 1) {
-						_mapGrids[x][y].setText("S");
+					_mapGrids[x][y].setBackground(Color.GRAY);
+				} else {
+					_mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
+					_mapGrids[x][y].addActionListener(this);
+					_mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
+					_mapGrids[x][y].setBackground(Color.GREEN);
+					if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
+						_mapGrids[x][y].setEnabled(false);
+						_mapGrids[x][y].setBackground(Color.ORANGE);
+						if (x == 1 & y == 13) {
+							_mapGrids[x][y].setText("G");
+						} else if (x == 18 && y == 1) {
+							_mapGrids[x][y].setText("S");
+						}
 					}
 				}
+				
+				map.add(_mapGrids[x][y]);
 			}
 		}
-		loadArenaFromDisk();
+		
+		if (!RobotSystem.isRealRun()) {
+			loadArenaFromDisk();
+		}
+		
 		_mapPane.add(map);
 		JButton loadMap = new JButton("Load");
-		loadMap.setActionCommand("LoadMap");
-		loadMap.addActionListener(this);
+		
+		if (RobotSystem.isRealRun()) {
+			loadMap.setEnabled(false);
+		} else {
+			loadMap.setActionCommand("LoadMap");
+			loadMap.addActionListener(this);
+		}
+		
 		JButton clearMap = new JButton("Clear");
-		clearMap.setActionCommand("ClearMap");
-		clearMap.addActionListener(this);
+		
+		if (RobotSystem.isRealRun()) {
+			clearMap.setEnabled(false);
+		} else {
+			clearMap.setActionCommand("ClearMap");
+			clearMap.addActionListener(this);
+		}
+		
 		_mapPane.add(loadMap);
 		_mapPane.add(clearMap);
 		contentPane.add(_mapPane, BorderLayout.EAST);
@@ -143,46 +167,63 @@ public class UI extends JFrame implements ActionListener {
 		JLabel[] exploreCtrlLabels = new JLabel[4];
 		_exploreTextFields = new JTextField[4];
 		_exploreBtn = new JButton("Explore");
-		_exploreBtn.setActionCommand("ExploreMaze");
-		_exploreBtn.addActionListener(this);
+		
+		if (RobotSystem.isRealRun()) {
+			_exploreBtn.setEnabled(false);
+		} else {
+			_exploreBtn.setActionCommand("ExploreMaze");
+			_exploreBtn.addActionListener(this);
+		}
+		
 		exploreCtrlLabels[0] = new JLabel("Robot initial position: ");
 		exploreCtrlLabels[1] = new JLabel("Speed (steps/sec): ");
 		exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
 		exploreCtrlLabels[3] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 4; i++) {
 			_exploreTextFields[i] = new JTextField(10);
+			if (RobotSystem.isRealRun()) {
+				_exploreTextFields[i].setEditable(false);
+			}
 		}
-		_exploreTextFields[0].setEditable(false);
+		
 		JPanel exploreInputPane = new JPanel(new GridLayout(4, 2));
+		
 		exploreInputPane.add(exploreCtrlLabels[0]);
-		exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[0]);
-		_exploreTextFields[0].setText("2,2");
-		_exploreTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[0].getDocument().addDocumentListener(new InitialPositionListener());
-		_exploreTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
 		exploreInputPane.add(exploreCtrlLabels[1]);
-		exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[1]);
-		_exploreTextFields[1].setText("10");
-		_exploreTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
-		_exploreTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
 		exploreInputPane.add(exploreCtrlLabels[2]);
-		exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[2]);
-		_exploreTextFields[2].setText("100");
-		_exploreTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[2].getDocument().addDocumentListener(new InitialPositionListener());
-		_exploreTextFields[2].getDocument().putProperty("name", "Target Coverage");
 		exploreInputPane.add(exploreCtrlLabels[3]);
-		exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		exploreInputPane.add(_exploreTextFields[3]);
-		_exploreTextFields[3].setText("360");
-		_exploreTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_exploreTextFields[3].getDocument().addDocumentListener(new InitialPositionListener());
-		_exploreTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
-
+		
+		if (!RobotSystem.isRealRun()) {
+			_exploreTextFields[0].setEditable(false);
+			exploreCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[0].setText("2,2");
+			_exploreTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[0].getDocument().addDocumentListener(new InitialPositionListener());
+			_exploreTextFields[0].getDocument().putProperty("name", "Robot Initial Position");
+			
+			exploreCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[1].setText("10");
+			_exploreTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
+			_exploreTextFields[1].getDocument().putProperty("name", "Robot Explore Speed");
+			
+			exploreCtrlLabels[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[2].setText("100");
+			_exploreTextFields[2].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[2].getDocument().addDocumentListener(new InitialPositionListener());
+			_exploreTextFields[2].getDocument().putProperty("name", "Target Coverage");
+			
+			exploreCtrlLabels[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[3].setText("360");
+			_exploreTextFields[3].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_exploreTextFields[3].getDocument().addDocumentListener(new InitialPositionListener());
+			_exploreTextFields[3].getDocument().putProperty("name", "Robot Explore Time Limit");
+		}
+		
 		JPanel exploreBtnPane = new JPanel();
 		exploreBtnPane.add(_exploreBtn);
 
@@ -195,28 +236,41 @@ public class UI extends JFrame implements ActionListener {
 		JLabel[] ffpCtrlLabels = new JLabel[2];
 		_ffpTextFields = new JTextField[2];
 		_ffpBtn = new JButton("Navigate");
-		_ffpBtn.setActionCommand("FindFastestPath");
-		_ffpBtn.addActionListener(this);
-		_ffpBtn.setEnabled(false);
+		
+		if (RobotSystem.isRealRun()) {
+			_ffpBtn.setEnabled(false);
+		} else {
+			_ffpBtn.setActionCommand("FindFastestPath");
+			_ffpBtn.addActionListener(this);
+			_ffpBtn.setEnabled(false);
+		}
+		
 		ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
 		ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
 		for (int i = 0; i < 2; i++) {
 			_ffpTextFields[i] = new JTextField(10);
+			if (RobotSystem.isRealRun()) {
+				_ffpTextFields[i].setEditable(false);
+			}
 		}
 
 		JPanel ffpInputPane = new JPanel(new GridLayout(2, 2));
 		ffpInputPane.add(ffpCtrlLabels[0]);
-		ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		ffpInputPane.add(_ffpTextFields[0]);
-		_ffpTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_ffpTextFields[0].setEditable(false);
 		ffpInputPane.add(ffpCtrlLabels[1]);
-		_ffpTextFields[1].setText("120");
-		ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
 		ffpInputPane.add(_ffpTextFields[1]);
-		_ffpTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
-		_ffpTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
-		_ffpTextFields[1].getDocument().putProperty("name", "Robot FFP Time Limit");
+		
+		if (!RobotSystem.isRealRun()) {
+			ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_ffpTextFields[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_ffpTextFields[0].setEditable(false);
+	
+			_ffpTextFields[1].setText("120");
+			ffpCtrlLabels[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_ffpTextFields[1].setFont(new Font("Tahoma", Font.PLAIN, 14));
+			_ffpTextFields[1].getDocument().addDocumentListener(new InitialPositionListener());
+			_ffpTextFields[1].getDocument().putProperty("name", "Robot FFP Time Limit");
+	}
 
 		JPanel ffpBtnPane = new JPanel();
 		ffpBtnPane.add(_ffpBtn);

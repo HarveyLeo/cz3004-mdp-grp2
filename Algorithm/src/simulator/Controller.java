@@ -20,6 +20,7 @@ import algorithms.AStarPathFinder;
 import algorithms.MazeExplorer;
 import algorithms.Path;
 import datatypes.Orientation;
+import main.RobotSystem;
 import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
 import simulator.robot.Robot;
@@ -251,8 +252,8 @@ public class Controller {
 			_ui.setExploreBtnEnabled(true);
 			return;
 		}
-		
 		_ui.refreshExploreInput();
+		
 		Arena arena = Arena.getInstance();
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		Robot robot = Robot.getInstance();
