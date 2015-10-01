@@ -41,13 +41,22 @@ public class MapDecoder{
 		//need to clear current map due to algorithm which ignores already explored cell
 		//robot position will remain the same
 		mapArray = new int[300];
-		exploredMapStr = "1111111111111111111111111111111111111111111111111111111111111111111111111111";
+		exploredMapStr = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";         
 		mapObjectStr = obstacleMap;
 	}
 	
 	//update robot position with AMDTool
 	public void updateDemoRobotPos(String robotPos){
-		this.robotPosStr = robotPos;
+		//for AMDTool [col],[row] is used, we need to switch to [row],[col]
+		//also, the AMDTool reference the robot from the top left corner.
+		//we need to change it to the center of the robot by offsetting it by 1 in 
+		//both the row and column.
+		String[] tempArr = robotPos.split(",");
+		String tempStr = String.format("%s,%s,%s", 
+				Integer.parseInt(tempArr[1].trim())+1, 
+				Integer.parseInt(tempArr[0].trim())+1, 
+				tempArr[2].trim());
+		this.robotPosStr = tempStr;
 	}
 	
 	//draw sample map to verify correctness of algorithm
@@ -72,7 +81,7 @@ public class MapDecoder{
 		return currentMap;
 	}
 	
-	//[1] = xcoord, [2] = ycoord, [3] = orientation
+	//[1] = row, [2] = col, [3] = orientation
 	private int[] decodeRobotPos(){
 		
 		//Remove P0 prefix
@@ -159,7 +168,7 @@ public class MapDecoder{
 					//check if there is any obstacle or is it empty
 					if (obstacleMap[i] == 0){
 						mapArray[i] = 1;
-					}else if (obstacleMap[i] == 1){
+					}else{
 						mapArray[i] = 2;
 					}
 				}
@@ -174,10 +183,7 @@ public class MapDecoder{
 			}
 		}
 		
-		if (robot[0]>-1 && robot[0]<18 && robot[1]>-1 && robot[1]<13){
-			
-			robot[0]++;
-			robot[1]++;
+		if (robot[0]>0 && robot[0]<19 && robot[1]>0 && robot[1]<14){
 			
 			//set robot body
 			d2MapArray[robot[0]+1][robot[1]-1] = 3;
@@ -191,6 +197,7 @@ public class MapDecoder{
 			d2MapArray[robot[0]-1][robot[1]+1] = 3;
 			
 			//set robot head based on orientation
+			//north/ 0 degree is toward the 0
 			switch (robot[2]){
 			case 180:
 				d2MapArray[robot[0]+1][robot[1]] = 4;

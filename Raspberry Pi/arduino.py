@@ -4,46 +4,41 @@ import os, sys
 import serial
 import time
 
+from config import *
 from interface import *
 
 class Arduino(interface):
 
 	def __init__(self):
-		self.baudrate = 115200
-		ser = 0
+		self.baudrate = BAUD
+		self.ser = 0
 
-	def connect(self):
-		global ser
-		locations=['/dev/ttyACM0','/dev/ttyACM1']
-
+	def connect(self,port):
 		#connect to serial port
-		for device in locations:
-		    try:
-			ser = serial.Serial(device,self.baudrate, timeout=3)
-			print "Serial = %s" %str(ser)
+	    try:
+	    	print "-------------------------------"
+	    	print "Trying to connect to Arduino..."
+			self.ser = serial.Serial(port,self.baudrate, timeout=3)
 			time.sleep(1)
 
-			if(ser != 0):
-				print "Connected to Arduino! - "
+			if(self.ser != 0):
+				print "Connected to Arduino!"
 				self.read()
-				return 1
-		    except Exception, e:
-			print "Arduino Connection Error: %s" %str(e)
+			return 1
+
+	    except Exception, e:
+			print "Arduino connection exception: %s" %str(e)
 			return 0
 
 	def write(self,msg):
-		global ser
-
-		msg = msg + "|" #write msg with | as end of msg
-		ser.write(msg)
-		
-		print "RPi: %s" %msg
+		try:
+			self.ser.write(msg + "|") #write msg with | as end of msg
+		except Exception, e:
+			print "Arduino write exception: %s" %str(e)
 
 	def read(self):
-		global ser
-
-		msg = ser.readline() #read msg from arduino sensors
-		while (msg):
-			print "Arduino: %s" %msg
-			msg = ser.readline()
-		return msg
+		try:
+			msg = self.ser.readline() #read msg from arduino sensors
+			return msg
+		except Exception, e:
+			print "Arduino read exception: %s" %str(e)

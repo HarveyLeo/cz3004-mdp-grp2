@@ -1,117 +1,220 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
     <com.example.mdpandroidapp.PixelGridView
-        android:id="@+id/arenaMap"
+        android:id="@+id/map"
         android:layout_width="match_parent"
-    	android:layout_height="0dp"
-    	android:layout_weight="7"
-        />
+        android:layout_height="0dp" 
+        android:layout_weight="7"/>
     
-    <ScrollView
-        android:layout_width="match_parent"
-    	android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-    		android:layout_height="wrap_content"
-            android:orientation="vertical">
-            
-            <TextView
-                android:id="@+id/text_connection_status"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Display Connection Status Here"
-                />
-            <TextView
-                android:id="@+id/text_robot_status"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Display Robot Status Here"
-                />
-            <Switch 
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:textOn="Auto"
-    			android:textOff="Manual"
-    			android:onClick="onUpdateSwitchClick"
-                />
-            
-            <LinearLayout 
-                android:layout_width="match_parent"
-    			android:layout_height="50dp"
-            	android:orientation="horizontal">
-            	
-                <TextView
-	                android:layout_width="match_parent"
-	    			android:layout_height="wrap_content"
-	    			android:text="Start Coord:"
-                	/>
-                
-                <EditText
-	                android:id="@+id/edit_xcoord"
-	                android:layout_width="0dp"
-	    			android:layout_height="wrap_content"
-	    			android:layout_weight="1"
-	    			android:hint="X"
-                    />
-                
-                <EditText
-	                android:id="@+id/edit_ycoord"
-	                android:layout_width="0dp"
-	    			android:layout_height="wrap_content"
-	    			android:layout_weight="1"
-	    			android:hint="X"
-                    />
-                
-                <Button
-	                android:id="@+id/button_send_update"
-	                android:layout_width="0dp"
-	    			android:layout_height="wrap_content"
-	    			android:layout_weight="1"
-	    			android:text="Send"
-	    			android:onClick="onSendCoordBtnClick"
-                	/>
-                
-            </LinearLayout>
-            
-            <Button
-                android:id="@+id/button_move_left"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Move Left"
-    			android:onClick="onLeftBtnClick"
-                />
-            
-            <Button
-                android:id="@+id/button_move_right"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Move Right"
-    			android:onClick="onRightBtnClick"
-                />
-            
-            <Button
-                android:id="@+id/button_move_forward"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Move Forward"
-    			android:onClick="onForwardBtnClick"
-                />
-            
-            <TextView
-                android:id="@+id/text_map_debug"
-                android:layout_width="match_parent"
-    			android:layout_height="wrap_content"
-    			android:text="Display debug message here"
-                />
-            
-            
-        </LinearLayout>
-        
-    </ScrollView>
+
+    	
+	<LinearLayout
+	    android:layout_width="match_parent"
+    	android:layout_height="0dp"
+    	android:layout_weight="3"
+    	android:orientation="horizontal">
+    	
+		<LinearLayout
+		    android:layout_width="0dp"
+	    	android:layout_height="match_parent"
+	    	android:orientation="vertical"
+	    	android:layout_weight="3">
+	
+			<RelativeLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent">
+			    
+		        <ImageButton
+			        android:id="@+id/buttonUp"
+			        android:layout_width="50dp"
+			        android:layout_height="70dp"
+			        android:layout_alignParentTop="true"
+	   		        android:layout_centerHorizontal="true"
+					android:background="@null"
+			        android:src="@drawable/up" 
+			        android:onClick="onForwardBtnClick"/>
+			
+			    <ImageButton
+			        android:id="@+id/buttonLeft"
+			        android:layout_width="70dp"
+			        android:layout_height="50dp"
+			        android:layout_below="@+id/buttonUp"
+	    		    android:layout_toLeftOf="@+id/buttonUp"
+					android:background="@null"
+			        android:src="@drawable/left" 
+			        android:onClick="onLeftBtnClick"/>
+			
+			   	<ImageButton
+			   	    android:id="@+id/buttonRight"
+			   	    android:layout_width="70dp"
+			   	    android:layout_height="50dp"
+	 	    		android:layout_below="@+id/buttonUp"
+	 	    		android:layout_toRightOf="@+id/buttonUp"
+					android:background="@null"
+			   	    android:src="@drawable/right" 
+			   	    android:onClick="onRightBtnClick" />
+	
+	
+	
+			   	<TextView
+			   	    android:id="@+id/textViewX"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+			   	    android:layout_alignLeft="@+id/buttonLeft"
+			   	    android:layout_below="@+id/buttonLeft"
+			   	    android:layout_marginLeft="30dp"
+			   	    android:layout_marginTop="10dp"
+			   	    android:text="X:"
+			   	    android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+			   	<EditText
+			   	    android:id="@+id/editTextX"
+			   	    android:layout_width="50dp"
+			   	    android:layout_height="wrap_content"
+			   	    android:layout_alignBaseline="@+id/textViewX"
+			   	    android:layout_alignBottom="@+id/textViewX"
+			   	    android:layout_toRightOf="@+id/textViewX"
+			   	    android:inputType="number"
+			   	    android:ems="10" />
+			   	
+	
+			   	<TextView
+			   	    android:id="@+id/textViewY"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+			   	    android:layout_alignLeft="@+id/buttonLeft"
+	    		   	android:layout_marginLeft="30dp"
+	    		   	android:layout_marginTop="20dp"
+			   	    android:layout_below="@+id/textViewX"
+			   	    android:text="Y:"
+			   	    android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+			   	<EditText
+			   	    android:id="@+id/editTextY"
+			   	    android:layout_width="50dp"
+			   	    android:layout_height="wrap_content"
+			   	    android:layout_alignBaseline="@+id/textViewY"
+			   	    android:layout_alignBottom="@+id/textViewY"
+			   	    android:layout_toRightOf="@+id/textViewY"
+			   	    android:inputType="number"
+			   	    android:ems="10" />
+			   	
+	   		        <ImageButton
+			        android:id="@+id/buttonPos"
+			        android:layout_width="70dp"
+			        android:layout_height="70dp"
+			   	    android:layout_alignBottom="@+id/textViewY"
+			   	    android:layout_toRightOf="@+id/editTextY"
+	 
+					android:background="@null"
+			        android:src="@drawable/blue"
+			        android:onClick="onSendCoordBtnClick" />
+	
+			    
+			</RelativeLayout>
+
+		    
+		</LinearLayout>
+	    
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:layout_weight="6">
+		
+      		<RelativeLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent">
+			
+     		    <ImageButton
+		        	android:id="@+id/buttonStart"
+			   	    android:layout_width="85dp"
+			   	    android:layout_height="wrap_content"
+			        android:layout_alignParentTop="true"
+	       			android:layout_alignParentLeft="true"
+					android:layout_marginTop="5dp"
+					android:background="@null"
+			        android:src="@drawable/start"
+			        android:onClick="onExploreBtnClick" />
+     		    
+ 		       <ImageButton
+			        android:id="@+id/buttonFast"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+			        android:layout_alignParentTop="true"
+        			android:layout_toRightOf="@+id/buttonStart"
+					android:layout_marginTop="30dp"
+					android:onClick="onShortestBtnClick"
+					android:background="@null"
+			        android:src="@drawable/fast" />		   	
+      		    
+      		    
+		   	   	<Switch
+			   	    android:id="@+id/updateSwitch"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+					android:layout_below="@+id/buttonStart"
+					android:layout_toRightOf="@+id/buttonRefresh"
+					android:layout_marginTop="30dp"
+					android:layout_marginLeft="10dp"
+			   	    android:textOn="Auto"
+			   	    android:textOff="Manual"
+			   	    android:onClick="onUpdateSwitchClick"
+			   	    />
+   	   	
+				<ImageButton
+			        android:id="@+id/buttonRefresh"
+			        android:layout_width="70dp"
+			        android:layout_height="70dp"
+			   	    android:layout_below="@+id/buttonStart"
+					android:layout_marginTop="10dp"
+					android:layout_marginLeft="5dp"
+					android:background="@null"
+					android:onClick="onManualUpdateBtnClick"
+			        android:src="@drawable/green" />
+   	   		        
+				<TextView
+			 	    android:id="@+id/textViewConnect"
+			 	    android:layout_width="wrap_content"
+			 	    android:layout_height="wrap_content"
+					android:layout_below="@+id/buttonRefresh"
+					
+			 	    android:text="Bluetooth:"
+			 	    android:layout_marginLeft="5dp"
+			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+   	   		        		   	
+				<TextView
+			 	    android:id="@+id/textViewStatus"
+			 	    android:layout_width="wrap_content"
+			 	    android:layout_height="wrap_content"
+			   		android:layout_below="@+id/textViewConnect"
+			   		
+			 	    android:text="Robot Status:"
+			 	    android:layout_marginLeft="5dp"
+			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+				
+		   	   	<Switch
+			   	    android:id="@+id/tiltSwitch"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+					android:layout_alignParentTop="true"
+					android:layout_alignParentRight="true"
+			   	    android:textOn="Tilt On"
+			   	    android:textOff="Tilt Off"
+			   	    android:layout_marginTop="5dp"
+			   	    android:onClick="onTiltSwitchClick"/>
+
+
+			</RelativeLayout>
+		      
+		</LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
+

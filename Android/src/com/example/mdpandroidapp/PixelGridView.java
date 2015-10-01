@@ -85,12 +85,16 @@ public class PixelGridView extends ImageView
         invalidate();
     }
     
-    public void updateRobotPosition(int xcoord, int ycoord, int orientation){
-    	
+    public void updateActualMap(String P0, String P1, String P2){
+    	md.setMapDescriptor(P0, P1, P2);
     }
     
     public void updateDemoArenaMap(String obstacleMapDes){
-    	
+    	md.updateDemoMapArray(obstacleMapDes);
+    }
+    
+    public void setSampleMap(){
+    	md.setSampleMap();
     }
     
     public void updateDemoRobotPos(String robotPos){
@@ -105,7 +109,6 @@ public class PixelGridView extends ImageView
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
-    	//md.setSampleMap();
     	int[][] testMap = md.decodeMapDescriptor();
     	
 
