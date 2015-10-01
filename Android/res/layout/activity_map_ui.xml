@@ -133,7 +133,7 @@
 			
      		    <ImageButton
 		        	android:id="@+id/buttonStart"
-			   	    android:layout_width="wrap_content"
+			   	    android:layout_width="85dp"
 			   	    android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
 	       			android:layout_alignParentLeft="true"
@@ -148,7 +148,7 @@
 			   	    android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
         			android:layout_toRightOf="@+id/buttonStart"
-					android:layout_marginTop="5dp"
+					android:layout_marginTop="30dp"
 					android:onClick="onShortestBtnClick"
 					android:background="@null"
 			        android:src="@drawable/fast" />		   	
@@ -173,7 +173,7 @@
 			        android:layout_height="70dp"
 			   	    android:layout_below="@+id/buttonStart"
 					android:layout_marginTop="10dp"
-					android:layout_marginLeft="30dp"
+					android:layout_marginLeft="5dp"
 					android:background="@null"
 					android:onClick="onManualUpdateBtnClick"
 			        android:src="@drawable/green" />
@@ -197,6 +197,17 @@
 			 	    android:text="Robot Status:"
 			 	    android:layout_marginLeft="5dp"
 			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+				
+		   	   	<Switch
+			   	    android:id="@+id/tiltSwitch"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+					android:layout_alignParentTop="true"
+					android:layout_alignParentRight="true"
+			   	    android:textOn="Tilt On"
+			   	    android:textOff="Tilt Off"
+			   	    android:layout_marginTop="5dp"
+			   	    android:onClick="onTiltSwitchClick"/>
 
 
 			</RelativeLayout>

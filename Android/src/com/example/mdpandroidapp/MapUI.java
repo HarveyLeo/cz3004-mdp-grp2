@@ -23,6 +23,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+/**************/
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+/**************/
+
 /*
 update actual map desc
 1. must pass 3 strings, robot pos, explored map and obstacle map
@@ -72,7 +79,7 @@ misc
 	</ScrollView>
 */
 
-public class MapUI extends Activity {
+public class MapUI extends Activity implements SensorEventListener{
 	
 	//for logging purpose
 	private String logMessage = "";
@@ -103,6 +110,11 @@ public class MapUI extends Activity {
 	private String P0Str;
 	private String P1Str;
 	private String P2Str;
+	
+	/*********************************************************/
+	private boolean tiltEnabled = false;
+	private SensorManager sensorManager;
+	/********************************************************/
 
 	/*Activity LifeCycle
 	 * 
@@ -134,6 +146,11 @@ public class MapUI extends Activity {
 		filter.addAction(BluetoothService.EVENT_STATE_CONNECTED);
 		filter.addAction(BluetoothService.EVENT_MESSAGE_RECEIVED);
 		registerReceiver(mReceiver, filter);
+		
+		/*******************************************************************************************************************************/
+		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		sensorManager.registerListener(this,sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_NORMAL);
+		/*******************************************************************************************************************************/
     }
     
     @Override
@@ -410,5 +427,38 @@ public class MapUI extends Activity {
 		}
 	};
 	
+	/********************************************************************************************************************************/
+    //handle tilt switch
+	public void onTiltSwitchClick(View view){
+		boolean on = ((Switch)view).isChecked();
+		
+		if (on){
+			tiltEnabled = true;
+		}else{
+			tiltEnabled = false;
+		}
+	}
+	
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		float x = event.values[0];
+		float y = event.values[1];
+		if (tiltEnabled) {
+			if (y < -5) {
+				bluetoothService.write("f");			
+			} else if (x < -5) {
+				bluetoothService.write("tr");
+			} else if (x > 5) {
+				bluetoothService.write("tl");
+			}
+		}
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+		
+	}
+	/********************************************************************************************************************************/
 	
 }
