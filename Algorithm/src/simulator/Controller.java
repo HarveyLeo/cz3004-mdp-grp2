@@ -95,6 +95,11 @@ public class Controller {
 							msgExplore = _pcClient.readMessage();
 						}
 						exploreMaze();
+						String msgFastest = _pcClient.readMessage();
+						while (!msgFastest.equals(Message.START_FASTEST)) {
+							msgFastest = _pcClient.readMessage();
+						}
+						findFastestPath();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -538,14 +543,19 @@ public class Controller {
 	}
 
 	public void findFastestPath() {
-
-		if (!_ui.isIntFFPInput()) {
-			_ui.setStatus("invalid input for finding fastest path");
-			_ui.setFfpBtnEnabled(true);
-			return;
+		
+		if (!RobotSystem.isRealRun()) {
+			if (!_ui.isIntFFPInput()) {
+				_ui.setStatus("invalid input for finding fastest path");
+				_ui.setFfpBtnEnabled(true);
+				return;
+			}
+			
+			_ui.refreshFfpInput();
+		} else {
+			_ffpTimeLimit = 120;
 		}
 		
-		_ui.refreshFfpInput();
 		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
 		
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();

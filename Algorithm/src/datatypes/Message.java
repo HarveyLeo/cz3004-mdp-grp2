@@ -6,4 +6,5 @@ public class Message {
 	public static final String MOVE_FORWARD = "W";
 	public static final String DONE = "Y";
 	public static final String START_EXPLORATION = "explore";
+	public static final String START_FASTEST = "fastest";
 }
