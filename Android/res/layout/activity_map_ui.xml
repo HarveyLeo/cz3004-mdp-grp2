@@ -194,7 +194,7 @@
 			 	    android:layout_height="wrap_content"
 			   		android:layout_below="@+id/textViewConnect"
 			   		
-			 	    android:text="Status:"
+			 	    android:text="Robot Status:"
 			 	    android:layout_marginLeft="5dp"
 			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
 

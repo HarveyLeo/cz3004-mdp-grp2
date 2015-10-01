@@ -367,7 +367,7 @@ public class MapUI extends Activity {
 	}
 	
 	private void setConnectStatus(String message){
-		connectionStatusView.setText("Conn Status: "+message);
+		connectionStatusView.setText("Connection: "+message);
 	}
 	
 	private void setRobotStatus(String message){
