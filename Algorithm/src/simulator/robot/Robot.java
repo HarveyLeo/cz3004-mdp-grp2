@@ -203,8 +203,11 @@ public class Robot {
 			try {
 				pcClient.sendMessage(Message.MOVE_FORWARD + count);
 				String feedback = pcClient.readMessage();
-				while (!feedback.equals(Message.DONE)) {
-					feedback = pcClient.readMessage();
+				for (int i = 0; i < count; i++) {
+					while (!feedback.equals(Message.DONE)) {
+						feedback = pcClient.readMessage();
+					}
+					controller.moveRobotForward();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
