@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import datatypes.Message;
+
 public class PCClient {
 	
 	public static final String RPI_IP_ADDRESS = "192.168.2.2";
@@ -32,11 +34,11 @@ public class PCClient {
 		PCClient pcClient = PCClient.getInstance();
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
 		System.out.println("RPi successfully connected");
-		while (true) {
-			pcClient.sendMessage("A081|");
+//		while (true) {
+			pcClient.sendMessage(Message.READ_SENSOR_VALUES);
 			String msgReceived = pcClient.readMessage();
 			System.out.println("Message received: "+ msgReceived);
-		}	
+//		}	
 	}
 	
 	public void setUpConnection (String IPAddress, int portNumber) throws UnknownHostException, IOException{

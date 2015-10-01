@@ -32,7 +32,7 @@ import tcpcomm.PCClient;
 public class Controller {
 	
 	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
-	private static final int THRESHOLD_BUFFER_TIME = 3;
+	private static final int THRESHOLD_BUFFER_TIME = 5;
 	
 	private static Controller _instance;
 	private UI _ui;
@@ -94,6 +94,7 @@ public class Controller {
 						while (!msgExplore.equals(Message.START_EXPLORATION)) {
 							msgExplore = _pcClient.readMessage();
 						}
+						_ui.setStatus("start exploring");
 						exploreMaze();
 						String msgFastest = _pcClient.readMessage();
 						while (!msgFastest.equals(Message.START_FASTEST)) {

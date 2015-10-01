@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import datatypes.Message;
 import datatypes.Movement;
 import datatypes.Orientation;
 import datatypes.SensorPosition;
@@ -24,7 +25,7 @@ public class MazeExplorer {
 	private static final int RIGHT_CAN_ACCESS = -3;
 	public static final int[] GOAL = {13, 18};
 	public static final int[] START = {1, 1};
-	private static final String READ_SENSOR_VALUES = "E";
+
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
@@ -723,8 +724,12 @@ public class MazeExplorer {
 			try {
 				Controller controller = Controller.getInstance();
 				PCClient pcClient = controller.getPCClient();
-				pcClient.sendMessage(READ_SENSOR_VALUES);
+				pcClient.sendMessage(Message.READ_SENSOR_VALUES);
+				//Testing
+				System.out.println("sent E|");
 				msgSensorValues = pcClient.readMessage();
+				//Testing
+				System.out.println("Message from Arduino: " + msgSensorValues);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
