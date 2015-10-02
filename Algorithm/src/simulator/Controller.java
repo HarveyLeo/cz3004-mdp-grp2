@@ -191,17 +191,31 @@ public class Controller {
 		} else {
 			for (int i = x - 1; i <= x + 1; i++) {
 				for (int j = y - 1; j <= y + 1; j++) {
-					if (i == x && j == y + 1) {
-						mazeGrids[20 - j][i - 1].setBackground(Color.PINK);
-					} else {
-						mazeGrids[20 - j][i - 1].setBackground(Color.CYAN);
-					}
+					mazeGrids[20 - j][i - 1].setBackground(Color.CYAN);		
 				}
 			}
+			
+			_robotOrientation = Orientation.SOUTH;
+			
+			switch (_robotOrientation) {
+			case NORTH:
+				mazeGrids[19 - y][x - 1].setBackground(Color.PINK);	
+				break;
+			case SOUTH:
+				mazeGrids[21 - y][x - 1].setBackground(Color.PINK);	
+				break;
+			case EAST:
+				mazeGrids[20 - y][x].setBackground(Color.PINK);	
+				break;
+			case WEST:
+				mazeGrids[20 - y][x - 2].setBackground(Color.PINK);	
+				break;
+			}
+			
 			_robotPosition[0] = x - 1;
 			_robotPosition[1] = y - 1;
 		
-			_robotOrientation = Orientation.NORTH;
+			
 			_ui.setStatus("robot initial position set");
 		}
 	}
@@ -348,7 +362,10 @@ public class Controller {
 					robot.setSpeed(_speed);
 				}
 				_hasReachedStart = false;
-				explorer.explore(_robotPosition);
+				//Testing
+				System.out.println(_robotOrientation);
+				
+				explorer.explore(_robotPosition, _robotOrientation);
 
 				return null;
 			}

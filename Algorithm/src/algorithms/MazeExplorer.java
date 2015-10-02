@@ -136,13 +136,13 @@ public class MazeExplorer {
 		return P1HexStr;
 	}
     
-	public void explore(int[] robotPosition) {
+	public void explore(int[] robotPosition, Orientation robotOrientation) {
 		
 		
 		Controller controller = Controller.getInstance();
 		
 
-		init(robotPosition);
+		init(robotPosition, robotOrientation);
 		
 		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
 			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
@@ -508,12 +508,12 @@ public class MazeExplorer {
 		
 	}
 
-	private void init(int[] robotPosition) {
+	private void init(int[] robotPosition, Orientation robotOrientation) {
 		_robot = Robot.getInstance();
 		_robotPosition = new int[2];
 		_robotPosition[0] = robotPosition[0];
 		_robotPosition[1] = robotPosition[1];
-		_robotOrientation = Orientation.NORTH;
+		_robotOrientation = robotOrientation;
 		_hasExploredTillGoal = false;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
