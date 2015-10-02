@@ -153,33 +153,15 @@ public class AStarPathFinder {
 
 				if (isExploring) {
 					for (int v = 0; v < count; v++) {
-						if (!RobotSystem.isRealRun()) {
-							robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-							explorer.setIsExplored(robotPosition, currentOrientation);
-						}
 						_robot.moveForward();
-						if (RobotSystem.isRealRun()) {
-							robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-							explorer.setIsExplored(robotPosition, currentOrientation);
-						}
+						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+						explorer.setIsExplored(robotPosition, currentOrientation);
 					}
 				} else {
 					_robot.moveForward(count);
 				}
 				count = 1;
-				Movement move = ChangeRobotOrientation(currentOrientation, nextOrientation);
-				Orientation ori;
-//				if (isExploring) {
-//					if (move == Movement.TURN_RIGHT_TWICE) {
-//						ori = explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-//						explorer.setIsExplored(robotPosition, ori);
-//						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-//						explorer.setIsExplored(robotPosition, ori);
-//					} else {
-//						ori = explorer.updateRobotOrientation(move);
-//						explorer.setIsExplored(robotPosition, ori);
-//					}
-//				}
+				ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring);
 			}
 			currentOrientation = nextOrientation;
 		}
@@ -187,15 +169,9 @@ public class AStarPathFinder {
 
 		if (isExploring) {
 			for (int v = 0; v < count; v++) {
-				if (!RobotSystem.isRealRun()) {
-					robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-					explorer.setIsExplored(robotPosition, currentOrientation);
-				}
 				_robot.moveForward();
-				if (RobotSystem.isRealRun()) {
-					robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-					explorer.setIsExplored(robotPosition, currentOrientation);
-				}
+				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+				explorer.setIsExplored(robotPosition, currentOrientation);
 			}
 		} else {
 			_robot.moveForward(count);
@@ -207,61 +183,110 @@ public class AStarPathFinder {
 
 
 
-	private Movement ChangeRobotOrientation(Orientation curOri, Orientation nextOri) {
+	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri, boolean isExploring) {
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		
 		switch (curOri) {
 			case NORTH:
 				if (nextOri == Orientation.EAST) {
 					_robot.turnRight();
-					return Movement.TURN_RIGHT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnLeft();
-					return Movement.TURN_LEFT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 					_robot.turnRight();
-					return Movement.TURN_RIGHT_TWICE;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				}
 				break;
 			case SOUTH:
 				if (nextOri == Orientation.EAST) {
 					_robot.turnLeft();
-					return Movement.TURN_LEFT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
-					return Movement.TURN_RIGHT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 					_robot.turnRight();
-					return Movement.TURN_RIGHT_TWICE;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				}
 				break;
 			case EAST:
 				if (nextOri == Orientation.NORTH) {
 					_robot.turnLeft();
-					return Movement.TURN_LEFT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
-					return Movement.TURN_RIGHT;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 					_robot.turnRight();
-					return Movement.TURN_RIGHT_TWICE;
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				}
 				break;
 			case WEST:
 				if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
-					return Movement.TURN_RIGHT;
+					if (isExploring) {
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnLeft();
-					return Movement.TURN_LEFT;
+					if (isExploring) {
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				} else if (nextOri == Orientation.EAST) {
 					_robot.turnRight();
+					if (isExploring) {
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 					_robot.turnRight();
-					return Movement.TURN_RIGHT_TWICE;
+					if (isExploring) {
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+					}
 				}
 		}
-		return null;
 	}
 
 	private Orientation getOrientationIfMoveToNeighbor(Orientation curOri, int curX, int curY, int nextX, int nextY) {

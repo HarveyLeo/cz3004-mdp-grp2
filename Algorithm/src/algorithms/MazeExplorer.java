@@ -39,6 +39,14 @@ public class MazeExplorer {
 		
 	}
 	
+	public int[] getRobotPosition() {
+		return _robotPosition;
+	}
+	
+	public Orientation getRobotOrientation() {
+		return _robotOrientation;
+	}
+	
 	public int[][] getMazeRef() {
 		return _mazeRef;
 	}
@@ -404,160 +412,96 @@ public class MazeExplorer {
 		switch (ori) {
 			case NORTH:
 				if (_robotOrientation == Orientation.SOUTH) {
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.WEST;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robotOrientation = Orientation.NORTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+
 				} else if (_robotOrientation == Orientation.EAST) {
-					_robotOrientation = Orientation.NORTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					
 					_robot.turnLeft();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-				} else if (_robotOrientation == Orientation.WEST) {
 					_robotOrientation = Orientation.NORTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+
+				} else if (_robotOrientation == Orientation.WEST) {
+					
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.NORTH;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 				}
 				break;
 			case SOUTH:
 				if (_robotOrientation == Orientation.NORTH) {
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.EAST;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robotOrientation = Orientation.SOUTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 				} else if (_robotOrientation == Orientation.EAST) {
-					_robotOrientation = Orientation.SOUTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-				} else if (_robotOrientation == Orientation.WEST) {
 					_robotOrientation = Orientation.SOUTH;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					setIsExplored(_robotPosition, _robotOrientation);
+					
+				} else if (_robotOrientation == Orientation.WEST) {
 					_robot.turnLeft();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.SOUTH;
+					setIsExplored(_robotPosition, _robotOrientation);
 				}
 				break;
 			case EAST:
 				if (_robotOrientation == Orientation.NORTH) {
-					_robotOrientation = Orientation.EAST;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-				} else if (_robotOrientation == Orientation.SOUTH) {
-					_robotOrientation = Orientation.EAST;
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					_robot.turnLeft();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-				} else if (_robotOrientation == Orientation.WEST) {
-					if (!RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.NORTH;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.NORTH;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					if (!RobotSystem.isRealRun()) {
 					_robotOrientation = Orientation.EAST;
 					setIsExplored(_robotPosition, _robotOrientation);
-					}
+					
+				} else if (_robotOrientation == Orientation.SOUTH) {
+					
+					_robot.turnLeft();
+					_robotOrientation = Orientation.EAST;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
+				} else if (_robotOrientation == Orientation.WEST) {
+		
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.EAST;
-						setIsExplored(_robotPosition, _robotOrientation);
-						}
+					_robotOrientation = Orientation.NORTH;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
+					_robot.turnRight();
+					_robotOrientation = Orientation.EAST;
+					setIsExplored(_robotPosition, _robotOrientation);
 				}
 				break;
 			case WEST:
 				if (_robotOrientation == Orientation.NORTH) {
-					if (!RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robot.turnLeft();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.WEST;
+					setIsExplored(_robotPosition, _robotOrientation);
 				} else if (_robotOrientation == Orientation.SOUTH) {
-					if (!RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+			
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.WEST;
+					setIsExplored(_robotPosition, _robotOrientation);
 				} else if (_robotOrientation == Orientation.EAST) {
-					if (!RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.SOUTH;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.SOUTH;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					if (!RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.SOUTH;
+					setIsExplored(_robotPosition, _robotOrientation);
+				
+				
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						_robotOrientation = Orientation.WEST;
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					_robotOrientation = Orientation.SOUTH;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 				}
 		}
 		
@@ -594,77 +538,38 @@ public class MazeExplorer {
 			
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
-					updateRobotOrientation(Movement.TURN_RIGHT);
-					if (!RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
-					
+					updateRobotOrientation(Movement.TURN_RIGHT);
+					setIsExplored(_robotPosition, _robotOrientation);
+
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
-						if (!RobotSystem.isRealRun()) {
-							updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-							setIsExplored(_robotPosition, _robotOrientation);
-						}
 						_robot.moveForward();
-						if (RobotSystem.isRealRun()) {
-							updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-							setIsExplored(_robotPosition, _robotOrientation);
-						}
+						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+						setIsExplored(_robotPosition, _robotOrientation);
 					} else {
-						if (!RobotSystem.isRealRun()) {
-							updateRobotOrientation(Movement.TURN_LEFT);
-						}
 						_robot.turnLeft();
-						if (RobotSystem.isRealRun()) {
-							updateRobotOrientation(Movement.TURN_LEFT);
-						}
+						updateRobotOrientation(Movement.TURN_LEFT);
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
-					if (!RobotSystem.isRealRun()) {
-						updateRobotOrientation(Movement.TURN_RIGHT);
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robot.turnRight();
-					if (RobotSystem.isRealRun()) {
-						updateRobotOrientation(Movement.TURN_RIGHT);
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					updateRobotOrientation(Movement.TURN_RIGHT);
+					setIsExplored(_robotPosition, _robotOrientation);
 					
-					if (!RobotSystem.isRealRun()) {
-						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
 					_robot.moveForward();
-					if (RobotSystem.isRealRun()) {
-						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-						setIsExplored(_robotPosition, _robotOrientation);
-					}
+					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+					setIsExplored(_robotPosition, _robotOrientation);
+
 				}
 		
 			} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 
-				if (!RobotSystem.isRealRun()) {
-					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-					setIsExplored(_robotPosition, _robotOrientation);
-				}
 				_robot.moveForward();
-				if (RobotSystem.isRealRun()) {
-					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-					setIsExplored(_robotPosition, _robotOrientation);
-				}
-
+				updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+				setIsExplored(_robotPosition, _robotOrientation);
 			} else {
-				if (!RobotSystem.isRealRun()) {
-					updateRobotOrientation(Movement.TURN_LEFT);
-					setIsExplored(_robotPosition, _robotOrientation);
-				}
 				_robot.turnLeft();
-				if (RobotSystem.isRealRun()) {
-					updateRobotOrientation(Movement.TURN_LEFT);
-					setIsExplored(_robotPosition, _robotOrientation);
-				}
+				updateRobotOrientation(Movement.TURN_LEFT);
+				setIsExplored(_robotPosition, _robotOrientation);
+				
 			}
 		}
 	}
@@ -1232,6 +1137,8 @@ public class MazeExplorer {
 			}
 	}
 
+		Controller controller = Controller.getInstance();
+		controller.updateMazeColor();
 	}
 
 	private int parseSensorValue(String msgSensorValues, SensorPosition sensorPosition) {
