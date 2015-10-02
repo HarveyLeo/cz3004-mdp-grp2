@@ -53,18 +53,19 @@ public class PCClient {
 		}
 	}
 
-	public void sendMessage(String msg) throws IOException{
-		System.out.println("sent msg: " + msg);
+	public void sendMessage(String msg) throws IOException {
+		
 		_toRPi.print(msg);
 		_toRPi.flush();
+		
+		System.out.println("Message sent: " + msg);
 	}
 
-	public String readMessage() throws IOException{
-		String messageReceived;
-	
-		messageReceived = _fromRPi.nextLine();
-
-		System.out.println("received msg: " + messageReceived);
+	public String readMessage() throws IOException {
+		
+		String messageReceived = _fromRPi.nextLine();
+		System.out.println("Message received" + messageReceived);
+		
 		return messageReceived;
 	}
          

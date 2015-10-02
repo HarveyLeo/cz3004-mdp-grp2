@@ -83,28 +83,48 @@ public class Controller {
 				protected Void doInBackground() throws Exception {
 					
 					try {
+						//Connect with RPi
 						_ui.setStatus("waiting for connection...");
 						_pcClient.setUpConnection(PCClient.RPI_IP_ADDRESS, PCClient.RPI_PORT);
 						_ui.setStatus("connected with RPi");
+						
+						//Read initial robot position
 						String msgRobotPosition = _pcClient.readMessage();
-						int index = msgRobotPosition.indexOf(",");
-						int posX = Integer.parseInt(msgRobotPosition.substring(0, index));
-						int posY = Integer.parseInt(msgRobotPosition.substring(index+1));
-						resetRobotInMaze(_ui.getMazeGrids(), posX, posY);
+						while (!msgRobotPosition.matches("[0-9]+,[0-9]+")) {
+							msgRobotPosition = _pcClient.readMessage();
+						}
+						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
+						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
+						
+						//Get explore command
 						String msgExplore = _pcClient.readMessage();
 						while (!msgExplore.equals(Message.START_EXPLORATION)) {
 							msgExplore = _pcClient.readMessage();
 						}
 						_ui.setStatus("start exploring");
 						exploreMaze();
-
-	
+						
+						//Get ffp command
+						String msgFFP = _pcClient.readMessage();
+						while (!msgFFP.equals(Message.START_FASTEST)) {
+							msgFFP = _pcClient.readMessage();
+						}
+						_ui.setStatus("start finding fastest path");
+						findFastestPath();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 					return null;
+				}
+
+				private int[] getRobotPositionInput (String msgRobotPosition) {
+					int[] posInput = new int[2];
+					int index = msgRobotPosition.indexOf(",");
+					posInput[0] = Integer.parseInt(msgRobotPosition.substring(0, index));
+					posInput[1] = Integer.parseInt(msgRobotPosition.substring(index + 1));
+					return posInput;
 				}
 				
 				
@@ -350,24 +370,18 @@ public class Controller {
 				}
 				_hasReachedStart = false;
 				explorer.explore(_robotPosition, _robotOrientation);
-
 				return null;
 			}
 			@Override
 			public void done() {
-					
-				
-//				String P1Descriptor, P2Descriptor;
 				
 				_hasReachedStart = true;
 				
-//				P1Descriptor = explorer.getP1Descriptor();
-				
-//				P2Descriptor = explorer.getP2Descriptor();
-				
-//				System.out.println("P1 descriptor: " + P1Descriptor);
-//				
-//				System.out.println("P2 descriptor: " + P2Descriptor);
+				String P1Descriptor, P2Descriptor;
+				P1Descriptor = explorer.getP1Descriptor();
+				P2Descriptor = explorer.getP2Descriptor();	
+				System.out.println("P1 descriptor: " + P1Descriptor);
+				System.out.println("P2 descriptor: " + P2Descriptor);
 			
 				_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
 				
@@ -389,7 +403,7 @@ public class Controller {
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
 				}
-
+				
 			}
 		};
 		
