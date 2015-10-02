@@ -154,13 +154,7 @@ public class MazeExplorer {
 		
 		setIsExplored(robotPosition, _robotOrientation);
 		
-		//Testing
-		System.out.println("start exploring to goal");
-		
 		exploreAlongWall (GOAL);
-		
-		//Testing
-		System.out.println("end exploring to goal");
 		
 		if (!controller.hasReachedTimeThreshold()) {
 			_hasExploredTillGoal = true;

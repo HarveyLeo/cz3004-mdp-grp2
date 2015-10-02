@@ -32,7 +32,10 @@ import tcpcomm.PCClient;
 public class Controller {
 	
 	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
-	private static final int THRESHOLD_BUFFER_TIME = 5;
+	private static final int THRESHOLD_BUFFER_TIME = 10;
+	private static final int EXPLORE_TIME_LIMIT = 360;
+	private static final int FFP_TIME_LIMIT = 120;
+	private static final int EXPLORE_REAL_RUN_SPEED = 1;
 	
 	private static Controller _instance;
 	private UI _ui;
@@ -105,11 +108,8 @@ public class Controller {
 //						_pcClient.sendMessage("A|");
 //						_pcClient.readMessage();
 						exploreMaze();
-//						String msgFastest = _pcClient.readMessage();
-//						while (!msgFastest.equals(Message.START_FASTEST)) {
-//							msgFastest = _pcClient.readMessage();
-//						}
-//						findFastestPath();
+
+	
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -195,7 +195,7 @@ public class Controller {
 				}
 			}
 			
-			_robotOrientation = Orientation.SOUTH;
+			_robotOrientation = Orientation.NORTH;
 			
 			switch (_robotOrientation) {
 			case NORTH:
@@ -350,8 +350,8 @@ public class Controller {
 		Robot robot = Robot.getInstance();
 		
 		if (RobotSystem.isRealRun()) {
-			_exploreTimeLimit = 360;
-			_speed = 1;
+			_exploreTimeLimit = EXPLORE_TIME_LIMIT;
+			_speed = EXPLORE_REAL_RUN_SPEED;
 		}
 
 		ExploreTimeClass timeActionListener = new ExploreTimeClass(_exploreTimeLimit);
@@ -362,9 +362,6 @@ public class Controller {
 					robot.setSpeed(_speed);
 				}
 				_hasReachedStart = false;
-				//Testing
-				System.out.println(_robotOrientation);
-				
 				explorer.explore(_robotPosition, _robotOrientation);
 
 				return null;
@@ -408,6 +405,8 @@ public class Controller {
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
 				}
+				//Testing
+//				findFastestPath();
 				
 			}
 		};
@@ -588,11 +587,9 @@ public class Controller {
 			}
 			
 			_ui.refreshFfpInput();
-		} else {
-			_ffpTimeLimit = 120;
-		}
+		} 
 		
-		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
+
 		
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		
@@ -600,10 +597,13 @@ public class Controller {
 			Path _fastestPath;
 			@Override
 			protected Void doInBackground() throws Exception {
+	
 				MazeExplorer explorer = MazeExplorer.getInstance();
 				_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
 						MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+			
 				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH, false);
+
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
 				for (Path.Step step : steps) {
@@ -616,17 +616,26 @@ public class Controller {
 			@Override
 			public void done() {
 				_ui.setStatus("fastest path found");
+
 				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
 					_ui.setTimerMessage("fastest path: within time limit");
 				}
 				if (_ffpTimer.isRunning()) {
 					_ffpTimer.stop();
 				}
+
 			}
 		};
 		
+
+		if (RobotSystem.isRealRun()) {
+			_ffpTimeLimit = FFP_TIME_LIMIT;
+		}
+		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
 		_ffpTimer = new Timer(1000, timeActionListener);
 		_ffpTimer.start();
+		
+		
 		_ui.setStatus("robot finding fastest path");
 		findFastestPath.execute();
 	}

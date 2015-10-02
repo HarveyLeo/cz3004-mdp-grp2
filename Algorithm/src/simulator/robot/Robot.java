@@ -121,7 +121,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_RIGHT);
+				pcClient.sendMessage(Message.TURN_RIGHT + Message.SEPARATOR);
 	
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
@@ -147,7 +147,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD);
+				pcClient.sendMessage(Message.MOVE_FORWARD + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -172,7 +172,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_LEFT);
+				pcClient.sendMessage(Message.TURN_LEFT + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -203,7 +203,12 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD + count);
+				if (count >= 10) {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count % 10 + count / 10 +  "|");
+				} else {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count + Message.SEPARATOR);
+				}
+
 				String feedback = pcClient.readMessage();
 				for (int i = 0; i < count; i++) {
 					while (!feedback.equals(Message.DONE)) {
