@@ -96,17 +96,6 @@ public class Controller {
 							msgExplore = _pcClient.readMessage();
 						}
 						_ui.setStatus("start exploring");
-						//Testing - calibration at initial position
-//						_pcClient.sendMessage("C|");
-//						_pcClient.readMessage();
-//						_pcClient.sendMessage("A|");
-//						_pcClient.readMessage();
-//						_pcClient.sendMessage("C|");
-//						_pcClient.readMessage();
-//						_pcClient.sendMessage("A|");
-//						_pcClient.readMessage();
-//						_pcClient.sendMessage("A|");
-//						_pcClient.readMessage();
 						exploreMaze();
 
 	
@@ -278,8 +267,6 @@ public class Controller {
 						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
 						threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME;
-						//Testing
-						System.out.println("current threshold (sec): " + threshold);
 						publish(threshold);
 						return null;
 					}
@@ -368,10 +355,7 @@ public class Controller {
 			}
 			@Override
 			public void done() {
-				
-				//Testing
-				System.out.println("executing exploreMaze done()");
-				
+					
 				
 //				String P1Descriptor, P2Descriptor;
 				
@@ -405,9 +389,7 @@ public class Controller {
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
 				}
-				//Testing
-//				findFastestPath();
-				
+
 			}
 		};
 		
