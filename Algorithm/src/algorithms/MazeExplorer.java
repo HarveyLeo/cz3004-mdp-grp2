@@ -25,7 +25,7 @@ public class MazeExplorer {
 	private static final int RIGHT_CAN_ACCESS = -3;
 	public static final int[] GOAL = {13, 18};
 	public static final int[] START = {1, 1};
-
+	private static final int INVALID_SENSOR_VALUE = -1;
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
@@ -37,6 +37,14 @@ public class MazeExplorer {
 	
 	private MazeExplorer() {
 		
+	}
+	
+	public int[] getRobotPosition() {
+		return _robotPosition;
+	}
+	
+	public Orientation getRobotOrientation() {
+		return _robotOrientation;
 	}
 	
 	public int[][] getMazeRef() {
@@ -128,12 +136,13 @@ public class MazeExplorer {
 		return P1HexStr;
 	}
     
-	public void explore(int[] robotPosition) {
+	public void explore(int[] robotPosition, Orientation robotOrientation) {
+		
 		
 		Controller controller = Controller.getInstance();
 		
 
-		init(robotPosition);
+		init(robotPosition, robotOrientation);
 		
 		for (int i = robotPosition[0] - 1; i <= robotPosition[0] + 1; i++) {
 			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
@@ -141,10 +150,10 @@ public class MazeExplorer {
 				_mazeRef[i][j] = IS_EMPTY;
 			}
 		}
-		
+
 		
 		setIsExplored(robotPosition, _robotOrientation);
-
+		
 		exploreAlongWall (GOAL);
 		
 		if (!controller.hasReachedTimeThreshold()) {
@@ -228,8 +237,7 @@ public class MazeExplorer {
 			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
 				for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
 					if (_mazeRef[obsX][obsY] == UNEXPLORED){
-						//Testing
-//						System.out.println("obs: " + obsX + " " + obsY);
+
 						nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap, true);
 					
 						if (nextRobotPosition != null) {
@@ -398,86 +406,108 @@ public class MazeExplorer {
 		switch (ori) {
 			case NORTH:
 				if (_robotOrientation == Orientation.SOUTH) {
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.WEST;
 					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnRight();
 					_robotOrientation = Orientation.NORTH;
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+
 				} else if (_robotOrientation == Orientation.EAST) {
-					_robotOrientation = Orientation.NORTH;
-					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnLeft();
-				} else if (_robotOrientation == Orientation.WEST) {
 					_robotOrientation = Orientation.NORTH;
 					setIsExplored(_robotPosition, _robotOrientation);
+
+				} else if (_robotOrientation == Orientation.WEST) {
+					
 					_robot.turnRight();
+					_robotOrientation = Orientation.NORTH;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 				}
 				break;
 			case SOUTH:
 				if (_robotOrientation == Orientation.NORTH) {
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.EAST;
 					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnRight();
 					_robotOrientation = Orientation.SOUTH;
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+					
 				} else if (_robotOrientation == Orientation.EAST) {
-					_robotOrientation = Orientation.SOUTH;
-					setIsExplored(_robotPosition, _robotOrientation);
+					
 					_robot.turnRight();
-				} else if (_robotOrientation == Orientation.WEST) {
 					_robotOrientation = Orientation.SOUTH;
 					setIsExplored(_robotPosition, _robotOrientation);
+					
+				} else if (_robotOrientation == Orientation.WEST) {
 					_robot.turnLeft();
+					_robotOrientation = Orientation.SOUTH;
+					setIsExplored(_robotPosition, _robotOrientation);
 				}
 				break;
 			case EAST:
 				if (_robotOrientation == Orientation.NORTH) {
-					_robotOrientation = Orientation.EAST;
-					setIsExplored(_robotPosition, _robotOrientation);
 					_robot.turnRight();
-				} else if (_robotOrientation == Orientation.SOUTH) {
 					_robotOrientation = Orientation.EAST;
 					setIsExplored(_robotPosition, _robotOrientation);
+					
+				} else if (_robotOrientation == Orientation.SOUTH) {
+					
 					_robot.turnLeft();
+					_robotOrientation = Orientation.EAST;
+					setIsExplored(_robotPosition, _robotOrientation);
+					
 				} else if (_robotOrientation == Orientation.WEST) {
+		
+					_robot.turnRight();
 					_robotOrientation = Orientation.NORTH;
 					setIsExplored(_robotPosition, _robotOrientation);
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.EAST;
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
-					_robot.turnRight();
 				}
 				break;
 			case WEST:
 				if (_robotOrientation == Orientation.NORTH) {
-					_robotOrientation = Orientation.WEST;
-					setIsExplored(_robotPosition, _robotOrientation);
 					_robot.turnLeft();
-				} else if (_robotOrientation == Orientation.SOUTH) {
 					_robotOrientation = Orientation.WEST;
 					setIsExplored(_robotPosition, _robotOrientation);
+				} else if (_robotOrientation == Orientation.SOUTH) {
+			
 					_robot.turnRight();
+					_robotOrientation = Orientation.WEST;
+					setIsExplored(_robotPosition, _robotOrientation);
 				} else if (_robotOrientation == Orientation.EAST) {
+					
+					_robot.turnRight();
 					_robotOrientation = Orientation.SOUTH;
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robotOrientation = Orientation.WEST;
+				
+				
+					_robot.turnRight();
+					_robotOrientation = Orientation.SOUTH;
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
-					_robot.turnRight();
+					
 				}
 		}
 		
 		
 	}
 
-	private void init(int[] robotPosition) {
+	private void init(int[] robotPosition, Orientation robotOrientation) {
 		_robot = Robot.getInstance();
 		_robotPosition = new int[2];
 		_robotPosition[0] = robotPosition[0];
 		_robotPosition[1] = robotPosition[1];
-		_robotOrientation = Orientation.NORTH;
+		_robotOrientation = robotOrientation;
 		_hasExploredTillGoal = false;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
@@ -499,35 +529,41 @@ public class MazeExplorer {
 
 		while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
 			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
+			
 			if (rightStatus != RIGHT_NO_ACCESS) {
 				if (rightStatus == RIGHT_UNSURE_ACCESS) {
+					_robot.turnRight();
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
+						_robot.moveForward();
 						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 						setIsExplored(_robotPosition, _robotOrientation);
-						_robot.moveForward();
 					} else {
-						updateRobotOrientation(Movement.TURN_LEFT);
 						_robot.turnLeft();
+						updateRobotOrientation(Movement.TURN_LEFT);
 					}
 				} else { //rightStatus == RIGHT_CAN_ACCESS
+					_robot.turnRight();
 					updateRobotOrientation(Movement.TURN_RIGHT);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.turnRight();
+					
+					_robot.moveForward();
 					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 					setIsExplored(_robotPosition, _robotOrientation);
-					_robot.moveForward();
+
 				}
+		
 			} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 
+				_robot.moveForward();
 				updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.moveForward();
 			} else {
+				_robot.turnLeft();
 				updateRobotOrientation(Movement.TURN_LEFT);
 				setIsExplored(_robotPosition, _robotOrientation);
-				_robot.turnLeft();
+				
 			}
 		}
 	}
@@ -724,12 +760,10 @@ public class MazeExplorer {
 			try {
 				Controller controller = Controller.getInstance();
 				PCClient pcClient = controller.getPCClient();
+
 				pcClient.sendMessage(Message.READ_SENSOR_VALUES);
-				//Testing
-				System.out.println("sent E|");
 				msgSensorValues = pcClient.readMessage();
-				//Testing
-				System.out.println("Message from Arduino: " + msgSensorValues);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -741,7 +775,7 @@ public class MazeExplorer {
 		int[] leftSensorPosition = new int[2];
 		int[] rightSensorPosition = new int[2];
 		int numOfClearGrids;
-		
+
 		switch (ori) {
 		case NORTH:
 			frontSensorPosition[0] = robotPosition[0];
@@ -759,66 +793,77 @@ public class MazeExplorer {
 				numOfClearGrids = _robot.senseFront(frontSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.CF);
+				
 			}
-			for (int i = 1; i <= numOfClearGrids; i++) {
-				_isExplored[frontSensorPosition[0]][frontSensorPosition[1] + i] = true;
-				_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] + i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
-				_isExplored[frontSensorPosition[0]][frontSensorPosition[1] + numOfClearGrids + 1] = true;
-				_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontSensorPosition[0]][frontSensorPosition[1] + i] = true;
+					_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] + i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
+					_isExplored[frontSensorPosition[0]][frontSensorPosition[1] + numOfClearGrids + 1] = true;
+					_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.LF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] + i] = true;
-				_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] + i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
-				_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] + numOfClearGrids + 1] = true;
-				_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] + i] = true;
+					_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] + i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
+					_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] + numOfClearGrids + 1] = true;
+					_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.RF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] + i] = true;
-				_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] + i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
-				_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] + numOfClearGrids + 1] = true;
-				_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] + i] = true;
+					_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] + i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
+					_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] + numOfClearGrids + 1] = true;
+					_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.L);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[leftSensorPosition[0] - i][leftSensorPosition[1]] = true;
-				_mazeRef[leftSensorPosition[0] - i][leftSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
-				_isExplored[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = true;
-				_mazeRef[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[leftSensorPosition[0] - i][leftSensorPosition[1]] = true;
+					_mazeRef[leftSensorPosition[0] - i][leftSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+					_isExplored[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = true;
+					_mazeRef[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.R);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[rightSensorPosition[0] + i][rightSensorPosition[1]] = true;
-				_mazeRef[rightSensorPosition[0] + i][rightSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[rightSensorPosition[0] + numOfClearGrids + 1][rightSensorPosition[1]] = true;
-				_mazeRef[rightSensorPosition[0] + numOfClearGrids + 1][rightSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[rightSensorPosition[0] + i][rightSensorPosition[1]] = true;
+					_mazeRef[rightSensorPosition[0] + i][rightSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[rightSensorPosition[0] + numOfClearGrids + 1][rightSensorPosition[1]] = true;
+					_mazeRef[rightSensorPosition[0] + numOfClearGrids + 1][rightSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			break;
 			
@@ -839,65 +884,75 @@ public class MazeExplorer {
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.CF);
 			}
-			for (int i = 1; i <= numOfClearGrids; i++) {
-				_isExplored[frontSensorPosition[0]][frontSensorPosition[1] - i] = true;
-				_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] - i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[1] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontSensorPosition[0]][frontSensorPosition[1] - numOfClearGrids - 1] = true;
-				_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontSensorPosition[0]][frontSensorPosition[1] - i] = true;
+					_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] - i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontSensorPosition[0]][frontSensorPosition[1] - numOfClearGrids - 1] = true;
+					_mazeRef[frontSensorPosition[0]][frontSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.LF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] - i] = true;
-				_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] - i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] - numOfClearGrids - 1] = true;
-				_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] - i] = true;
+					_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] - i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontleftSensorPosition[0]][frontleftSensorPosition[1] - numOfClearGrids - 1] = true;
+					_mazeRef[frontleftSensorPosition[0]][frontleftSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.RF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] - i] = true;
-				_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] - i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[1] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] - numOfClearGrids - 1] = true;
-				_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] - i] = true;
+					_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] - i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontrightSensorPosition[0]][frontrightSensorPosition[1] - numOfClearGrids - 1] = true;
+					_mazeRef[frontrightSensorPosition[0]][frontrightSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.L);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[leftSensorPosition[0] + i][leftSensorPosition[1]] = true;
-				_mazeRef[leftSensorPosition[0] + i][leftSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = true;
-				_mazeRef[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[leftSensorPosition[0] + i][leftSensorPosition[1]] = true;
+					_mazeRef[leftSensorPosition[0] + i][leftSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = true;
+					_mazeRef[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.R);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[rightSensorPosition[0] - i][rightSensorPosition[1]] = true;
-				_mazeRef[rightSensorPosition[0] - i][rightSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[0] - numOfClearGrids - 1 >= 0) {
-				_isExplored[rightSensorPosition[0] - numOfClearGrids - 1][rightSensorPosition[1]] = true;
-				_mazeRef[rightSensorPosition[0] - numOfClearGrids - 1][rightSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[rightSensorPosition[0] - i][rightSensorPosition[1]] = true;
+					_mazeRef[rightSensorPosition[0] - i][rightSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+					_isExplored[rightSensorPosition[0] - numOfClearGrids - 1][rightSensorPosition[1]] = true;
+					_mazeRef[rightSensorPosition[0] - numOfClearGrids - 1][rightSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			break;
 		case EAST:
@@ -917,65 +972,75 @@ public class MazeExplorer {
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.CF);
 			}
-			for (int i = 1; i <= numOfClearGrids; i++) {
-				_isExplored[frontSensorPosition[0] + i][frontSensorPosition[1]] = true;
-				_mazeRef[frontSensorPosition[0] + i][frontSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[frontSensorPosition[0] + numOfClearGrids + 1][frontSensorPosition[1]] = true;
-				_mazeRef [frontSensorPosition[0] + numOfClearGrids + 1][frontSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontSensorPosition[0] + i][frontSensorPosition[1]] = true;
+					_mazeRef[frontSensorPosition[0] + i][frontSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[frontSensorPosition[0] + numOfClearGrids + 1][frontSensorPosition[1]] = true;
+					_mazeRef [frontSensorPosition[0] + numOfClearGrids + 1][frontSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.LF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontleftSensorPosition[0] + i][frontleftSensorPosition[1]] = true;
-				_mazeRef[frontleftSensorPosition[0] + i][frontleftSensorPosition[1]] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[frontleftSensorPosition[0] + numOfClearGrids + 1][frontleftSensorPosition[1]] = true;
-				_mazeRef [frontleftSensorPosition[0] + numOfClearGrids + 1][frontleftSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontleftSensorPosition[0] + i][frontleftSensorPosition[1]] = true;
+					_mazeRef[frontleftSensorPosition[0] + i][frontleftSensorPosition[1]] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[frontleftSensorPosition[0] + numOfClearGrids + 1][frontleftSensorPosition[1]] = true;
+					_mazeRef [frontleftSensorPosition[0] + numOfClearGrids + 1][frontleftSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.RF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontrightSensorPosition[0] + i][frontrightSensorPosition[1]] = true;
-				_mazeRef [frontrightSensorPosition[0] + i][frontrightSensorPosition[1]]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[frontrightSensorPosition[0] + numOfClearGrids + 1][frontrightSensorPosition[1]] = true;
-				_mazeRef [frontrightSensorPosition[0] + numOfClearGrids + 1][frontrightSensorPosition[1]] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontrightSensorPosition[0] + i][frontrightSensorPosition[1]] = true;
+					_mazeRef [frontrightSensorPosition[0] + i][frontrightSensorPosition[1]]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[frontrightSensorPosition[0] + numOfClearGrids + 1][frontrightSensorPosition[1]] = true;
+					_mazeRef [frontrightSensorPosition[0] + numOfClearGrids + 1][frontrightSensorPosition[1]] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.L);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + i] = true;
-				_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + i]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
-				_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = true;
-				_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + i] = true;
+					_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + i]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
+					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = true;
+					_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.R);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[rightSensorPosition[0]][rightSensorPosition[1] - i] = true;
-				_mazeRef [rightSensorPosition[0]][rightSensorPosition[1] - i]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[1] - numOfClearGrids - 1 >= 0) {
-				_isExplored[rightSensorPosition[0]][rightSensorPosition[1] - numOfClearGrids - 1] = true;
-				_mazeRef [rightSensorPosition[0]][rightSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[rightSensorPosition[0]][rightSensorPosition[1] - i] = true;
+					_mazeRef [rightSensorPosition[0]][rightSensorPosition[1] - i]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+					_isExplored[rightSensorPosition[0]][rightSensorPosition[1] - numOfClearGrids - 1] = true;
+					_mazeRef [rightSensorPosition[0]][rightSensorPosition[1] - numOfClearGrids - 1] = IS_OBSTACLE;
+				}
 			}
 			break;
 		case WEST:
@@ -994,92 +1059,105 @@ public class MazeExplorer {
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.CF);
 			}
-			for (int i = 1; i <= numOfClearGrids; i++) {
-				_isExplored[frontSensorPosition[0] - i][frontSensorPosition[1]] = true;		
-				_mazeRef[frontSensorPosition[0] - i][frontSensorPosition[1]]= IS_EMPTY;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontSensorPosition[0] - i][frontSensorPosition[1]] = true;		
+					_mazeRef[frontSensorPosition[0] - i][frontSensorPosition[1]]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontSensorPosition[0] - numOfClearGrids - 1][frontSensorPosition[1]] = true;
+					_mazeRef[frontSensorPosition[0] - numOfClearGrids - 1][frontSensorPosition[1]]= IS_OBSTACLE;
+				}
 			}
-			if (numOfClearGrids < Sensor.LONG_RANGE && frontSensorPosition[0] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontSensorPosition[0] - numOfClearGrids - 1][frontSensorPosition[1]] = true;
-				_mazeRef[frontSensorPosition[0] - numOfClearGrids - 1][frontSensorPosition[1]]= IS_OBSTACLE;
-			}
-			
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontleftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.LF);
 			}
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
 			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontleftSensorPosition[0] - i][frontleftSensorPosition[1]] = true;
-				_mazeRef[frontleftSensorPosition[0] - i][frontleftSensorPosition[1]]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontleftSensorPosition[0] - numOfClearGrids - 1][frontleftSensorPosition[1]] = true;
-				_mazeRef[frontleftSensorPosition[0] - numOfClearGrids - 1][frontleftSensorPosition[1]]= IS_OBSTACLE;
+					_isExplored[frontleftSensorPosition[0] - i][frontleftSensorPosition[1]] = true;
+					_mazeRef[frontleftSensorPosition[0] - i][frontleftSensorPosition[1]]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontleftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontleftSensorPosition[0] - numOfClearGrids - 1][frontleftSensorPosition[1]] = true;
+					_mazeRef[frontleftSensorPosition[0] - numOfClearGrids - 1][frontleftSensorPosition[1]]= IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseSideFront(frontrightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.RF);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[frontrightSensorPosition[0] - i][frontrightSensorPosition[1]] = true;
-				_mazeRef[frontrightSensorPosition[0] - i][frontrightSensorPosition[1]]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[0] - numOfClearGrids - 1 >= 0) {
-				_isExplored[frontrightSensorPosition[0] - numOfClearGrids - 1][frontrightSensorPosition[1]] = true;
-				_mazeRef[frontrightSensorPosition[0] - numOfClearGrids - 1][frontrightSensorPosition[1]]= IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[frontrightSensorPosition[0] - i][frontrightSensorPosition[1]] = true;
+					_mazeRef[frontrightSensorPosition[0] - i][frontrightSensorPosition[1]]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && frontrightSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+					_isExplored[frontrightSensorPosition[0] - numOfClearGrids - 1][frontrightSensorPosition[1]] = true;
+					_mazeRef[frontrightSensorPosition[0] - numOfClearGrids - 1][frontrightSensorPosition[1]]= IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseLeft(leftSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.L);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - i] = true;
-				_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - i] = IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
-				_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1] = true;
-				_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1]= IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - i] = true;
+					_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - i] = IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1] = true;
+					_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1]= IS_OBSTACLE;
+				}
 			}
 			if (!RobotSystem.isRealRun()) {
 				numOfClearGrids = _robot.senseRight(rightSensorPosition, ori);
 			} else {
 				numOfClearGrids = parseSensorValue(msgSensorValues, SensorPosition.R);
 			}
-			for (int i = 2; i <= numOfClearGrids; i++) {
-				_isExplored[rightSensorPosition[0]][rightSensorPosition[1] + i] = true;
-				_mazeRef[rightSensorPosition[0]][rightSensorPosition[1] + i]= IS_EMPTY;
-			}
-			if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
-				_isExplored[rightSensorPosition[0]][rightSensorPosition[1] + numOfClearGrids + 1] = true;
-				_mazeRef[rightSensorPosition[0]][rightSensorPosition[1] + numOfClearGrids + 1]= IS_OBSTACLE;
+			if (numOfClearGrids != INVALID_SENSOR_VALUE) {
+				for (int i = 2; i <= numOfClearGrids; i++) {
+					_isExplored[rightSensorPosition[0]][rightSensorPosition[1] + i] = true;
+					_mazeRef[rightSensorPosition[0]][rightSensorPosition[1] + i]= IS_EMPTY;
+				}
+				if (numOfClearGrids < Sensor.SHORT_RANGE && rightSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+					_isExplored[rightSensorPosition[0]][rightSensorPosition[1] + numOfClearGrids + 1] = true;
+					_mazeRef[rightSensorPosition[0]][rightSensorPosition[1] + numOfClearGrids + 1]= IS_OBSTACLE;
+				}
 			}
 	}
-		
 
+		Controller controller = Controller.getInstance();
+		controller.updateMazeColor();
 	}
 
 	private int parseSensorValue(String msgSensorValues, SensorPosition sensorPosition) {
 		String sensorValues = msgSensorValues.substring(0, msgSensorValues.length() - 1);
 		List<String> valueList = Arrays.asList(sensorValues.split(":"));
-		int reading = -1;
+
+		int reading = INVALID_SENSOR_VALUE;
+		
 		switch (sensorPosition) {
-		case CF:
+		case LF:
 			reading = Integer.parseInt(valueList.get(1));
 			break;
-		case LF:
-			reading = Integer.parseInt(valueList.get(0));
-			break;
-		case RF:
+		case CF:
 			reading = Integer.parseInt(valueList.get(2));
 			break;
-		case L:
+		case RF:
 			reading = Integer.parseInt(valueList.get(3));
 			break;
-		case R:
+		case L:
 			reading = Integer.parseInt(valueList.get(4));
+			break;
+		case R:
+			reading = Integer.parseInt(valueList.get(5));
 		}
+		
 		return reading;
 	}
 	

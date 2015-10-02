@@ -121,7 +121,8 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_RIGHT);
+				pcClient.sendMessage(Message.TURN_RIGHT + Message.SEPARATOR);
+	
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -136,6 +137,7 @@ public class Robot {
 	public void moveForward() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
@@ -145,7 +147,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD);
+				pcClient.sendMessage(Message.MOVE_FORWARD + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -170,7 +172,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_LEFT);
+				pcClient.sendMessage(Message.TURN_LEFT + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -201,7 +203,12 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD + count);
+				if (count >= 10) {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count % 10 + count / 10 +  "|");
+				} else {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count + Message.SEPARATOR);
+				}
+
 				String feedback = pcClient.readMessage();
 				for (int i = 0; i < count; i++) {
 					while (!feedback.equals(Message.DONE)) {

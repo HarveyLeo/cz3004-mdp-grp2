@@ -54,7 +54,7 @@ void LeftEncoderInc(){left_encoder_val++;}
 ---------------------------------------------------------------------------------------------------*/
 #define LF A0   //Left-front
 #define L  A5   //Left
-#define CF  A2  //Centre-front
+#define CF A2  //Centre-front
 #define R  A3   //Right
 #define RF A4   //Right-front
 #define SR 0    //Short-range sensor
@@ -63,7 +63,6 @@ void LeftEncoderInc(){left_encoder_val++;}
 /*---------------------------------------------------------------------------------------------------
 MDP1                                    Set-Up
 ---------------------------------------------------------------------------------------------------*/
-
 void setup()
 {
   Serial.begin(115200);
@@ -75,7 +74,6 @@ void setup()
 /*---------------------------------------------------------------------------------------------------
 MDP2                                  Main Program
 ---------------------------------------------------------------------------------------------------*/
-
 void loop()
 {
   char command_buffer[10];
@@ -163,17 +161,17 @@ R ---> Gradual Right Turn
      break;
    }
      case 'L':
-     {
+   {
       turnLeft();
       sendSensors();
       break;
-     }
+   }
      case 'R':
-     {
+   {
       turnRight();
       sendSensors();
       break;
-     }
+   }
     default:
    {
      break;
@@ -187,7 +185,6 @@ R ---> Gradual Right Turn
 MDP3                                    Move Forward
 ---------------------------------------------------------------------------------------------------*/
 void moveForward(int distance){
-  
   left_encoder_val = 0; 
   right_encoder_val = 0; 
   int pwmR = SPEED;
@@ -214,17 +211,16 @@ void moveForward(int distance){
   
   }
   int target_Distance = multiplier * distance;
-  
   while(1){
-                  if(right_encoder_val > target_Distance){ // break
-                    md.setBrakes(MAX_SPEED, MAX_SPEED-20);
-                    delay(100);
-                    md.setBrakes(0, 0);
-                    break;
-                  }
-                  output = pidControlForward(left_encoder_val,right_encoder_val);
-                  md.setSpeeds(pwmR-output,pwmL+output);
-      }      
+     if(right_encoder_val > target_Distance){ // break
+       md.setBrakes(MAX_SPEED, MAX_SPEED-20);
+       delay(100);
+       md.setBrakes(0, 0);
+       break;
+       }
+       output = pidControlForward(left_encoder_val,right_encoder_val);
+       md.setSpeeds(pwmR-output,pwmL+output);
+    }      
 }
 //End of moveForward()
 
@@ -265,8 +261,6 @@ int rotateLeft(int angle){
       md.setBrakes(0, 0);
       break;
     }
-
-
     if((left_encoder_val >= angle_offset - 5)&&(angle < 9)){
       md.setBrakes(400, 400);
       delay(100);
@@ -315,8 +309,6 @@ int rotateRight(int angle){
       md.setBrakes(0, 0);
       break;
     }
-
-
     if((right_encoder_val >= angle_offset - 5)&&(angle < 9)){
       md.setBrakes(400, 400);
       delay(100);
@@ -367,7 +359,7 @@ int sensorRead(int n, int sensor){
     x[i] = analogRead(sensor);
   }
   insertionsort(x, n);
-  return x[n/2];          //Return Median
+  return x[n/2]; //Return Median
 }
 //End of Sensor Reading Functions
 
@@ -402,7 +394,6 @@ void angleAlign(){
 //Distance alignment to ensure robot is approx 15cm from wall to front sensors
 void distAlign(){
   while(1){
-    
     int LFdistance = distanceInCM(sensorRead(20,LF),LF);
 
     if(LFdistance > 19) md.setSpeeds(150,150);
@@ -506,10 +497,8 @@ void avoid(){
       delay(1000);
       moveForward(1);
       delay(1000);
-      rotateRight(90);
-      
+      rotateRight(90);     
     }
-    
     delay(1000);
   }
 }
@@ -613,7 +602,7 @@ int distanceInCM(int reading, int sensor){
 
 //MDP14
 //This function converts the cm readings into grids based on sensor type
-int distanceInGrids(int dis, int sensorType){
+  int distanceInGrids(int dis, int sensorType){
   int grids;
   
   if(sensorType == SR){ //Short range effective up to 2 grids away
@@ -631,8 +620,7 @@ int distanceInGrids(int dis, int sensorType){
       else if (dis >= 39 && dis <= 48) grids = 4;
       else if (dis >= 49 && dis <= 58) grids = 5;
       else grids = -1;
-  }
-  
+  } 
   return grids;
 }
 //End of Sensor Reading Conversion Functions
