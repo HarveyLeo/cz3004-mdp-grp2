@@ -672,7 +672,15 @@ public class BluetoothService extends Service{
 	
 	private void showToast(String msg){
 		toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
-		if (displayToast)
+		if (displayToast){
 			toast.show();
+			mHandler.postDelayed(new Runnable(){
+
+				@Override
+				public void run() {
+					toast.cancel();
+				}
+			}, 400);
+		}
 	}
 }

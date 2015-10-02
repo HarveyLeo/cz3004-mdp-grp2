@@ -80,6 +80,7 @@
 			   	    android:layout_alignBottom="@+id/textViewX"
 			   	    android:layout_toRightOf="@+id/textViewX"
 			   	    android:inputType="number"
+			   	    android:text="2"
 			   	    android:ems="10" />
 			   	
 	
@@ -102,6 +103,7 @@
 			   	    android:layout_alignBottom="@+id/textViewY"
 			   	    android:layout_toRightOf="@+id/textViewY"
 			   	    android:inputType="number"
+			   	    android:text="2"
 			   	    android:ems="10" />
 			   	
 	   		        <ImageButton
@@ -148,9 +150,10 @@
 			   	    android:layout_height="wrap_content"
 			        android:layout_alignParentTop="true"
         			android:layout_toRightOf="@+id/buttonStart"
-					android:layout_marginTop="30dp"
+					android:layout_marginTop="20dp"
 					android:onClick="onShortestBtnClick"
 					android:background="@null"
+					android:layout_alignRight="@+id/updateSwitch"
 			        android:src="@drawable/fast" />		   	
       		    
       		    
@@ -208,6 +211,17 @@
 			   	    android:textOff="Tilt Off"
 			   	    android:layout_marginTop="5dp"
 			   	    android:onClick="onTiltSwitchClick"/>
+		   	   	
+		   	   	<ImageButton
+		        	android:id="@+id/buttonConnect"
+			   	    android:layout_width="wrap_content"
+			   	    android:layout_height="wrap_content"
+			        android:layout_alignParentRight="true"
+	       			android:layout_below="@+id/tiltSwitch"
+					android:layout_marginTop="10dp"
+					android:background="@null"
+			        android:src="@drawable/connect"
+			        android:onClick="" />
 
 
 			</RelativeLayout>
