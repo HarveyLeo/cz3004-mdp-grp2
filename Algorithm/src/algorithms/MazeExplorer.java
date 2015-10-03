@@ -155,9 +155,8 @@ public class MazeExplorer {
 
 
 		if (RobotSystem.isRealRun()) {
-			if (_robotOrientation == Orientation.SOUTH) {
-				_robotOrientation = _robot.calibrateAtStartZoneFacingSouth();
-			}
+			_robotOrientation = _robot.calibrateAtStartZone(_robotOrientation);
+			
 		}
 		
 		setIsExplored(_robotPosition, _robotOrientation);
@@ -185,8 +184,9 @@ public class MazeExplorer {
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, true);
 		} 
 		
-		adjustOrientationTo(Orientation.NORTH);
-		
+		if (RobotSystem.isRealRun()) {
+			_robotOrientation = _robot.calibrateAtStartZone(_robotOrientation);
+		}
 
 	}
 

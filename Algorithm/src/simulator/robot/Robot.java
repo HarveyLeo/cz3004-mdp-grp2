@@ -247,13 +247,36 @@ public class Robot {
 		
 	}
 	
-	public Orientation calibrateAtStartZoneFacingSouth() {	
-		calibrateRobotPosition();
-		turnRight();
-		
-		calibrateRobotPosition();
-		turnRight();
-		
+	public Orientation calibrateAtStartZone(Orientation ori) {	
+		switch (ori) {
+			case NORTH:
+				turnLeft();
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				turnRight();
+				turnRight();
+				break;
+			case SOUTH:
+				calibrateRobotPosition();
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();			
+				break;
+			case EAST:
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();
+				break;
+			case WEST:
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				turnRight();
+				turnRight();
+		}
 		return Orientation.NORTH;
 	}
 }
