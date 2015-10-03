@@ -186,6 +186,8 @@ public class MazeExplorer {
 		
 		if (RobotSystem.isRealRun()) {
 			_robotOrientation = _robot.calibrateAtStartZone(_robotOrientation);
+		} else {
+			adjustOrientationTo(Orientation.NORTH);
 		}
 
 	}

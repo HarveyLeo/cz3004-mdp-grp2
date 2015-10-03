@@ -136,7 +136,7 @@ public class AStarPathFinder {
 		robotPosition = fastestPath.getStep(0);
 		
 		int count = 0;
-		
+
 		for (int i = 0; i < steps.size() - 1; i++) {
 			
 			tempPosition[0] = steps.get(i).getX();
