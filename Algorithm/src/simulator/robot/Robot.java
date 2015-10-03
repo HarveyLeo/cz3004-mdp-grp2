@@ -12,9 +12,11 @@ import tcpcomm.PCClient;
 public class Robot {
 	private static Robot _instance;
 	private int _speed;
+	private int _stepsSinceLastCalibration;
+
 	
 	private Robot() {
-
+		_stepsSinceLastCalibration = 0;
 	}
 	
 	public static Robot getInstance() {
@@ -28,6 +30,13 @@ public class Robot {
 		_speed = speed;
 	}
 	
+	public int getStepsSinceLastCalibration(){
+		return _stepsSinceLastCalibration;
+	}
+	
+	public void resetStepsSinceLastCalibration(){
+		_stepsSinceLastCalibration = 0;
+	}
 	
 	public int senseFront(int[] sensorPosition, Orientation robotOrientation) {
 		
@@ -155,9 +164,9 @@ public class Robot {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			_stepsSinceLastCalibration ++;
 		}
 		controller.moveRobotForward();
-		
 	}
 
 	public void turnLeft() {
@@ -216,9 +225,35 @@ public class Robot {
 					}
 					controller.moveRobotForward();
 				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void calibrateRobotPosition() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		try {
+			pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
+			String feedback = pcClient.readMessage();
+			while (!feedback.equals(Message.DONE)) {
+				feedback = pcClient.readMessage();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public Orientation calibrateAtStartZoneFacingSouth() {	
+		calibrateRobotPosition();
+		turnRight();
+		
+		calibrateRobotPosition();
+		turnRight();
+		
+		return Orientation.NORTH;
 	}
 }

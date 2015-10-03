@@ -62,6 +62,10 @@ public class Controller {
 	public boolean hasReachedTimeThreshold() {
 		return _hasReachedTimeThreshold;
 	}
+	
+	public void setRobotOrientation(Orientation ori) {
+		_robotOrientation = ori;
+	}
 
 	public static Controller getInstance() {
 		if (_instance == null) {
@@ -204,7 +208,7 @@ public class Controller {
 				}
 			}
 			
-			_robotOrientation = Orientation.NORTH;
+			_robotOrientation = Orientation.SOUTH;
 			
 			switch (_robotOrientation) {
 			case NORTH:
@@ -369,6 +373,7 @@ public class Controller {
 					robot.setSpeed(_speed);
 				}
 				_hasReachedStart = false;
+				
 				explorer.explore(_robotPosition, _robotOrientation);
 				return null;
 			}
@@ -630,8 +635,6 @@ public class Controller {
 		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
 		_ffpTimer = new Timer(1000, timeActionListener);
 		_ffpTimer.start();
-		
-		
 		_ui.setStatus("robot finding fastest path");
 		findFastestPath.execute();
 	}

@@ -26,6 +26,7 @@ public class MazeExplorer {
 	public static final int[] GOAL = {13, 18};
 	public static final int[] START = {1, 1};
 	private static final int INVALID_SENSOR_VALUE = -1;
+	private static final int CALIBRATION_THRESHOLD = 3;
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
@@ -36,7 +37,7 @@ public class MazeExplorer {
 	private boolean _hasExploredTillGoal;
 	
 	private MazeExplorer() {
-		
+
 	}
 	
 	public int[] getRobotPosition() {
@@ -54,6 +55,7 @@ public class MazeExplorer {
 	public Boolean[][] getIsExplored() {
 		return _isExplored;
 	}
+	
 	
 	public boolean areAllExplored() {
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
@@ -151,8 +153,14 @@ public class MazeExplorer {
 			}
 		}
 
+
+		if (RobotSystem.isRealRun()) {
+			if (_robotOrientation == Orientation.SOUTH) {
+				_robotOrientation = _robot.calibrateAtStartZoneFacingSouth();
+			}
+		}
 		
-		setIsExplored(robotPosition, _robotOrientation);
+		setIsExplored(_robotPosition, _robotOrientation);
 		
 		exploreAlongWall (GOAL);
 		
@@ -1133,6 +1141,129 @@ public class MazeExplorer {
 
 		Controller controller = Controller.getInstance();
 		controller.updateMazeColor();
+		
+		if (RobotSystem.isRealRun()) {
+			if (canCalibrateAhead(msgSensorValues)) {
+				_robot.calibrateRobotPosition();
+				_robot.resetStepsSinceLastCalibration();
+			} else {
+				boolean needCalibration = _robot.getStepsSinceLastCalibration() > CALIBRATION_THRESHOLD;
+				Movement move = canCalibrateAside(robotPosition, ori);
+				
+				if (needCalibration && move != null) {
+					if (move == Movement.TURN_LEFT) {
+						_robot.turnLeft();
+						_robot.calibrateRobotPosition();
+						_robot.turnRight();
+						_robot.resetStepsSinceLastCalibration();
+					} else if (move == Movement.TURN_RIGHT) {
+						_robot.turnRight();
+						_robot.calibrateRobotPosition();
+						_robot.turnLeft();
+						_robot.resetStepsSinceLastCalibration();
+					}
+				}
+			}
+		}
+	}
+
+	private boolean canCalibrateAhead(String msgSensorValues) {
+		return msgSensorValues.matches(Message.CALIBRATE_PATTERN);
+	}
+
+
+	private Movement canCalibrateAside (int[] robotPosition, Orientation ori) {
+
+		
+		boolean leftHasRef = true, rightHasRef = true;
+		Movement move = null;
+		
+		switch(ori) {
+			case NORTH:
+				if (robotPosition[0] - 2 == -1) {
+					move = Movement.TURN_LEFT;
+				} else if (robotPosition[0] + 2 == Arena.MAP_LENGTH) {
+					move = Movement.TURN_RIGHT;
+				} else {
+					for (int i = -1; i <= 1; i++) {
+						if (_mazeRef[robotPosition[0] - 2][robotPosition[1] + i] != IS_OBSTACLE) {
+							leftHasRef = false;
+						}
+						if (_mazeRef[robotPosition[0] + 2][robotPosition[1] + i] != IS_OBSTACLE) {
+							rightHasRef = false;
+						}
+					}
+					if (leftHasRef) {
+						move = Movement.TURN_LEFT;
+					} else if (rightHasRef) {
+						move = Movement.TURN_RIGHT;
+					}
+				}
+				break;
+			case SOUTH:
+				if (robotPosition[0] - 2 == -1) {
+					move = Movement.TURN_RIGHT;
+				} else if (robotPosition[0] + 2 == Arena.MAP_LENGTH) {
+					move = Movement.TURN_LEFT;
+				} else {
+					for (int i = -1; i <= 1; i++) {
+						if (_mazeRef[robotPosition[0] - 2][robotPosition[1] + i] != IS_OBSTACLE) {
+							rightHasRef = false;
+						}
+						if (_mazeRef[robotPosition[0] + 2][robotPosition[1] + i] != IS_OBSTACLE) {
+							leftHasRef = false;
+						}
+					}
+					if (leftHasRef) {
+						move = Movement.TURN_LEFT;
+					} else if (rightHasRef) {
+						move = Movement.TURN_RIGHT;
+					}
+				}
+				break;
+			case EAST:
+				if (robotPosition[1] - 2 == -1) {
+					move = Movement.TURN_RIGHT;
+				} else if (robotPosition[1] + 2 == Arena.MAP_WIDTH) {
+					move = Movement.TURN_LEFT;
+				} else {
+					for (int i = -1; i <= 1; i++) {
+						if (_mazeRef[robotPosition[0] + i][robotPosition[1] - 2] != IS_OBSTACLE) {
+							rightHasRef = false;
+						}
+						if (_mazeRef[robotPosition[0] + i][robotPosition[1] + 2] != IS_OBSTACLE) {
+							leftHasRef = false;
+						}
+					}
+					if (leftHasRef) {
+						move = Movement.TURN_LEFT;
+					} else if (rightHasRef) {
+						move = Movement.TURN_RIGHT;
+					}
+				}
+				break;
+			case WEST:
+				if (robotPosition[1] - 2 == -1) {
+					move = Movement.TURN_LEFT;
+				} else if (robotPosition[1] + 2 == Arena.MAP_WIDTH) {
+					move = Movement.TURN_RIGHT;
+				} else {
+					for (int i = -1; i <= 1; i++) {
+						if (_mazeRef[robotPosition[0] + i][robotPosition[1] - 2] != IS_OBSTACLE) {
+							leftHasRef = false;
+						}
+						if (_mazeRef[robotPosition[0] + i][robotPosition[1] + 2] != IS_OBSTACLE) {
+							rightHasRef = false;
+						}
+					}
+					if (leftHasRef) {
+						move = Movement.TURN_LEFT;
+					} else if (rightHasRef) {
+						move = Movement.TURN_RIGHT;
+					}
+				}
+		}
+		return move;
 	}
 
 	private int parseSensorValue(String msgSensorValues, SensorPosition sensorPosition) {
