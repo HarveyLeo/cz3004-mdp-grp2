@@ -24,6 +24,7 @@ public class MazeExplorer {
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
 	public static final int[] GOAL = {13, 18};
+//	public static final int[] GOAL = {6, 4};
 	public static final int[] START = {1, 1};
 	private static final int INVALID_SENSOR_VALUE = -1;
 	
@@ -175,9 +176,9 @@ public class MazeExplorer {
 		Path backPath;
 		boolean end = false;
 
-		while (!controller.hasReachedTimeThreshold() && !areAllExplored() && !end) {
-			end = ExploreNextRound(_robotPosition);
-		}
+//		while (!controller.hasReachedTimeThreshold() && !areAllExplored() && !end) {
+//			end = ExploreNextRound(_robotPosition);
+//		}
 		
 		
 		if (!isGoalPos(_robotPosition, START)) { 
