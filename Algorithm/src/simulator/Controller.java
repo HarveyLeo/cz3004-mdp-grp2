@@ -603,7 +603,7 @@ public class Controller {
 				_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
 						MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
 
-				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH, false);
+				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH);
 
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();

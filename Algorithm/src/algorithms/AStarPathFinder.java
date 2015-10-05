@@ -124,7 +124,11 @@ public class AStarPathFinder {
 		_robot = Robot.getInstance();
 	}
 
-	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation, boolean isExploring) {
+	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation) {
+		return moveRobotAlongFastestPath(fastestPath, currentOrientation, false, false);
+	}
+	
+	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation, boolean isExploring, boolean hasCalibration) {
 
 		int[] tempPosition = new int[2];
 		int[] robotPosition;
@@ -155,13 +159,13 @@ public class AStarPathFinder {
 					for (int v = 0; v < count; v++) {
 						_robot.moveForward();
 						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-						explorer.setIsExplored(robotPosition, currentOrientation);
+						explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 					}
 				} else {
 					_robot.moveForward(count);
 				}
 				count = 1;
-				ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring);
+				ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring, hasCalibration);
 			}
 			currentOrientation = nextOrientation;
 		}
@@ -171,7 +175,7 @@ public class AStarPathFinder {
 			for (int v = 0; v < count; v++) {
 				_robot.moveForward();
 				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-				explorer.setIsExplored(robotPosition, currentOrientation);
+				explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 			}
 		} else {
 			_robot.moveForward(count);
@@ -183,7 +187,7 @@ public class AStarPathFinder {
 
 
 
-	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri, boolean isExploring) {
+	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri, boolean isExploring, boolean hasCalibration) {
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		
 		switch (curOri) {
@@ -192,24 +196,24 @@ public class AStarPathFinder {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnLeft();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_LEFT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				}
 				break;
@@ -218,24 +222,24 @@ public class AStarPathFinder {
 					_robot.turnLeft();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_LEFT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				}
 				break;
@@ -244,24 +248,24 @@ public class AStarPathFinder {
 					_robot.turnLeft();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_LEFT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.WEST) {
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 					_robot.turnRight();
 					if (isExploring) {
 						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				}
 				break;
@@ -269,21 +273,21 @@ public class AStarPathFinder {
 				if (nextOri == Orientation.NORTH) {
 					_robot.turnRight();
 					if (isExploring) {
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.SOUTH) {
 					_robot.turnLeft();
 					if (isExploring) {
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				} else if (nextOri == Orientation.EAST) {
 					_robot.turnRight();
 					if (isExploring) {
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 					_robot.turnRight();
 					if (isExploring) {
-						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation());
+						explorer.setIsExplored(explorer.getRobotPosition(), explorer.getRobotOrientation(), hasCalibration);
 					}
 				}
 		}
