@@ -107,14 +107,6 @@ public class Controller {
 						}
 						_ui.setStatus("start exploring");
 						exploreMaze();
-						
-						//Get ffp command
-//						String msgFFP = _pcClient.readMessage();
-//						while (!msgFFP.equals(Message.START_FASTEST)) {
-//							msgFFP = _pcClient.readMessage();
-//						}
-//						_ui.setStatus("start finding fastest path");
-//						findFastestPath();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -407,8 +399,18 @@ public class Controller {
 				
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
+				} else {
+					try {
+						String msgFFP = _pcClient.readMessage();
+						while (!msgFFP.equals(Message.START_FASTEST)) {
+							msgFFP = _pcClient.readMessage();
+						}
+						_ui.setStatus("start finding fastest path");
+						findFastestPath();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-				
 			}
 		};
 		

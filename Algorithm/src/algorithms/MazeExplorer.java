@@ -23,11 +23,9 @@ public class MazeExplorer {
 	private static final int RIGHT_NO_ACCESS = -1;
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
-//	public static final int[] GOAL = {8, 13};
 	public static final int[] GOAL = {13, 18};
 	public static final int[] START = {1, 1};
 	private static final int INVALID_SENSOR_VALUE = -1;
-	private static final int CALIBRATION_THRESHOLD = 5;
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
@@ -36,6 +34,7 @@ public class MazeExplorer {
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
 	private boolean _hasExploredTillGoal;
+	private int _calibrationThreshold;
 	
 	private MazeExplorer() {
 
@@ -144,6 +143,7 @@ public class MazeExplorer {
 		
 		Controller controller = Controller.getInstance();
 		
+		_calibrationThreshold = 5;
 
 		init(robotPosition, robotOrientation);
 		
@@ -194,6 +194,9 @@ public class MazeExplorer {
 	}
 
 	private boolean ExploreNextRound(int[] currentRobotPosition) {
+		
+		_calibrationThreshold = 3;
+		
 		VirtualMap virtualMap = VirtualMap.getInstance();
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		Path fastestPath;
@@ -1150,7 +1153,7 @@ public class MazeExplorer {
 				_robot.calibrateRobotPosition();
 				_robot.resetStepsSinceLastCalibration();
 			} else {
-				boolean needCalibration = _robot.getStepsSinceLastCalibration() > CALIBRATION_THRESHOLD;
+				boolean needCalibration = _robot.getStepsSinceLastCalibration() > _calibrationThreshold;
 				Movement move = canCalibrateAside(robotPosition, ori);
 				
 				if (needCalibration && move != null) {
