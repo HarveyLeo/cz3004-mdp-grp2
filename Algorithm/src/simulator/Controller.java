@@ -109,12 +109,12 @@ public class Controller {
 						exploreMaze();
 						
 						//Get ffp command
-						String msgFFP = _pcClient.readMessage();
-						while (!msgFFP.equals(Message.START_FASTEST)) {
-							msgFFP = _pcClient.readMessage();
-						}
-						_ui.setStatus("start finding fastest path");
-						findFastestPath();
+//						String msgFFP = _pcClient.readMessage();
+//						while (!msgFFP.equals(Message.START_FASTEST)) {
+//							msgFFP = _pcClient.readMessage();
+//						}
+//						_ui.setStatus("start finding fastest path");
+//						findFastestPath();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

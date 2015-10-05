@@ -23,10 +23,11 @@ public class MazeExplorer {
 	private static final int RIGHT_NO_ACCESS = -1;
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
+//	public static final int[] GOAL = {8, 13};
 	public static final int[] GOAL = {13, 18};
 	public static final int[] START = {1, 1};
 	private static final int INVALID_SENSOR_VALUE = -1;
-	private static final int CALIBRATION_THRESHOLD = 3;
+	private static final int CALIBRATION_THRESHOLD = 5;
 	
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;

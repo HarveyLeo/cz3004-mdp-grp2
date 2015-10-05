@@ -62,9 +62,9 @@ public class PCClient {
 	}
 
 	public String readMessage() throws IOException {
-		
+
 		String messageReceived = _fromRPi.nextLine();
-		System.out.println("Message received" + messageReceived);
+		System.out.println("Message received: " + messageReceived);
 		
 		return messageReceived;
 	}
