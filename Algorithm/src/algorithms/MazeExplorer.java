@@ -860,7 +860,7 @@ public class MazeExplorer {
 					_isExplored[leftSensorPosition[0] - i][leftSensorPosition[1]] = true;
 					_mazeRef[leftSensorPosition[0] - i][leftSensorPosition[1]] = IS_EMPTY;
 				}
-				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
+				if (numOfClearGrids < Sensor.LONG_RANGE && leftSensorPosition[0] - numOfClearGrids - 1 >= 0) {
 					_isExplored[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = true;
 					_mazeRef[leftSensorPosition[0] - numOfClearGrids - 1][leftSensorPosition[1]] = IS_OBSTACLE;
 				}
@@ -949,7 +949,7 @@ public class MazeExplorer {
 					_isExplored[leftSensorPosition[0] + i][leftSensorPosition[1]] = true;
 					_mazeRef[leftSensorPosition[0] + i][leftSensorPosition[1]] = IS_EMPTY;
 				}
-				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
+				if (numOfClearGrids < Sensor.LONG_RANGE && leftSensorPosition[0] + numOfClearGrids + 1 < Arena.MAP_LENGTH) {
 					_isExplored[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = true;
 					_mazeRef[leftSensorPosition[0] + numOfClearGrids + 1][leftSensorPosition[1]] = IS_OBSTACLE;
 				}
@@ -1037,7 +1037,7 @@ public class MazeExplorer {
 					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + i] = true;
 					_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + i]= IS_EMPTY;
 				}
-				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
+				if (numOfClearGrids < Sensor.LONG_RANGE && leftSensorPosition[1] + numOfClearGrids + 1 < Arena.MAP_WIDTH) {
 					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = true;
 					_mazeRef [leftSensorPosition[0]][leftSensorPosition[1] + numOfClearGrids + 1] = IS_OBSTACLE;
 				}
@@ -1124,7 +1124,7 @@ public class MazeExplorer {
 					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - i] = true;
 					_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - i] = IS_EMPTY;
 				}
-				if (numOfClearGrids < Sensor.SHORT_RANGE && leftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
+				if (numOfClearGrids < Sensor.LONG_RANGE && leftSensorPosition[1] - numOfClearGrids - 1 >= 0) {
 					_isExplored[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1] = true;
 					_mazeRef[leftSensorPosition[0]][leftSensorPosition[1] - numOfClearGrids - 1]= IS_OBSTACLE;
 				}

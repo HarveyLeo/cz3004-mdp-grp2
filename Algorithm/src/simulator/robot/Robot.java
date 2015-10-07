@@ -85,8 +85,8 @@ public class Robot {
 				sensorOri = null;
 		}
 		numOfClearGrids = arena.getNumOfClearGrids(sensorPosition, sensorOri);
-		if (numOfClearGrids > Sensor.SHORT_RANGE) {
-			numOfClearGrids = Sensor.SHORT_RANGE;
+		if (numOfClearGrids > Sensor.LONG_RANGE) {
+			numOfClearGrids = Sensor.LONG_RANGE;
 		}
 		return numOfClearGrids;
 	}
