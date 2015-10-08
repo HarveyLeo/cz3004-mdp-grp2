@@ -45,8 +45,8 @@ public class Robot {
 		int numOfClearGrids;
 		Orientation sensorOri = robotOrientation;
 		numOfClearGrids = arena.getNumOfClearGrids(sensorPosition, sensorOri);
-		if (numOfClearGrids > Sensor.LONG_RANGE) {
-			numOfClearGrids = Sensor.LONG_RANGE;
+		if (numOfClearGrids > Sensor.SHORT_RANGE) {
+			numOfClearGrids = Sensor.SHORT_RANGE;
 		}
 		
 		return numOfClearGrids;
