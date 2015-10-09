@@ -13,22 +13,23 @@ class Arduino(interface):
 		self.baudrate = BAUD
 		self.ser = 0
 
-	def connect(self,port):
+	def connect(self):
 		#connect to serial port
 	    try:
 	    	print "-------------------------------"
 	    	print "Trying to connect to Arduino..."
-			self.ser = serial.Serial(port,self.baudrate, timeout=3)
-			time.sleep(1)
+		self.ser = serial.Serial(SER_PORT0,self.baudrate, timeout=3)
+		time.sleep(1)
 
-			if(self.ser != 0):
-				print "Connected to Arduino!"
-				self.read()
-			return 1
+		if(self.ser != 0):
+			print "Connected to Arduino!"
+			self.read()
+		return 1
 
 	    except Exception, e:
-			print "Arduino connection exception: %s" %str(e)
-			return 0
+			self.ser = serial.Serial(SER_PORT1,self.baudrate,timeout=3)
+			#print "Arduino connection exception: %s" %str(e)
+			return 1
 
 	def write(self,msg):
 		try:

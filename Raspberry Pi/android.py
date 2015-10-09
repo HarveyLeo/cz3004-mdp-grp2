@@ -26,9 +26,9 @@ class Android(interface):
             self.btsock, client_info = self.server_sock.accept()
             secure = client_info[0]
           
-            if secure != "08:60:6E:A5:A4:1E":
-                print "Tablet MAC Address unrecgonized... Disconnecting..."
-                return 0
+#            if secure != "08:60:6E:A5:A4:1E":
+ #               print "Tablet MAC Address unrecgonized... Disconnecting..."
+  #              return 0
                 
             print "Accepted connection from ", client_info
             print "Connected to Android!"

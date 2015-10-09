@@ -20,7 +20,7 @@ class Main:
 		self.ard = Arduino()
 		self.pc = Pc()
 		self.bt.connect(UUID)
-		self.ard.connect(SER_PORT)
+		self.ard.connect()
 		self.coord = 0
 		self.mode = 0
 
@@ -34,10 +34,10 @@ class Main:
 		print "==========================="
 
 	#read/write from Android (Bluetooth)
-	def readBt(self,ardQueue):
+	def readBt(self,pcQueue):
 		while 1:
 			msg = self.bt.read()
-			ardQueue.put_nowait(msg)
+			pcQueue.put_nowait(msg)
 			print "Read from BT: %s\n" %msg
 			
 
@@ -68,10 +68,14 @@ class Main:
 	def readPc(self,ardQueue,btQueue):
 		while 1:
 			msg = self.pc.read()
+		#	if msg=="E|":
+		#		msg="edmund\n"
+		#		self.pcQueue.put_nowait(msg)
 			print "Read from PC: %s\n" %msg
 			msg = msg.split("|")
-			btQueue.put_nowait(msg[1])
 			ardQueue.put_nowait(msg[0])
+#			btQueue.put_nowait(msg[1])
+		#	ardQueue.put_nowait(msg[0])
 		#	print "Write to Ard: %s\n" %msg[1]
 		#	print "Read from PC: %s\n" %(msg[0],msg[1])
 
@@ -79,13 +83,16 @@ class Main:
 		while 1:
 			if not pcQueue.empty():
 				msg =pcQueue.get_nowait()
+			#	len1=len(msg)
+			#	msg= "hello world"
 				self.pc.write(msg)
-				print "Write to PC -: %s\n" %msg 
+				print "Write to PC -: %s\n" %msg
+			#	print "Length: %d\n" %len1 
 
 	#multithreading 
 	def multithread(self):
 		try:
-			thread.start_new_thread(self.readBt, (self.ardQueue,))
+			thread.start_new_thread(self.readBt, (self.pcQueue,))
 			thread.start_new_thread(self.readArd, (self.pcQueue,))
 			thread.start_new_thread(self.readPc, (self.ardQueue,self.btQueue))
 			thread.start_new_thread(self.writeBt, (self.btQueue,))
@@ -108,14 +115,14 @@ class Main:
 
  	def getCoord(self):
  		while self.coord == 0:
- 			msg = self.pc.read()
- 		pcQueue.put_nowait(msg)
- 		print "Coordinates received: %s" %msg
+ 			self.coord = self.bt.read()
+ 		self.pcQueue.put_nowait(self.coord)
+ 		print "Coordinates received: %s\n" %self.coord
 
  	def getMode(self):
  		#mode = 1 for exploration, mode = 2 for fast
  		while mode == 0:
- 			msg = self.pc.read()
+ 			self.msg = self.bt.read()
  			if msg == "exp":
  				mode = 1
  				pcQueue.put_nowait("explore")
@@ -126,11 +133,11 @@ class Main:
 try:
 	while True:
 		test = Main()
-	#	test.getCoord()
-	#	test.getMode()
+#		test.getCoord()
+#		test.getMode()
 		test.multithread()
 except KeyboardInterrupt:
 	print "Terminating the program now..."
-	self.disconnectAll()
-	pass
+#	self.disconnectAll()
+#	pass
 
