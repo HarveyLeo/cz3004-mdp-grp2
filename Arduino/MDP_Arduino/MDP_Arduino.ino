@@ -1,3 +1,4 @@
+
 /*---------------------------------------------------------------------------------------------------
                                MDP GROUP2 ARDUINO PROGRAM SOURCE CODES
                                ---------------------------------------
@@ -19,17 +20,17 @@ MDP6 -> sendSensors()
 MDP7 -> frontAlignment()
   MDP7.1 -> angleAlign()
   MDP7.2 -> distAlign()
-MDP8 -> avoid()
-MDP9 -> turnLeft()
-MDP10 -> turnRight()
+MDP8 -> turnLeft()
+MDP9 -> turnRight()
 
 Extension FunctionsL
-MDP11 -> pidControlForward()
-MDP12 -> insertionsort()
-MDP13 -> distanceInCM()
-MDP14 -> distanceInGrids()
+MDP10 -> pidControlForward()
+  MDP10.1 -> pidControlLR()
+MDP11 -> insertionsort()
+MDP12 -> distanceInCM()
+MDP13 -> distanceInGrids()
+MDP14 -> readyMsg()
 MDP15 -> stopIfFault()
-
 ---------------------------------------------------------------------------------------------------*/
 #include "DualVNH5019MotorShield.h"
 #include "PinChangeInt.h"
@@ -109,6 +110,8 @@ void loop()
     i++;
   }
 
+//command = 'C';
+//arg=0;
 /*---------------------------------------------------------------------------------------------------
                                         Input Commands
                                         --------------
@@ -128,21 +131,21 @@ R ---> Gradual Right Turn
     {
       if(arg == 0) moveForward(1);
       else moveForward(arg);
-      sendSensors();
+      readyMsg();
       break;
     }
     case 'A':
     {
       if(arg == 0) rotateLeft(90);
       else rotateLeft(arg);
-      sendSensors();
+      readyMsg();
       break;
     }
     case 'D':
     {
       if(arg == 0) rotateRight(90);
       else rotateRight(arg);
-      sendSensors();
+      readyMsg();
       break;
     }
     case 'E':
@@ -153,27 +156,21 @@ R ---> Gradual Right Turn
    case 'C':
    {
       frontAlignment();
-      sendSensors();
+      readyMsg();
       break;
-   }
-     case 'T':
-   {
-     delay(3000);
-     avoid();
-     break;
    }
      case 'L':
-     {
+   {
       turnLeft();
-      sendSensors();
+      readyMsg();
       break;
-     }
+   }
      case 'R':
-     {
+   {
       turnRight();
-      sendSensors();
+      readyMsg();
       break;
-     }
+   }
     default:
    {
      break;
@@ -193,10 +190,12 @@ void moveForward(int distance){
   int pwmR = SPEED;
   int pwmL = SPEED;
   int output=0;
+  int Roffset=10;
 
   int multiplier;
   switch(distance){
-    case 2: multiplier = 580; break;
+    case 1: multiplier = 550; break;
+    case 2: multiplier = 575; break;
     case 3: multiplier = 585; break;
     case 4: multiplier = 590; break;
     case 5: multiplier = 590; break;
@@ -206,18 +205,20 @@ void moveForward(int distance){
     case 9: multiplier = 590; break;
     case 10: multiplier = 600; break;
     case 11: multiplier = 600; break;
-    case 12: multiplier = 590; break;
+    case 12: multiplier = 600; break;
     case 13: multiplier = 600; break;
     case 14: multiplier = 600; break;
     case 15: multiplier = 600; break;
-    default: multiplier = 560; break;
+    case 16: multiplier = 600; break;
+    case 17: multiplier = 600; break;
+    default: multiplier = 600; break;
   
   }
   int target_Distance = multiplier * distance;
   
   while(1){
                   if(right_encoder_val > target_Distance){ // break
-                    md.setBrakes(MAX_SPEED, MAX_SPEED-20);
+                    md.setBrakes(MAX_SPEED, MAX_SPEED);
                     delay(100);
                     md.setBrakes(0, 0);
                     break;
@@ -234,7 +235,7 @@ MDP4                                      Rotate Left
 int rotateLeft(int angle){
   left_encoder_val = 0;
   right_encoder_val = 0;
-  int pwm1=300, pwm2=300, output=0;
+  int pwm1=200, pwm2=200, output=0;
   int angle_offset;
 
   if (angle <= 15){
@@ -246,8 +247,9 @@ int rotateLeft(int angle){
     angle_offset = angle * 8.4;
   else if ((angle > 30) && (angle <= 45))
     angle_offset = angle * 9.0;   
-  else if ((angle > 45) && (angle <= 90))   //8.9 When all fully charged 
-    angle_offset = angle * 8.9;
+  else if ((angle > 45) && (angle <= 90))   //8.9 When all fully charged (no pid speed 300)
+    angle_offset = angle * 9.33;            //9.37 When all fully charged (pid speed 200)
+                                            //9.33 When all fully charged, pid speed 200, no usb 5V
   else if ((angle > 90) && (angle <= 360))  
     angle_offset = angle * 8.9;
   else if ((angle > 360) && (angle <= 720))  
@@ -256,8 +258,6 @@ int rotateLeft(int angle){
     angle_offset = angle * 8.9;
 
   while(1){
-
-    md.setSpeeds(pwm1-output, -(pwm2+output));
 
     if((left_encoder_val >= angle_offset - 70)&&(angle > 8)){ 
       md.setBrakes(400, 400);
@@ -273,6 +273,9 @@ int rotateLeft(int angle){
       md.setBrakes(0, 0);
       break;
     }
+    output = pidControlLR(left_encoder_val,right_encoder_val);
+    md.setSpeeds(pwm1-output, -(pwm2+output));
+    
   }
 }
 //End of rotateLeft()
@@ -284,7 +287,7 @@ MDP5                                     Rotating Right
 int rotateRight(int angle){
   left_encoder_val = 0;
   right_encoder_val = 0;
-  int pwm1=300, pwm2=300, output=0;
+  int pwm1=200, pwm2=200, output=0;
   int angle_offset;
 
   if (angle <= 15){
@@ -296,8 +299,9 @@ int rotateRight(int angle){
     angle_offset = angle * 8.4;  
   else if ((angle > 30) && (angle <= 45))
     angle_offset = angle * 8.9;
-  else if ((angle > 45) && (angle <= 90)) //9.15 When all fully charged
-    angle_offset = angle * 9.15;
+  else if ((angle > 45) && (angle <= 90)) //9.15 When all fully charged (no pid speed 300)
+    angle_offset = angle * 9.33;          //9.37 When all fully charged (pid speed 200)
+                                            //9.33 When all fully charged, pid speed 200, no usb 5V
   else if ((angle > 90) && (angle <= 360))  
     angle_offset = angle * 8.9;
   else if ((angle > 360) && (angle <= 720))  
@@ -306,8 +310,6 @@ int rotateRight(int angle){
     angle_offset = angle * 8.9;
 
   while(1){
-        
-    md.setSpeeds(-(pwm1-output), pwm2+output);
 
     if((right_encoder_val >= angle_offset - 70)&&(angle > 8)){ 
       md.setBrakes(400, 400);
@@ -323,6 +325,8 @@ int rotateRight(int angle){
       md.setBrakes(0, 0);
       break;
     }
+    output = pidControlLR(left_encoder_val,right_encoder_val);
+    md.setSpeeds(-(pwm1-output),(pwm2+output));
   }
 }
 //End of rotateRight()
@@ -334,27 +338,27 @@ MDP6                                 Sensor Reading Functions
 void sendSensors(){
   int cmLF, cmCF, cmRF, cmL, cmR;
   cmLF = distanceInCM(sensorRead(20,LF),LF);
-  cmCF = distanceInCM(sensorRead(60,CF),CF);
+  cmCF = distanceInCM(sensorRead(20,CF),CF);
   cmRF = distanceInCM(sensorRead(20,RF),RF);
-  cmL = distanceInCM(sensorRead(20,L),L);
+  cmL = distanceInCM(sensorRead(60,L),L);
   cmR = distanceInCM(sensorRead(20,R),R);
   
   Serial.print(":");
   Serial.print(distanceInGrids(cmLF,SR));
   Serial.print(":");
   //Serial.println(cmLF);
-  Serial.print(distanceInGrids(cmCF,LR));
+  Serial.print(distanceInGrids(cmCF,SR));
   Serial.print(":");
   //Serial.println(cmCF);
   Serial.print(distanceInGrids(cmRF,SR));
   Serial.print(":");
   //Serial.println(cmRF);
-  Serial.print(distanceInGrids(cmL,SR));
+  Serial.print(distanceInGrids(cmL,LR));
   Serial.print(":");
   //Serial.println(cmL);
   Serial.print(distanceInGrids(cmR,SR));
   //Serial.println(cmR);
-  Serial.println("|");
+  Serial.print("|\n");
 }
 
 //MDP6.1
@@ -387,15 +391,17 @@ void angleAlign(){
     int RFreading = sensorRead(20,RF);
     int error = LFreading - RFreading;
     
-    if(error>2) rotateLeft(1);
-    else if (error<-2) rotateRight(1);
-    else {
+    if(error>3) rotateLeft(1);
+    else if (error<-3) rotateRight(1);
+      else {
       rotateLeft(1);
       break;
     }
+ 
   }
   delay(100);
-  distAlign();
+  int LFdistance = distanceInCM(sensorRead(20,LF),LF);
+  if(LFdistance > 15  || LFdistance < 15)distAlign();
 }
 
 //MDP7.2
@@ -416,107 +422,13 @@ void distAlign(){
    
    //Recursive call if angle is misaligned after distance alignment.
    int angleError = sensorRead(20,LF) - sensorRead(20,RF);
-   if(angleError>2 || angleError<-2) frontAlignment();
+   if(angleError>3 || angleError<-3) frontAlignment();
 
 }
 //End of Robot Alignment Functions
 
 /*---------------------------------------------------------------------------------------------------
-MDP8                             Avoiding Obstacle In A Straight Line
----------------------------------------------------------------------------------------------------*/
-void avoid(){
-  int CFdistance, RFdistance, LFdistance, Ldistance, Rdistance;
- 
-  while(1){
-    moveForward(1);
-    
-    int LFreading = sensorRead(20,LF);
-    int CFreading = sensorRead(60,CF);
-    int RFreading = sensorRead(20,RF);
-    int Lreading = sensorRead(20,L);
-    int Rreading = sensorRead(20,R);
-
-    Serial.print("LF:");
-    Serial.println(LFreading);
-    LFdistance = 6088 / (LFreading  + 7) - 1;
-    Serial.println(LFdistance);
-    Serial.println("CF:");
-    Serial.println(CFreading);
-    CFdistance = 15500.0 / (CFreading +29) -5;
-    Serial.println(CFdistance);
-    Serial.print("RF:");
-    Serial.println(RFreading);
-    RFdistance = 6088 / (RFreading  + 7) - 1;
-    Serial.println(RFdistance);
-    Serial.print("L:");
-    Serial.println(Lreading);
-    Ldistance = 6088 / (Lreading  + 7) - 1;
-    Serial.println(Ldistance);
-    Serial.print("R:");
-    Serial.println(Rreading);
-    Rdistance = 6088 / (Rreading  + 7) - 1;
-    Serial.println(Rdistance);
-    
-    if (RFreading >= 275 && RFreading <= 435){ //Obstacle at RF sensor
-      Serial.println("RF Detected");
-      delay(1000);
-      rotateRight(90);
-      delay(1000);
-      moveForward(3);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(4);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(3);
-      delay(1000);
-      rotateRight(90);
-    }
-    else if(CFdistance >=20 && CFdistance <= 23){ //Obstacle at CF sensor
-      Serial.println("CF Detected");
-      delay(1000);
-      rotateRight(90);
-      delay(1000);
-      moveForward(2);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(4);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(2);
-      delay(1000);
-      rotateRight(90);
-    }
-    else if( LFreading >= 275 && LFreading <= 435){ //Obstacle at LF sensor
-      Serial.println("LF Detected");
-      delay(1000);
-      rotateRight(90);
-      delay(1000);
-      moveForward(1);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(4);
-      delay(1000);
-      rotateLeft(90);
-      delay(1000);
-      moveForward(1);
-      delay(1000);
-      rotateRight(90);
-      
-    }
-    
-    delay(1000);
-  }
-}
-//End of avoid()
-
-/*---------------------------------------------------------------------------------------------------
-MDP9                                  Gradual Left Turn
+MDP8                                  Gradual Left Turn
 ---------------------------------------------------------------------------------------------------*/
 void turnLeft(){
   md.setSpeeds(250,50);
@@ -528,7 +440,7 @@ void turnLeft(){
 //End of turnLeft()
 
 /*---------------------------------------------------------------------------------------------------
-MDP10                                 Gradual Right Turn
+MDP9                                 Gradual Right Turn
 ---------------------------------------------------------------------------------------------------*/
 void turnRight(){
   md.setSpeeds(50,250);
@@ -540,7 +452,7 @@ void turnRight(){
 //End of turnRight()
 
 /*---------------------------------------------------------------------------------------------------
-MDP11                                    PID Control
+MDP10                                    PID Control
 ---------------------------------------------------------------------------------------------------*/
 int pidControlForward(int left_encoder_val, int right_encoder_val) {
   int error,prevError,pwmL=SPEED,pwmR=SPEED;
@@ -560,8 +472,27 @@ int pidControlForward(int left_encoder_val, int right_encoder_val) {
 }
 //End of pidControlForward()
 
+//MDP 10.1
+int pidControlLR(int left_encoder_val, int right_encoder_val) {
+  int error,prevError,pwmL=SPEED,pwmR=SPEED;
+  float integral,derivative,output;
+  float kp = 1;
+  float ki = 1;
+  float kd = 1;
+
+  error = right_encoder_val-left_encoder_val;
+  integral += error;
+  derivative = error - prevError;
+  output = kp*error + ki*integral + kd*derivative;
+  prevError = error;
+
+  pwmL = output;
+  return pwmL;
+}
+//End of pidControlLR()
+
 /*---------------------------------------------------------------------------------------------------
-MDP12                               Insertion Sort Algorithm
+MDP11                               Insertion Sort Algorithm
 ---------------------------------------------------------------------------------------------------*/
 //Standard insertion sort algorithm
 void insertionsort(int array[], int length){
@@ -584,7 +515,7 @@ void insertionsort(int array[], int length){
 /*---------------------------------------------------------------------------------------------------
                                  Sensor Reading Conversions
 ---------------------------------------------------------------------------------------------------*/
-//MDP13
+//MDP12
 //This function converts the ADC readings into centimeters
 int distanceInCM(int reading, int sensor){
     int cm;
@@ -594,13 +525,13 @@ int distanceInCM(int reading, int sensor){
         cm = 6088 / (reading  + 7) - 1;
         break;
       case CF: //Long range
-        cm = 15500.0 / (reading +29) -5;
+        cm = 6088 / (reading  + 7) - 1;
         break;
       case RF:
         cm = 6088 / (reading  + 7) - 1;
         break;      
       case L:
-        cm = 6088 / (reading  + 7) - 1;
+        cm = 15500.0 / (reading +29) -5;;
         break;      
       case R:
         cm = 6088 / (reading  + 7) - 1;
@@ -611,22 +542,21 @@ int distanceInCM(int reading, int sensor){
    return cm;  
 }
 
-//MDP14
+//MDP13
 //This function converts the cm readings into grids based on sensor type
 int distanceInGrids(int dis, int sensorType){
   int grids;
-  
   if(sensorType == SR){ //Short range effective up to 2 grids away
-      if (dis > 28) grids = 0;
+      if (dis > 28) grids =3;
       else if (dis>= 10 && dis <= 19) grids = 1;
       else if (dis >= 20 && dis <= 28) grids = 2;
       //else if (dis >= 32 && dis <= 38) grids = 3;
       else grids = -1;
   }
   else if(sensorType == LR){ //Long range effective up to 5 grids away
-      if (dis > 58) grids = 0;
-      else if (dis>= 12 && dis <= 23) grids = 1;
-      else if (dis > 24 && dis <= 27) grids = 2;
+      if (dis > 58) grids = 6;
+      else if (dis>= 12 && dis <= 22) grids = 1;
+      else if (dis > 22 && dis <= 27) grids = 2;
       else if (dis >= 30 && dis <= 37) grids = 3;
       else if (dis >= 39 && dis <= 48) grids = 4;
       else if (dis >= 49 && dis <= 58) grids = 5;
@@ -636,6 +566,12 @@ int distanceInGrids(int dis, int sensorType){
   return grids;
 }
 //End of Sensor Reading Conversion Functions
+
+//MDP 14
+void readyMsg(){
+  Serial.print("Y\n");
+}
+//End of readyMsg()
 
 //MDP15
 void stopIfFault()
@@ -651,3 +587,5 @@ void stopIfFault()
     while(1);
   }
 }
+
+

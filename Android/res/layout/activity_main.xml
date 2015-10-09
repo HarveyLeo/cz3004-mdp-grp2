@@ -3,17 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="16dp"
-   	android:paddingLeft="16dp"
-   	android:paddingRight="16dp"
-   	android:paddingTop="16dp"
+
    	android:orientation="vertical"
    	tools:context="com.example.mdpandroidapp.MainActivity">
     
 	<ImageView 
-	    android:layout_width="150dp"
-    	android:layout_height="150dp"
-    	android:layout_gravity="center_horizontal"
+	    android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:scaleType="fitXY"
+    	android:adjustViewBounds="true"
     	android:src="@drawable/maze_runner"
     	android:contentDescription="Maze Runner" />
 	
@@ -24,8 +22,9 @@
 	
 	<Button 
 	    android:layout_width="match_parent"
-    	android:layout_height="50dp"
+    	android:layout_height="70dp"
     	android:text="Manage BT Connection"
+		android:textSize="25dp"
     	android:onClick="onManageBluetoothConnectionClick"/>
 	
 	<View
@@ -35,8 +34,9 @@
 	
 	<Button 
 	    android:layout_width="match_parent"
-    	android:layout_height="50dp"
+    	android:layout_height="70dp"
     	android:text="Manage BT Communication"
+    	android:textSize="25dp"
     	android:onClick="onManageBluetoothCommunicationClick"/>
 	
 	<View
@@ -46,8 +46,9 @@
 	
 	<Button 
 	    android:layout_width="match_parent"
-    	android:layout_height="50dp"
+    	android:layout_height="70dp"
     	android:text="View Map UI"
+    	android:textSize="25dp"
     	android:onClick="onViewMapUIClick"/>
 	
 	<View
@@ -55,11 +56,26 @@
 	    android:layout_height="3dp"
 	    android:background="@android:color/darker_gray"/>
 	
-	<Button 
-	    android:layout_width="100dp"
-    	android:layout_height="50dp"
-    	android:layout_gravity="start"
-    	android:text="Exit"
-    	android:onClick="onExitClick"/>
+
+	
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+			android:background="@drawable/maze">
+
+		   	
+		   		<Button 
+				    android:layout_width="wrap_content"
+			    	android:layout_height="wrap_content"
+			    	
+			    	android:layout_alignParentBottom="true"
+			    	android:layout_centerHorizontal="true"
+			    	android:text="Exit"
+			    	android:textSize="40dp"
+			    	android:onClick="onExitClick"/>
+		   	
+		   	
+		   	
+		   	</RelativeLayout>
 
 </LinearLayout>

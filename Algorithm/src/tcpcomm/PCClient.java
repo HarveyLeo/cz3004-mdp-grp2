@@ -6,10 +6,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import datatypes.Message;
+
 public class PCClient {
 	
-	private static final String RPI_IP_ADDRESS = "192.168.2.2";
-	private static final int RPI_PORT = 3053;
+	public static final String RPI_IP_ADDRESS = "192.168.2.2";
+	public static final int RPI_PORT = 3053;
 	
 	private static PCClient _instance;
 	private Socket _clientSocket;
@@ -33,7 +35,7 @@ public class PCClient {
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
 		System.out.println("RPi successfully connected");
 		while (true) {
-			pcClient.sendMessage("A081|");
+			pcClient.sendMessage(Message.READ_SENSOR_VALUES);
 			String msgReceived = pcClient.readMessage();
 			System.out.println("Message received: "+ msgReceived);
 		}	
@@ -51,13 +53,19 @@ public class PCClient {
 		}
 	}
 
-	public void sendMessage(String msg) throws IOException{
+	public void sendMessage(String msg) throws IOException {
+		
 		_toRPi.print(msg);
 		_toRPi.flush();
+		
+		System.out.println("Message sent: " + msg);
 	}
 
-	public String readMessage() throws IOException{
+	public String readMessage() throws IOException {
+
 		String messageReceived = _fromRPi.nextLine();
+		System.out.println("Message received: " + messageReceived);
+		
 		return messageReceived;
 	}
          

@@ -230,11 +230,11 @@ public class MapUI extends Activity implements SensorEventListener{
 	}
 	
 	public void onExploreBtnClick(View view){
-		bluetoothService.write("P5StartExploration");
+		bluetoothService.write("explore\r\n");
 	}
 	
 	public void onShortestBtnClick(View view){
-		bluetoothService.write("P6StartShortest");
+		bluetoothService.write("fastest\r\n");
 	}
     
 	public void onClearMapBtnClick(View view){
@@ -279,9 +279,9 @@ public class MapUI extends Activity implements SensorEventListener{
     public void onSendCoordBtnClick(View view){
     	EditText xText = (EditText)findViewById(R.id.editTextX);
     	EditText yText = (EditText)findViewById(R.id.editTextY);
-    	String tempCoord = String.format("P3%s,%s",
+    	String tempCoord = String.format("%s,%s",
 			xText.getText().toString(),
-			yText.getText().toString());
+			yText.getText().toString() + "\r\n");
     	
     	//transmit tempCoord
     	bluetoothService.write(tempCoord);

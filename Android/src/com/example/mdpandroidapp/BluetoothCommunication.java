@@ -168,32 +168,38 @@ public class BluetoothCommunication extends Activity{
 	 */
 	
 	public void onSendClick(View view){
-		onSaveTextDBClick(null);
+		//onSaveTextDBClick(null);
 		EditText editText;
 		Button sendBtn = (Button) view;
 		switch(sendBtn.getId()){
 		case R.id.button_send01:
 			editText = (EditText)findViewById(R.id.edit_text01);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		case R.id.button_send02:
 			editText = (EditText)findViewById(R.id.edit_text02);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		case R.id.button_send03:
 			editText = (EditText)findViewById(R.id.edit_text03);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		case R.id.button_send04:
 			editText = (EditText)findViewById(R.id.edit_text04);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		case R.id.button_send05:
 			editText = (EditText)findViewById(R.id.edit_text05);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		case R.id.button_send06:
 			editText = (EditText)findViewById(R.id.edit_text06);
+			editText.setText(editText.getText().toString().trim()+"\r\n"); 
 			bluetoothService.write(editText.getText().toString());
 			break;
 		default:
@@ -206,25 +212,25 @@ public class BluetoothCommunication extends Activity{
 		
 		editText = (EditText)findViewById(R.id.edit_text01);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text01", editText.getText().toString()});
+			new String[] {"edit_text01", editText.getText().toString().trim()+"\r\n"});
 		
 		editText = (EditText)findViewById(R.id.edit_text02);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text02", editText.getText().toString()});
+			new String[] {"edit_text02", editText.getText().toString().trim()+"\r\n"});
 		editText = (EditText)findViewById(R.id.edit_text03);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text03", editText.getText().toString()});
+			new String[] {"edit_text03", editText.getText().toString().trim()+"\r\n"});
 		
 		editText = (EditText)findViewById(R.id.edit_text04);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text04", editText.getText().toString()});
+			new String[] {"edit_text04", editText.getText().toString().trim()+"\r\n"});
 		editText = (EditText)findViewById(R.id.edit_text05);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text05", editText.getText().toString()});
+			new String[] {"edit_text05", editText.getText().toString().trim()+"\r\n"});
 		
 		editText = (EditText)findViewById(R.id.edit_text06);
 		new UpdateStringTask().execute(
-			new String[] {"edit_text06", editText.getText().toString()});
+			new String[] {"edit_text06", editText.getText().toString().trim()+"\r\n"});
 	}
 	
 	public void onCommBackClick(View view){
@@ -252,7 +258,11 @@ public class BluetoothCommunication extends Activity{
 			}
 		}
 		@Override
-		protected void onPostExecute(Boolean success){ }
+		protected void onPostExecute(Boolean success){ 
+			if (success){
+				logMsg("Text Saved");
+			}
+		}
 	}
 	
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver(){
