@@ -12,9 +12,11 @@ import tcpcomm.PCClient;
 public class Robot {
 	private static Robot _instance;
 	private int _speed;
+	private int _stepsSinceLastCalibration;
+
 	
 	private Robot() {
-
+		_stepsSinceLastCalibration = 0;
 	}
 	
 	public static Robot getInstance() {
@@ -28,6 +30,13 @@ public class Robot {
 		_speed = speed;
 	}
 	
+	public int getStepsSinceLastCalibration(){
+		return _stepsSinceLastCalibration;
+	}
+	
+	public void resetStepsSinceLastCalibration(){
+		_stepsSinceLastCalibration = 0;
+	}
 	
 	public int senseFront(int[] sensorPosition, Orientation robotOrientation) {
 		
@@ -36,8 +45,8 @@ public class Robot {
 		int numOfClearGrids;
 		Orientation sensorOri = robotOrientation;
 		numOfClearGrids = arena.getNumOfClearGrids(sensorPosition, sensorOri);
-		if (numOfClearGrids > Sensor.LONG_RANGE) {
-			numOfClearGrids = Sensor.LONG_RANGE;
+		if (numOfClearGrids > Sensor.SHORT_RANGE) {
+			numOfClearGrids = Sensor.SHORT_RANGE;
 		}
 		
 		return numOfClearGrids;
@@ -76,8 +85,8 @@ public class Robot {
 				sensorOri = null;
 		}
 		numOfClearGrids = arena.getNumOfClearGrids(sensorPosition, sensorOri);
-		if (numOfClearGrids > Sensor.SHORT_RANGE) {
-			numOfClearGrids = Sensor.SHORT_RANGE;
+		if (numOfClearGrids > Sensor.LONG_RANGE) {
+			numOfClearGrids = Sensor.LONG_RANGE;
 		}
 		return numOfClearGrids;
 	}
@@ -121,7 +130,8 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_RIGHT);
+				pcClient.sendMessage(Message.TURN_RIGHT + Message.SEPARATOR);
+	
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -136,6 +146,7 @@ public class Robot {
 	public void moveForward() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
@@ -145,7 +156,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD);
+				pcClient.sendMessage(Message.MOVE_FORWARD + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -153,9 +164,9 @@ public class Robot {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			_stepsSinceLastCalibration ++;
 		}
 		controller.moveRobotForward();
-		
 	}
 
 	public void turnLeft() {
@@ -170,7 +181,7 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.TURN_LEFT);
+				pcClient.sendMessage(Message.TURN_LEFT + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
@@ -201,7 +212,12 @@ public class Robot {
 			}
 		} else {
 			try {
-				pcClient.sendMessage(Message.MOVE_FORWARD + count);
+				if (count >= 10) {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count % 10 + count / 10 +  "|");
+				} else {
+					pcClient.sendMessage(Message.MOVE_FORWARD + count + Message.SEPARATOR);
+				}
+
 				String feedback = pcClient.readMessage();
 				for (int i = 0; i < count; i++) {
 					while (!feedback.equals(Message.DONE)) {
@@ -209,9 +225,58 @@ public class Robot {
 					}
 					controller.moveRobotForward();
 				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void calibrateRobotPosition() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		try {
+			pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
+			String feedback = pcClient.readMessage();
+			while (!feedback.equals(Message.DONE)) {
+				feedback = pcClient.readMessage();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public Orientation calibrateAtStartZone(Orientation ori) {	
+		switch (ori) {
+			case NORTH:
+				turnLeft();
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				turnRight();
+				turnRight();
+				break;
+			case SOUTH:
+				calibrateRobotPosition();
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();			
+				break;
+			case EAST:
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();
+				calibrateRobotPosition();
+				turnRight();
+				break;
+			case WEST:
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				turnRight();
+				turnRight();
+		}
+		return Orientation.NORTH;
 	}
 }

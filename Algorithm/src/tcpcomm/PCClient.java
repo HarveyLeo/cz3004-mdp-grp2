@@ -34,11 +34,11 @@ public class PCClient {
 		PCClient pcClient = PCClient.getInstance();
 		pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
 		System.out.println("RPi successfully connected");
-//		while (true) {
+		while (true) {
 			pcClient.sendMessage(Message.READ_SENSOR_VALUES);
 			String msgReceived = pcClient.readMessage();
 			System.out.println("Message received: "+ msgReceived);
-//		}	
+		}	
 	}
 	
 	public void setUpConnection (String IPAddress, int portNumber) throws UnknownHostException, IOException{
@@ -53,13 +53,19 @@ public class PCClient {
 		}
 	}
 
-	public void sendMessage(String msg) throws IOException{
+	public void sendMessage(String msg) throws IOException {
+		
 		_toRPi.print(msg);
 		_toRPi.flush();
+		
+		System.out.println("Message sent: " + msg);
 	}
 
-	public String readMessage() throws IOException{
+	public String readMessage() throws IOException {
+
 		String messageReceived = _fromRPi.nextLine();
+		System.out.println("Message received: " + messageReceived);
+		
 		return messageReceived;
 	}
          
