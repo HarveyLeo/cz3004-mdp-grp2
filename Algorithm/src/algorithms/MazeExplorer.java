@@ -1149,13 +1149,26 @@ public class MazeExplorer {
 		Controller controller = Controller.getInstance();
 		controller.updateMazeColor();
 		
+		Movement move;
 		if (RobotSystem.isRealRun() && hasCalibration) {
 			if (canCalibrateAhead(msgSensorValues)) {
 				_robot.calibrateRobotPosition();
+				move = canCalibrateAside(robotPosition, ori);
+				if (move != null) {
+					if (move == Movement.TURN_LEFT) {
+						_robot.turnLeft();
+						_robot.calibrateRobotPosition();
+						_robot.turnRight();
+					} else if (move == Movement.TURN_RIGHT) {
+						_robot.turnRight();
+						_robot.calibrateRobotPosition();
+						_robot.turnLeft();
+					}
+				}
 				_robot.resetStepsSinceLastCalibration();
 			} else {
 				boolean needCalibration = _robot.getStepsSinceLastCalibration() > _calibrationThreshold;
-				Movement move = canCalibrateAside(robotPosition, ori);
+				move = canCalibrateAside(robotPosition, ori);
 				
 				if (needCalibration && move != null) {
 					if (move == Movement.TURN_LEFT) {
