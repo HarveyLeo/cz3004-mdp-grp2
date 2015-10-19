@@ -81,7 +81,7 @@ public class AStarPathFinder {
 							neighbor._pathCost = pathCostOfNeighbor;
 							neighbor._heuristic = heuristicOfNeighbor;
 							neighbor._parent = current;
-							neighbor._ori = getOrientationIfMoveToNeighbor(current._ori, current._x, current._y, neighborX, neighborY);
+							neighbor._ori = getOrientationIfMoveToNeighbor(current._x, current._y, neighborX, neighborY);
 							addToOpen(neighbor);
 							_virtualMap.setVisited(neighborX, neighborY);
 						} else if (isInOpenList(neighbor)){
@@ -90,7 +90,7 @@ public class AStarPathFinder {
 								neighbor._pathCost = pathCostOfNeighbor;
 								neighbor._heuristic = heuristicOfNeighbor;
 								neighbor._parent = current;
-								neighbor._ori = getOrientationIfMoveToNeighbor(current._ori, current._x, current._y, neighborX, neighborY);
+								neighbor._ori = getOrientationIfMoveToNeighbor(current._x, current._y, neighborX, neighborY);
 								addToOpen(neighbor);	
 							}
 						}
@@ -148,7 +148,7 @@ public class AStarPathFinder {
 			nextPosition[0] = steps.get(i+1).getX();
 			nextPosition[1] = steps.get(i+1).getY();
 
-			nextOrientation = getOrientationIfMoveToNeighbor(currentOrientation, 
+			nextOrientation = getOrientationIfMoveToNeighbor(
 					tempPosition[0], tempPosition[1],
 					nextPosition[0], nextPosition[1]);
 			if (nextOrientation == currentOrientation) {
@@ -293,7 +293,17 @@ public class AStarPathFinder {
 		}
 	}
 
-	private Orientation getOrientationIfMoveToNeighbor(Orientation curOri, int curX, int curY, int nextX, int nextY) {
+	public Orientation getBestInitialOrientation(Path fastestPath) {
+		int[] nextPosition = new int[2];
+		Orientation bestOrientation;
+		ArrayList<Path.Step> steps = fastestPath.getSteps();
+		nextPosition[0] = steps.get(1).getX();
+		nextPosition[1] = steps.get(1).getY();
+		bestOrientation = getOrientationIfMoveToNeighbor(MazeExplorer.START[0], MazeExplorer.START[1], nextPosition[0], nextPosition[1]);
+		return bestOrientation;
+	}
+	
+	private Orientation getOrientationIfMoveToNeighbor(int curX, int curY, int nextX, int nextY) {
 		Orientation nextOri = null;
 	
 		if (nextY == curY + 1) {

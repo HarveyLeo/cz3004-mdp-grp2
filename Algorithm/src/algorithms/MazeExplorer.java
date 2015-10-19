@@ -24,7 +24,7 @@ public class MazeExplorer {
 	private static final int RIGHT_UNSURE_ACCESS = -2;
 	private static final int RIGHT_CAN_ACCESS = -3;
 	public static final int[] GOAL = {13, 18};
-//	public static final int[] GOAL = {18, 13};
+//	public static final int[] GOAL = {4, 3};
 	public static final int[] START = {1, 1};
 	private static final int INVALID_SENSOR_VALUE = -1;
 	
@@ -417,7 +417,7 @@ public class MazeExplorer {
 		return null;
 	}
 
-	private void adjustOrientationTo(Orientation ori) {
+	public void adjustOrientationTo(Orientation ori) {
 		switch (ori) {
 			case NORTH:
 				if (_robotOrientation == Orientation.SOUTH) {

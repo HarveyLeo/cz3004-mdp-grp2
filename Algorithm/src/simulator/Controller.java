@@ -46,6 +46,7 @@ public class Controller {
 	private float _actualCoverage;
 	private boolean _hasReachedStart, _hasReachedTimeThreshold;
 	private PCClient _pcClient;
+	private Path _fastestPath;
 
 	private Controller() {
 		_ui = new UI();
@@ -367,6 +368,17 @@ public class Controller {
 				_hasReachedStart = false;
 				
 				explorer.explore(_robotPosition, _robotOrientation);
+				
+				//Compute the fastest path right after exploration for real run
+				if (RobotSystem.isRealRun()) {
+					AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+					Orientation bestOri = pathFinder.getBestInitialOrientation(_fastestPath);
+					explorer.adjustOrientationTo(bestOri);
+				}
+				
+				
 				return null;
 			}
 			@Override
@@ -374,14 +386,15 @@ public class Controller {
 				
 				_hasReachedStart = true;
 				
+				//Generate P1 & P2 map descriptors
 				String P1Descriptor, P2Descriptor;
 				P1Descriptor = explorer.getP1Descriptor();
 				P2Descriptor = explorer.getP2Descriptor();	
 				System.out.println("P1 descriptor: " + P1Descriptor);
 				System.out.println("P2 descriptor: " + P2Descriptor);
 			
-				_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
-				
+				//Set simulator console status
+				_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));			
 				if (!_ui.getTimerMessage().equals("exploration: time out")) {
 					_ui.setTimerMessage("explored within time limit");
 				}
@@ -397,6 +410,7 @@ public class Controller {
 					_ui.setStatus("exploration not reaches goal zone");
 				}
 				
+				//Waiting for fastest path command for real run
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
 				} else {
@@ -592,20 +606,19 @@ public class Controller {
 			_ui.refreshFfpInput();
 		} 
 		
-
-		
-		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-		
 		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
-			Path _fastestPath;
 			@Override
 			protected Void doInBackground() throws Exception {
-	
+				
 				MazeExplorer explorer = MazeExplorer.getInstance();
-				_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
-						MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
-
-				pathFinder.moveRobotAlongFastestPath(_fastestPath, Orientation.NORTH);
+				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+	
+				if (!RobotSystem.isRealRun()) {
+					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+				}
+				
+				pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
 
 				ArrayList<Path.Step> steps = _fastestPath.getSteps();
 				JButton[][] mazeGrids = _ui.getMazeGrids();
