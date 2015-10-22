@@ -20,6 +20,7 @@ import javax.swing.Timer;
 import algorithms.AStarPathFinder;
 import algorithms.MazeExplorer;
 import algorithms.Path;
+import algorithms.Path.Step;
 import datatypes.Message;
 import datatypes.Orientation;
 import main.RobotSystem;
@@ -52,22 +53,6 @@ public class Controller {
 		_ui = new UI();
 	}
 	
-	public UI getUI() {
-		return _ui;
-	}
-	
-	public PCClient getPCClient() {
-		return _pcClient;
-	}
-	
-	public boolean hasReachedTimeThreshold() {
-		return _hasReachedTimeThreshold;
-	}
-	
-	public void setRobotOrientation(Orientation ori) {
-		_robotOrientation = ori;
-	}
-
 	public static Controller getInstance() {
 		if (_instance == null) {
 			_instance = new Controller();
@@ -79,7 +64,7 @@ public class Controller {
 		_ui.setVisible(true);
 		
 		if (RobotSystem.isRealRun()) {
-
+	
 			_pcClient = PCClient.getInstance();
 			
 			SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
@@ -115,7 +100,7 @@ public class Controller {
 				}
 					return null;
 				}
-
+	
 				private int[] getRobotPositionInput (String msgRobotPosition) {
 					int[] posInput = new int[2];
 					int index = msgRobotPosition.indexOf(",");
@@ -128,12 +113,24 @@ public class Controller {
 			};
 			
 			connectWithRPi.execute();
-
+	
 		} else {
 			_ui.refreshExploreInput();
 		}
 	}
 
+	public UI getUI() {
+		return _ui;
+	}
+	
+	public PCClient getPCClient() {
+		return _pcClient;
+	}
+	
+	public boolean hasReachedTimeThreshold() {
+		return _hasReachedTimeThreshold;
+	}
+	
 	public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
 		if (mapGrids[x][y].getBackground() == Color.GREEN) {
 			mapGrids[x][y].setBackground(Color.RED);
@@ -242,6 +239,10 @@ public class Controller {
 		_ui.setStatus("robot speed set");
 	}
 
+	public void setRobotOrientation(Orientation ori) {
+		_robotOrientation = ori;
+	}
+
 	public void setCoverage(int coverage) {
 		if (coverage > 100) {
 			_ui.setStatus("warning: target coverage out of range");
@@ -309,31 +310,6 @@ public class Controller {
 		}
 	}
 	
-	class FastestPathTimeClass implements ActionListener {
-		int _timeLimit;
-		int _counter; 
-		
-		public FastestPathTimeClass(int timeLimit) {
-			_timeLimit = timeLimit;
-			_counter = 0;
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			_timeLimit--;
-			_counter++;
-			_ui.setCoverageUpdate("Time passed (sec): " + _counter);
-			_ui.setTimer(_timeLimit);
-			if (_timeLimit == 0) {
-				_ffpTimer.stop();
-				_ui.setCoverageUpdate("");
-				_ui.setTimerMessage("fastest path: time out");
-				Toolkit.getDefaultToolkit().beep();
-			}			
-		}
-	}
-	
 	public void exploreMaze() {
 		
 		if (!RobotSystem.isRealRun()) {
@@ -377,7 +353,6 @@ public class Controller {
 					Orientation bestOri = pathFinder.getBestInitialOrientation(_fastestPath);
 					explorer.adjustOrientationTo(bestOri);
 				}
-				
 				
 				return null;
 			}
@@ -460,36 +435,94 @@ public class Controller {
 	}
 
 
-	public void turnRobotRight() {
-		JButton[][] mazeGrids = _ui.getMazeGrids();
-
-		switch (_robotOrientation) {
-			case NORTH:
-				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
-				_robotOrientation = Orientation.EAST;	
-				break;
-			case SOUTH:
-				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.PINK);
-				_robotOrientation = Orientation.WEST;
-				break;
-			case EAST:
-				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.CYAN);
-				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
-				_robotOrientation = Orientation.SOUTH;
-				break;
-			case WEST:
-				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.CYAN);
-				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
-				_robotOrientation = Orientation.NORTH;
+	class FastestPathTimeClass implements ActionListener {
+		int _timeLimit;
+		int _counter; 
+		
+		public FastestPathTimeClass(int timeLimit) {
+			_timeLimit = timeLimit;
+			_counter = 0;
 		}
-		updateMazeColor();
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			_timeLimit--;
+			_counter++;
+			_ui.setCoverageUpdate("Time passed (sec): " + _counter);
+			_ui.setTimer(_timeLimit);
+			if (_timeLimit == 0) {
+				_ffpTimer.stop();
+				_ui.setCoverageUpdate("");
+				_ui.setTimerMessage("fastest path: time out");
+				Toolkit.getDefaultToolkit().beep();
+			}			
+		}
+	}
+
+	public void findFastestPath() {
+		
+		if (!RobotSystem.isRealRun()) {
+			if (!_ui.isIntFFPInput()) {
+				_ui.setStatus("invalid input for finding fastest path");
+				_ui.setFfpBtnEnabled(true);
+				return;
+			}
+			
+			_ui.refreshFfpInput();
+		} 
+		
+		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
+			@Override
+			protected Void doInBackground() throws Exception {
+				
+				MazeExplorer explorer = MazeExplorer.getInstance();
+				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+	
+				if (!RobotSystem.isRealRun()) {
+					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+				}
+				
+				pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
+	
+				ArrayList<Path.Step> steps = _fastestPath.getSteps();
+				JButton[][] mazeGrids = _ui.getMazeGrids();
+				for (Path.Step step : steps) {
+					int x = step.getX();
+					int y = step.getY();
+					mazeGrids[19-y][x].setBackground(Color.YELLOW);
+				}
+				return null;
+			}
+			@Override
+			public void done() {
+				_ui.setStatus("fastest path found");
+	
+				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
+					_ui.setTimerMessage("fastest path: within time limit");
+				}
+				if (_ffpTimer.isRunning()) {
+					_ffpTimer.stop();
+				}
+	
+			}
+		};
+		
+	
+		if (RobotSystem.isRealRun()) {
+			_ffpTimeLimit = FFP_TIME_LIMIT;
+		}
+		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
+		_ffpTimer = new Timer(1000, timeActionListener);
+		_ffpTimer.start();
+		_ui.setStatus("robot finding fastest path");
+		findFastestPath.execute();
 	}
 
 	public void moveRobotForward() {
 		JButton[][] mazeGrids = _ui.getMazeGrids();
-
+	
 		switch (_robotOrientation) {
 			case NORTH:
 				for (int i = 17 - _robotPosition[1]; i <= 19 - _robotPosition[1]; i++) {
@@ -538,6 +571,33 @@ public class Controller {
 					}
 				}
 				_robotPosition[0] = _robotPosition[0] - 1;
+		}
+		updateMazeColor();
+	}
+
+	public void turnRobotRight() {
+		JButton[][] mazeGrids = _ui.getMazeGrids();
+
+		switch (_robotOrientation) {
+			case NORTH:
+				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
+				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
+				_robotOrientation = Orientation.EAST;	
+				break;
+			case SOUTH:
+				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
+				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.PINK);
+				_robotOrientation = Orientation.WEST;
+				break;
+			case EAST:
+				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.CYAN);
+				mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+				_robotOrientation = Orientation.SOUTH;
+				break;
+			case WEST:
+				mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.CYAN);
+				mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+				_robotOrientation = Orientation.NORTH;
 		}
 		updateMazeColor();
 	}
@@ -592,66 +652,6 @@ public class Controller {
 				}
 			}
 		}
-	}
-
-	public void findFastestPath() {
-		
-		if (!RobotSystem.isRealRun()) {
-			if (!_ui.isIntFFPInput()) {
-				_ui.setStatus("invalid input for finding fastest path");
-				_ui.setFfpBtnEnabled(true);
-				return;
-			}
-			
-			_ui.refreshFfpInput();
-		} 
-		
-		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
-			@Override
-			protected Void doInBackground() throws Exception {
-				
-				MazeExplorer explorer = MazeExplorer.getInstance();
-				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-	
-				if (!RobotSystem.isRealRun()) {
-					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
-							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
-				}
-				
-				pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
-
-				ArrayList<Path.Step> steps = _fastestPath.getSteps();
-				JButton[][] mazeGrids = _ui.getMazeGrids();
-				for (Path.Step step : steps) {
-					int x = step.getX();
-					int y = step.getY();
-					mazeGrids[19-y][x].setBackground(Color.YELLOW);
-				}
-				return null;
-			}
-			@Override
-			public void done() {
-				_ui.setStatus("fastest path found");
-
-				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
-					_ui.setTimerMessage("fastest path: within time limit");
-				}
-				if (_ffpTimer.isRunning()) {
-					_ffpTimer.stop();
-				}
-
-			}
-		};
-		
-
-		if (RobotSystem.isRealRun()) {
-			_ffpTimeLimit = FFP_TIME_LIMIT;
-		}
-		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
-		_ffpTimer = new Timer(1000, timeActionListener);
-		_ffpTimer.start();
-		_ui.setStatus("robot finding fastest path");
-		findFastestPath.execute();
 	}
 
 }

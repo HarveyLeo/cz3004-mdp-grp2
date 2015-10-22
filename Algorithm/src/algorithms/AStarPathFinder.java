@@ -110,20 +110,6 @@ public class AStarPathFinder {
 		return path;
 	}
 
-	private void init(int[][] mazeRef) {
-		_virtualMap = VirtualMap.getInstance();
-		_virtualMap.updateVirtualMap(mazeRef);
-		_closed = new ArrayList<Node>();
-		_open = new SortedList<Node>();
-		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		for (int x = 0; x < Arena.MAP_LENGTH; x++) {
-			for (int y = 0; y < Arena.MAP_WIDTH; y++) {
-				_nodes[x][y] = new Node(x, y);
-			}
-		}
-		_robot = Robot.getInstance();
-	}
-
 	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation) {
 		return moveRobotAlongFastestPath(fastestPath, currentOrientation, false, false);
 	}
@@ -186,6 +172,30 @@ public class AStarPathFinder {
 	}
 
 
+
+	public Orientation getBestInitialOrientation(Path fastestPath) {
+		int[] nextPosition = new int[2];
+		Orientation bestOrientation;
+		ArrayList<Path.Step> steps = fastestPath.getSteps();
+		nextPosition[0] = steps.get(1).getX();
+		nextPosition[1] = steps.get(1).getY();
+		bestOrientation = getOrientationIfMoveToNeighbor(MazeExplorer.START[0], MazeExplorer.START[1], nextPosition[0], nextPosition[1]);
+		return bestOrientation;
+	}
+	
+	private void init(int[][] mazeRef) {
+		_virtualMap = VirtualMap.getInstance();
+		_virtualMap.updateVirtualMap(mazeRef);
+		_closed = new ArrayList<Node>();
+		_open = new SortedList<Node>();
+		_nodes = new Node[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+		for (int x = 0; x < Arena.MAP_LENGTH; x++) {
+			for (int y = 0; y < Arena.MAP_WIDTH; y++) {
+				_nodes[x][y] = new Node(x, y);
+			}
+		}
+		_robot = Robot.getInstance();
+	}
 
 	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri, boolean isExploring, boolean hasCalibration) {
 		MazeExplorer explorer = MazeExplorer.getInstance();
@@ -293,16 +303,6 @@ public class AStarPathFinder {
 		}
 	}
 
-	public Orientation getBestInitialOrientation(Path fastestPath) {
-		int[] nextPosition = new int[2];
-		Orientation bestOrientation;
-		ArrayList<Path.Step> steps = fastestPath.getSteps();
-		nextPosition[0] = steps.get(1).getX();
-		nextPosition[1] = steps.get(1).getY();
-		bestOrientation = getOrientationIfMoveToNeighbor(MazeExplorer.START[0], MazeExplorer.START[1], nextPosition[0], nextPosition[1]);
-		return bestOrientation;
-	}
-	
 	private Orientation getOrientationIfMoveToNeighbor(int curX, int curY, int nextX, int nextY) {
 		Orientation nextOri = null;
 	
