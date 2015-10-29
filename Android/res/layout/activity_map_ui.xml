@@ -9,226 +9,273 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="0dp" 
-        android:layout_weight="7"/>
+        android:layout_weight="6"/>
     
-
-    	
-	<LinearLayout
-	    android:layout_width="match_parent"
-    	android:layout_height="0dp"
-    	android:layout_weight="3"
-    	android:orientation="horizontal">
-    	
-		<LinearLayout
-		    android:layout_width="0dp"
-	    	android:layout_height="match_parent"
-	    	android:orientation="vertical"
-	    	android:layout_weight="3">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:orientation="vertical">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+        	android:layout_weight="2"
+        	android:orientation="horizontal">
+            
+            <ImageButton
+				android:id="@+id/buttonUp"
+				android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="2"
+				android:scaleType="centerInside"
+				android:background="@null"
+				android:src="@drawable/up" />
+				<!-- android:onClick="onForwardBtnClick"-->
+				
+            
+            <ImageButton
+	        	android:id="@+id/buttonStart"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:scaleType="centerInside"
+				android:background="@null"
+		        android:src="@drawable/start"
+		        android:onClick="onExploreBtnClick" />
+   		
+	   		<ImageButton
+		        android:id="@+id/buttonFast"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:scaleType="centerInside"
+				android:onClick="onShortestBtnClick"
+				android:background="@null"
+		        android:src="@drawable/fast" />
+   		
+	   		<Switch
+		   	    android:id="@+id/tiltSwitch"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+		   	    android:textOn="Tilt On"
+		   	    android:textOff="Tilt Off"/>
+		   	    <!--android:onClick="onTiltSwitchClick"-->
+		   	    
+            
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+        	android:layout_weight="1"
+        	android:orientation="horizontal">
+            
+            <ImageButton
+		        android:id="@+id/buttonLeft"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:scaleType="centerInside"
+				android:background="@null"
+		        android:src="@drawable/left"/>
+		        <!-- android:onClick="onLeftBtnClick"-->    
 	
-			<RelativeLayout 
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent">
-			    
-		        <ImageButton
-			        android:id="@+id/buttonUp"
-			        android:layout_width="50dp"
-			        android:layout_height="70dp"
-			        android:layout_alignParentTop="true"
-	   		        android:layout_centerHorizontal="true"
-					android:background="@null"
-			        android:src="@drawable/up" 
-			        android:onClick="onForwardBtnClick"/>
+		   	<ImageButton
+		   	    android:id="@+id/buttonRight"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:scaleType="centerInside"
+				android:background="@null"
+		   	    android:src="@drawable/right" />
+		   	    <!-- android:onClick="onRightBtnClick"-->
+		   	    
+		   	
+		   	<Switch
+		   	    android:id="@+id/updateSwitch"
+		   	    android:layout_width="0dp"
+		   	    android:layout_height="match_parent"
+		   	    android:layout_weight="1"
+		   	    
+		   	    android:textOn="Auto"
+		   	    android:textOff="Manual"
+		   	    android:onClick="onUpdateSwitchClick"/>
+	   	
+		   	<ImageButton
+		        android:id="@+id/buttonRefresh"
+		        android:layout_width="0dp"
+		        android:layout_height="match_parent"
+		        android:layout_weight="1"
+		        android:scaleType="centerInside"
+				android:background="@null"
+				android:onClick="onManualUpdateBtnClick"
+		        android:src="@drawable/green" />
+		   	
+			<Button
+			    android:layout_width="0dp"
+		        android:layout_height="match_parent"
+		        android:layout_weight="1"
+				android:text="BT On"
+				android:textAppearance="?android:attr/textAppearanceSmall" 
+				android:onClick="enableBTBtnClick"/>
+            
+            
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+        	android:layout_weight="2"
+        	android:orientation="horizontal">
+            
+            <LinearLayout
+	            android:layout_width="0dp"
+		   	    android:layout_height="match_parent"
+		   	    android:orientation="vertical"
+		   	    android:layout_weight="1">
 			
-			    <ImageButton
-			        android:id="@+id/buttonLeft"
-			        android:layout_width="70dp"
-			        android:layout_height="50dp"
-			        android:layout_below="@+id/buttonUp"
-	    		    android:layout_toLeftOf="@+id/buttonUp"
-					android:background="@null"
-			        android:src="@drawable/left" 
-			        android:onClick="onLeftBtnClick"/>
-			
-			   	<ImageButton
-			   	    android:id="@+id/buttonRight"
-			   	    android:layout_width="70dp"
-			   	    android:layout_height="50dp"
-	 	    		android:layout_below="@+id/buttonUp"
-	 	    		android:layout_toRightOf="@+id/buttonUp"
-					android:background="@null"
-			   	    android:src="@drawable/right" 
-			   	    android:onClick="onRightBtnClick" />
-	
-	
-	
-			   	<TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginStart="3dp">
+                    
+                    <TextView
 			   	    android:id="@+id/textViewX"
 			   	    android:layout_width="wrap_content"
 			   	    android:layout_height="wrap_content"
-			   	    android:layout_alignLeft="@+id/buttonLeft"
-			   	    android:layout_below="@+id/buttonLeft"
-			   	    android:layout_marginLeft="30dp"
-			   	    android:layout_marginTop="10dp"
-			   	    android:text="X:"
-			   	    android:textAppearance="?android:attr/textAppearanceMedium" />
+			   	    android:text="X:"/>
 	
-			   	<EditText
-			   	    android:id="@+id/editTextX"
-			   	    android:layout_width="50dp"
-			   	    android:layout_height="wrap_content"
-			   	    android:layout_alignBaseline="@+id/textViewX"
-			   	    android:layout_alignBottom="@+id/textViewX"
-			   	    android:layout_toRightOf="@+id/textViewX"
-			   	    android:inputType="number"
-			   	    android:text="2"
-			   	    android:ems="10" />
-			   	
-	
-			   	<TextView
-			   	    android:id="@+id/textViewY"
-			   	    android:layout_width="wrap_content"
-			   	    android:layout_height="wrap_content"
-			   	    android:layout_alignLeft="@+id/buttonLeft"
-	    		   	android:layout_marginLeft="30dp"
-	    		   	android:layout_marginTop="20dp"
-			   	    android:layout_below="@+id/textViewX"
-			   	    android:text="Y:"
-			   	    android:textAppearance="?android:attr/textAppearanceMedium" />
-	
-			   	<EditText
-			   	    android:id="@+id/editTextY"
-			   	    android:layout_width="50dp"
-			   	    android:layout_height="wrap_content"
-			   	    android:layout_alignBaseline="@+id/textViewY"
-			   	    android:layout_alignBottom="@+id/textViewY"
-			   	    android:layout_toRightOf="@+id/textViewY"
-			   	    android:inputType="number"
-			   	    android:text="2"
-			   	    android:ems="10" />
-			   	
-	   		        <ImageButton
+				   	<EditText
+				   	    android:id="@+id/editTextX"
+				   	    android:layout_width="wrap_content"
+				   	    android:layout_height="wrap_content"
+				   	    android:inputType="number"
+				   	    android:text="2"/>
+                    
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginStart="3dp">
+                    
+                    <TextView
+				   	    android:id="@+id/textViewY"
+				   	    android:layout_width="wrap_content"
+				   	    android:layout_height="wrap_content"
+				   	    android:text="Y:"/>
+
+				   	<EditText
+				   	    android:id="@+id/editTextY"
+				   	    android:layout_width="wrap_content"
+				   	    android:layout_height="wrap_content"
+				   	    android:inputType="number"
+				   	    android:text="2"/>
+                    
+                </LinearLayout>
+                
+   	    	</LinearLayout>
+   	    	
+            <LinearLayout
+	            android:layout_width="0dp"
+		   	    android:layout_height="match_parent"
+		   	    android:orientation="vertical"
+		   	    android:layout_weight="1">
+                
+                <ImageButton
 			        android:id="@+id/buttonPos"
-			        android:layout_width="70dp"
-			        android:layout_height="70dp"
-			   	    android:layout_alignBottom="@+id/textViewY"
-			   	    android:layout_toRightOf="@+id/editTextY"
-	 
+			        android:layout_width="match_parent"
+			        android:layout_height="match_parent"
+			        android:scaleType="centerInside"
 					android:background="@null"
 			        android:src="@drawable/blue"
 			        android:onClick="onSendCoordBtnClick" />
-	
-			    
-			</RelativeLayout>
-
-		    
-		</LinearLayout>
-	    
-		<LinearLayout
-			android:layout_width="0dp"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			android:layout_weight="6">
-		
-      		<RelativeLayout 
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent">
 			
-     		    <ImageButton
-		        	android:id="@+id/buttonStart"
-			   	    android:layout_width="85dp"
+   	    	</LinearLayout>
+   	    	
+            <ScrollView
+                android:layout_width="0dp"
+			   	android:layout_height="match_parent"
+			   	android:layout_weight="2">
+                
+	            <LinearLayout
+		            android:layout_width="match_parent"
 			   	    android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-	       			android:layout_alignParentLeft="true"
-					android:layout_marginTop="5dp"
-					android:background="@null"
-			        android:src="@drawable/start"
-			        android:onClick="onExploreBtnClick" />
-     		    
- 		       <ImageButton
-			        android:id="@+id/buttonFast"
-			   	    android:layout_width="wrap_content"
-			   	    android:layout_height="wrap_content"
-			        android:layout_alignParentTop="true"
-        			android:layout_toRightOf="@+id/buttonStart"
-					android:layout_marginTop="20dp"
-					android:onClick="onShortestBtnClick"
-					android:background="@null"
-					android:layout_alignRight="@+id/updateSwitch"
-			        android:src="@drawable/fast" />		   	
-      		    
-      		    
-		   	   	<Switch
-			   	    android:id="@+id/updateSwitch"
-			   	    android:layout_width="wrap_content"
-			   	    android:layout_height="wrap_content"
-					android:layout_below="@+id/buttonStart"
-					android:layout_toRightOf="@+id/buttonRefresh"
-					android:layout_marginTop="30dp"
-					android:layout_marginLeft="10dp"
-			   	    android:textOn="Auto"
-			   	    android:textOff="Manual"
-			   	    android:onClick="onUpdateSwitchClick"
-			   	    />
-   	   	
-				<ImageButton
-			        android:id="@+id/buttonRefresh"
-			        android:layout_width="70dp"
-			        android:layout_height="70dp"
-			   	    android:layout_below="@+id/buttonStart"
-					android:layout_marginTop="10dp"
-					android:layout_marginLeft="5dp"
-					android:background="@null"
-					android:onClick="onManualUpdateBtnClick"
-			        android:src="@drawable/green" />
-   	   		        
-				<TextView
-			 	    android:id="@+id/textViewConnect"
-			 	    android:layout_width="wrap_content"
-			 	    android:layout_height="wrap_content"
-					android:layout_below="@+id/buttonRefresh"
-					
-			 	    android:text="Bluetooth:"
-			 	    android:layout_marginLeft="5dp"
-			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
-   	   		        		   	
-				<TextView
-			 	    android:id="@+id/textViewStatus"
-			 	    android:layout_width="wrap_content"
-			 	    android:layout_height="wrap_content"
-			   		android:layout_below="@+id/textViewConnect"
-			   		
-			 	    android:text="Robot Status:"
-			 	    android:layout_marginLeft="5dp"
-			 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+			   	    android:orientation="vertical">
 				
-		   	   	<Switch
-			   	    android:id="@+id/tiltSwitch"
-			   	    android:layout_width="wrap_content"
-			   	    android:layout_height="wrap_content"
-					android:layout_alignParentTop="true"
-					android:layout_alignParentRight="true"
-			   	    android:textOn="Tilt On"
-			   	    android:textOff="Tilt Off"
-			   	    android:layout_marginTop="5dp"
-			   	    android:onClick="onTiltSwitchClick"/>
-		   	   	
-		   	   	<ImageButton
+	                <TextView
+				 	    android:id="@+id/textViewConnect"
+				 	    android:layout_width="match_parent"
+				 	    android:layout_height="wrap_content"
+				 	    android:text="Conn:"
+				 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+	                
+	                <View
+					    android:layout_width="match_parent"
+					    android:layout_height="1dp"
+					    android:background="@android:color/darker_gray"/>
+					                
+	                <TextView
+				 	    android:id="@+id/textViewRPIMAC"
+				 	    android:layout_width="match_parent"
+				 	    android:layout_height="wrap_content"
+				 	    android:text="RPI MAC: "
+				 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+	                
+	                <View
+					    android:layout_width="match_parent"
+					    android:layout_height="1dp"
+					    android:background="@android:color/darker_gray"/>
+	                
+	                <TextView
+				 	    android:id="@+id/textViewRPIName"
+				 	    android:layout_width="match_parent"
+				 	    android:layout_height="wrap_content"
+				 	    android:text="RPI Name: "
+				 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+	                
+	                <View
+					    android:layout_width="match_parent"
+					    android:layout_height="1dp"
+					    android:background="@android:color/darker_gray"/>
+	                
+	                <TextView
+				 	    android:id="@+id/textViewStatus"
+				 	    android:layout_width="match_parent"
+				 	    android:layout_height="wrap_content"
+				 	    android:text="Status: "
+				 	    android:textAppearance="?android:attr/textAppearanceSmall" />
+	                
+	   	    	</LinearLayout>
+   	    	</ScrollView>
+
+            <LinearLayout
+	            android:layout_width="0dp"
+		   	    android:layout_height="match_parent"
+		   	    android:orientation="vertical"
+		   	    android:layout_weight="1">
+			
+                <ImageButton
 		        	android:id="@+id/buttonConnect"
-			   	    android:layout_width="wrap_content"
-			   	    android:layout_height="wrap_content"
-			        android:layout_alignParentRight="true"
-	       			android:layout_below="@+id/tiltSwitch"
-					android:layout_marginTop="10dp"
+			   	    android:layout_width="match_parent"
+			   	    android:layout_height="match_parent"
+					android:scaleType="centerInside"
 					android:background="@null"
 			        android:src="@drawable/connect"
-			        android:onClick="" />
+			        android:onClick="autoConnect"/>
+                
+   	    	</LinearLayout>
+        </LinearLayout>
 
-
-			</RelativeLayout>
-		      
-		</LinearLayout>
-
-    </LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>
 

@@ -69,11 +69,11 @@ public class BluetoothService extends Service{
 	private static BluetoothAdapter mBluetoothAdapter;
 	private static ArrayList<String> arrayList;
 
-	//Random UUID
+	//Standard UUID
 	private static final UUID MY_UUID 
 		= UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	
-	//For connection and reconnection to remote device
+	//For manual connection and reconnection to remote device
 	private static String targetMACAddress = "";
 	private static String targetDeviceName = "";
 	private static String serverName = "MDP Tablet Group 2";
@@ -81,6 +81,10 @@ public class BluetoothService extends Service{
 	private static String connectedDeviceName = "";
 	private static int reconnectAttempt = 0;
 	private static boolean isServer = false;
+	
+	//For auto connection to remote device
+	private static String RPIMACAddress = "";
+	private static String RPIDeviceName = "";
 	
 	/*Service Binding
 	 * 
@@ -170,6 +174,14 @@ public class BluetoothService extends Service{
 		arrayList = new ArrayList<String>();
 		arrayList.add(deviceName + "\n" + MACAddress);
 		pairDevice(mBluetoothAdapter.getRemoteDevice(MACAddress));
+	}
+	
+	public void setRPIDeviceInfo(String nRPIDeviceName, String nRPIMACAddress){
+		if (nRPIMACAddress.equals("")){
+			return;
+		}
+		setDeviceInfo(nRPIDeviceName, nRPIMACAddress);
+		
 	}
 	
 	public ArrayList<String> getDeviceList(){
@@ -314,6 +326,15 @@ public class BluetoothService extends Service{
 		mConnectThread = new ConnectThread(device);
 		mConnectThread.start();
 		setState(STATE_CONNECTING, true);
+	}
+	
+	public void autoConnectAsClient(){
+		if (targetMACAddress.equals("")){
+			targetMACAddress = RPIMACAddress;
+			targetDeviceName = RPIDeviceName;
+		}
+		
+		connectAsClient();
 	}
 	
 	private void reconnectAsClient(){
