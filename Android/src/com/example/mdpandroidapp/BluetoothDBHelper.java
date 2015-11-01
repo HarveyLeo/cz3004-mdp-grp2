@@ -8,7 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class BluetoothDBHelper extends SQLiteOpenHelper{
 	
 	private static final String DB_NAME = "bluetooth";
-	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION = 2;
+	
 
 	public BluetoothDBHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -34,7 +35,7 @@ public class BluetoothDBHelper extends SQLiteOpenHelper{
 	
 	private void updateMyDatabase(SQLiteDatabase db, int oldVersion,
 		int newVersion){
-		if (oldVersion < 1){
+		if (oldVersion == 0){
 			db.execSQL("CREATE TABLE STRING_MESS ("
 					+ "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
 					+ "NAME TEXT, "
@@ -45,7 +46,19 @@ public class BluetoothDBHelper extends SQLiteOpenHelper{
 			insertString(db, "edit_text04", "start_coord(1,2)");
 			insertString(db, "edit_text05", "return to start zone");
 			insertString(db, "edit_text06", "request map update");
+			insertString(db, "RPIDeviceName", "");
+			insertString(db, "RPIMacAddr", "");
+			
+		}else if(oldVersion == 1){
+			insertString(db, "RPIDeviceName", "");
+			insertString(db, "RPIMacAddr", "");
 		}
 	}
+	
+	
+	
+	
+	
+	
 
 }

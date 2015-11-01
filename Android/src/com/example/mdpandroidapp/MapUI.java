@@ -5,79 +5,29 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-
-/**************/
+import android.widget.Toast;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-/**************/
 
-/*
-update actual map desc
-1. must pass 3 strings, robot pos, explored map and obstacle map
-2. keep the maparray
-3. perform the algorithm
-4. print the result
-
-update actual robot pos
-1. perform together with map update (must be passed together)
-
-update demo map desc
-1. must pass in one string, obstacle map.
-2. robot pos is updated separately and explored map is assumed to be fully explored
-3. clear the maparray (algorithm will ignore already explored cells)
-4. perform the algorithm
-5. print the result
-
-update demo robot pos
-1. must pass in one string, robot pos
-2. robot pos must be transformed to suit the algorithm
-	2a. input(x)(y)(orientation) will be switched to (row(y)))(col(x))(orientation)
-	2b. input (x)(y)(orientation) will be changed to (x+1)(y+1)(orientation), taking reference
-		from the center of the robot instead of the top left corner.
-3. keep the maparray
-4. perform the algorithm (clear the existing robot pos and insert new pos)
-5. print the result.
-
-misc
-1. map array will be cleared when user back out the activity
-2. switch will be reset to manual and disabled at the following conditions
-	- not connected
-	- disconnected
-	
-	
-	<ScrollView 
-        android:layout_width="match_parent"
-    	android:layout_height="0dp"
-    	android:layout_weight="1">
-		
-        <TextView
-          android:id="@+id/text_map_debug"
-          android:layout_width="match_parent"
-		  android:layout_height="wrap_content"
-		  android:text="Display debug message here"
-          />
-		        
-	</ScrollView>
-*/
 
 public class MapUI extends Activity implements SensorEventListener{
 	
@@ -96,6 +46,10 @@ public class MapUI extends Activity implements SensorEventListener{
 	//for status display
 	private TextView robotStatusView;
 	private TextView connectionStatusView;
+	private TextView RPIMACAddrView;
+	private TextView RPIDeviceNameView;
+	private String RPIMACAddr = "";
+	private String RPIDeviceName = "";
 	
 	//for update demonstration
 	private PixelGridView pixelGrid;
@@ -128,6 +82,8 @@ public class MapUI extends Activity implements SensorEventListener{
         
         robotStatusView = (TextView)findViewById(R.id.textViewStatus);
         connectionStatusView = (TextView)findViewById(R.id.textViewConnect);
+        RPIMACAddrView = (TextView)findViewById(R.id.textViewRPIMAC);
+        RPIDeviceNameView = (TextView)findViewById(R.id.textViewRPIName);
         //debugView = (TextView)findViewById(R.id.text_map_debug);
         updateSwitch = (Switch)findViewById(R.id.updateSwitch);
         manualUpdateBtn = (ImageButton)findViewById(R.id.buttonRefresh);
@@ -159,18 +115,46 @@ public class MapUI extends Activity implements SensorEventListener{
 		//Bind this activity to BluetoothService
 		Intent intent = new Intent(this, BluetoothService.class);
 		bindService(intent, connection, Context.BIND_AUTO_CREATE); 
+		
 	}
     
     @Override
 	protected void onResume(){
-		
+
 		super.onResume();
+		
+		//Read saved RPI MAC and name from DB.
+		try{
+			BluetoothDBHelper dbHelper = new BluetoothDBHelper(this);
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			
+			Cursor cursor = db.query("STRING_MESS", 
+				new String[]{"NAME", "DESCRIPTION"},
+				null, null, null, null, null);
+			if (cursor.moveToLast()){
+				RPIMACAddr = cursor.getString(1);
+				setRPIMacAddr(RPIMACAddr);
+			}
+			if (cursor.moveToPrevious()){
+				RPIDeviceName = cursor.getString(1);
+				setRPIDeviceName(RPIDeviceName);
+			}
+			cursor.close();
+			db.close();
+		}catch (SQLiteException e) { 
+			Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+		}
+		
 		if (bluetoothService == null){
 			setConnectStatus("Bluetooth State None");
 			disableUpdateSwitch();
 			return;
 		}
+		
+		bluetoothService.setRPIDeviceInfo(RPIDeviceName, RPIMACAddr);
 		bluetoothService.startToast();
+		
 		int mState = bluetoothService.getState();
 		switch(mState){
 			case BluetoothService.STATE_NONE:
@@ -242,6 +226,15 @@ public class MapUI extends Activity implements SensorEventListener{
 		pixelGrid.invalidate();
 	}
 	
+	public void enableBTBtnClick(View view){
+		Intent turnonBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		this.startActivity(turnonBTIntent);
+	}
+	
+	public void disableBTBtnClick(View view){
+		bluetoothService.turnOffBT();
+	}
+	
     //handle auto/ manual update switch
 	public void onUpdateSwitchClick(View view){
 		boolean on = ((Switch)view).isChecked();
@@ -259,6 +252,10 @@ public class MapUI extends Activity implements SensorEventListener{
 	public void onManualUpdateBtnClick(View view){
 		bluetoothService.write("sendArena");
 		listenForUpdate = true;
+	}
+	
+	public void autoConnect(View view){
+		bluetoothService.autoConnectAsClient();
 	}
 	
 	private void disableUpdateSwitch(){
@@ -383,12 +380,20 @@ public class MapUI extends Activity implements SensorEventListener{
 		//debugView.setText(logMessage);
 	}
 	
+	private void setRPIMacAddr(String message){
+		RPIMACAddrView.setText("RPI MAC: "+message);
+	}
+	
+	private void setRPIDeviceName(String message){
+		RPIDeviceNameView.setText("RPI Name: "+message);
+	}
+	
 	private void setConnectStatus(String message){
-		connectionStatusView.setText("Connection: "+message);
+		connectionStatusView.setText("Conn: "+message);
 	}
 	
 	private void setRobotStatus(String message){
-		robotStatusView.setText("Robot Status: "+message);
+		robotStatusView.setText("Status: "+message);
 	}
 	
 	private ServiceConnection connection = new ServiceConnection(){
@@ -420,12 +425,15 @@ public class MapUI extends Activity implements SensorEventListener{
 				default:
 					break;
 			}
+			bluetoothService.setRPIDeviceInfo(RPIDeviceName, RPIMACAddr);
 		}
 		@Override
 		public void onServiceDisconnected(ComponentName name){
 			bound = false;
 		}
 	};
+	
+	
 	
 	/********************************************************************************************************************************/
     //handle tilt switch

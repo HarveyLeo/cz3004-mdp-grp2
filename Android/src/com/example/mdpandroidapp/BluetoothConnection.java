@@ -9,10 +9,14 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
@@ -67,7 +71,13 @@ public class BluetoothConnection extends Activity {
 
 				String deviceInfo = (String)ListView.getItemAtPosition(position);
 				String[] deviceData = deviceInfo.split("\n");
+				//deviceName, MACAddress
 				bluetoothService.setDeviceInfo(deviceData[0], deviceData[1]);
+				bluetoothService.setRPIDeviceInfo(deviceData[0], deviceData[1]);
+				new UpdateStringTask().execute(
+						new String[] {"RPIDeviceName", deviceData[0]});
+				new UpdateStringTask().execute(
+						new String[] {"RPIMacAddr", deviceData[1]});
 				logMsg(String.format("Select name: %s, MAC: %s", 
 						deviceData[0], deviceData[1]));
 				singleDeviceListView(deviceData[0], deviceData[1]);
@@ -270,4 +280,31 @@ public class BluetoothConnection extends Activity {
 			bound = false;
 		}
 	};
+	
+	private class UpdateStringTask extends AsyncTask<String, Void, Boolean>{
+		
+		@Override
+		protected Boolean doInBackground(String... name) {
+			String[] values = (String[]) name;
+			ContentValues stringValues = new ContentValues();
+			stringValues.put("DESCRIPTION", values[1]);
+			BluetoothDBHelper dbHelper = 
+				new BluetoothDBHelper(BluetoothConnection.this);
+			try{
+				SQLiteDatabase db = dbHelper.getWritableDatabase();
+				db.update("STRING_MESS", stringValues, "NAME = ?", 
+					new String[] {values[0]});
+				db.close();
+				return true;
+			}catch(SQLiteException e){
+				return false;
+			}
+		}
+		@Override
+		protected void onPostExecute(Boolean success){ 
+			if (success){
+				logMsg("Text Saved");
+			}
+		}
+	}
 }
