@@ -1,0 +1,15 @@
+*.a
+*.o
+/examples/
+/lib_zipfiles/
+/avr_studio_5/templates/
+/avr_studio_5/stk500_xml/
+/installer.nsi
+/test/3pi-test/Debug
+*.atsuo
+
+
+
+*~
+\#*#
+.#*

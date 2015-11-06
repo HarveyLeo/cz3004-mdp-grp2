@@ -385,16 +385,6 @@ public class Controller {
 					_ui.setStatus("exploration not reaches goal zone");
 				}
 				
-				//Send Arduino the signal that exploration is done
-				try {
-					_pcClient.sendMessage(Message.EXPLORE_DONE + Message.SEPARATOR);
-					String msgExDone = _pcClient.readMessage();
-					while (!msgExDone.equals(Message.DONE)) {
-						msgExDone = _pcClient.readMessage();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 				
 				//Waiting for fastest path command for real run
 				if (!RobotSystem.isRealRun()) {

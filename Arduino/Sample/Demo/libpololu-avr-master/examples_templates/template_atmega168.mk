@@ -1,0 +1,3 @@
+DEVICE = atmega168
+MCU = atmega168
+AVRDUDE_DEVICE = m168

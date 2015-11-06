@@ -170,21 +170,33 @@ public class MazeExplorer {
 			_hasExploredTillGoal = false; //Timeout before reaching goal
 		}
 
-		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-		Path backPath;
-		boolean end = false;
+		
 
 //		if (!RobotSystem.isRealRun()) {
+//			boolean end = false;
 //			while (!controller.hasReachedTimeThreshold() && !areAllExplored() && !end) {
 //				end = ExploreNextRound(_robotPosition);
 //			}
 //		}
 		if (!isGoalPos(_robotPosition, START)) {
+			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+			Path backPath;
 			backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], START[0], START[1], _mazeRef);
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, false, false);
 		} 
-		
+				
 		if (RobotSystem.isRealRun()) {
+			//Send Arduino the signal that exploration is done
+			try {
+				PCClient pcClient = PCClient.getInstance();
+				pcClient.sendMessage(Message.EXPLORE_DONE + Message.SEPARATOR);
+				String msgExDone = pcClient.readMessage();
+				while (!msgExDone.equals(Message.DONE)) {
+					msgExDone = pcClient.readMessage();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			_robotOrientation = _robot.calibrateAtStartZone(_robotOrientation);
 		} else {
 			adjustOrientationTo(Orientation.NORTH);

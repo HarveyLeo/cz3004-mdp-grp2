@@ -1,0 +1,3 @@
+DEVICE = atmega48
+MCU = atmega48
+AVRDUDE_DEVICE = m48
